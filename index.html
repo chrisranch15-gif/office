@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Office"><meta name="theme-color" content="#F5F2EC">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Office · The Ranch Real Estate Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root,.t-daylight{--bg:#F7F5F1;--surface:#FFFFFF;--raised:#ECE7DF;--sep:#E6E0D6;--ph:#EAE5DC;--iconbg:#F3E9DA;--text:#1E2327;--text2:#3A3F43;--muted:#6B655C;--chev:#B5AEA3;--accent:#8C6A43;--good:#3F6B45;--warn:#9A4A2E;--btn:#1E2327;--btnText:#F7F5F1;--segOn:#FFFFFF;--shadow:0 1px 2px rgba(30,35,39,.05);--t-need:#A8663A;--t-day:#4C6A8A;--t-mail:#3F7468;--t-run:#7A7A3E;--t-list:#8E5A6B;--t-biz:#5E5A86;--tint:9%}
+.t-evening{--bg:#0F1214;--surface:#171B1E;--raised:#1D2226;--sep:#262C30;--ph:#23292D;--iconbg:#2A2419;--text:#F2EEE8;--text2:#CFC9C0;--muted:#A39D94;--chev:#5E5A54;--accent:#D4B48A;--good:#8FC29A;--warn:#E8A86A;--btn:#F2EEE8;--btnText:#0F1214;--segOn:#2E353A;--shadow:none;--t-need:#E0A26E;--t-day:#8FB0D6;--t-mail:#7EC2AE;--t-run:#C9C77F;--t-list:#D59AAE;--t-biz:#A9A4DE;--tint:13%}
+.t-heritage{--bg:#1F2A24;--surface:#26332C;--raised:#2E3C34;--sep:#35443B;--ph:#34433A;--iconbg:#3B3A2B;--text:#F3EBDD;--text2:#DDD3C2;--muted:#B3A891;--chev:#7D8A80;--accent:#C9A46A;--good:#A9CDA0;--warn:#E8B07A;--btn:#E9DCC3;--btnText:#1F2A24;--segOn:#3A4A40;--shadow:none;--t-need:#E6A872;--t-day:#9DB8CF;--t-mail:#A8D2B6;--t-run:#D8C27E;--t-list:#D9A39A;--t-biz:#B8B0D8;--tint:14%}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:24px 20px 140px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.mark{font-family:'Playfair Display',Georgia,serif;font-size:22px;letter-spacing:.02em}
+.seg{display:flex;gap:2px;padding:3px;border-radius:22px;background:var(--raised)}
+.seg button{min-height:36px;padding:0 13px;border:0;border-radius:18px;background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--segOn);color:var(--text);box-shadow:var(--shadow)}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--raised);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px}
+.hello{margin-top:48px}
+.date{margin:0;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:clamp(34px,7vw,48px);line-height:1.1;margin:10px 0 0}
+.status{margin:14px 0 0;display:flex;align-items:center;gap:10px;font-size:17px;color:var(--text2)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--good);flex:none}
+.dot.warn{background:var(--warn)}
+section{margin-top:36px}
+.h2row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 4px 10px}
+h2{margin:0;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.xbtn{width:44px;height:44px;border-radius:22px;border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--sep)}.xbtn:hover{color:var(--text)}.row.faded{opacity:.6}.moreline{display:flex;gap:18px;flex-wrap:wrap;padding:6px 4px 0}.pill.launch{gap:8px;min-height:40px;padding:0 18px}.pill.launch svg{width:18px;height:18px}
+.jump{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.jump a{padding:8px 14px;border-radius:18px;box-shadow:inset 0 0 0 1px var(--sep);color:var(--text);text-decoration:none;font-size:14px}.jump a:hover{background:var(--card)}section[id]{scroll-margin-top:16px}
+.linkbtn{background:none;border:0;padding:6px 0;color:var(--accent);font-size:14px;cursor:pointer}
+.group{background:var(--surface);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:16px 20px;position:relative}
+.row+.row:before{content:"";position:absolute;top:0;left:72px;right:0;height:1px;background:var(--sep)}
+.row.plain+.row.plain:before{left:20px}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--iconbg);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.body{flex:1 1 200px;min-width:0}
+.t{font-size:16px;font-weight:500}
+.s{font-size:14px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:22px;border:0;background:var(--btn);color:var(--btnText);font-size:15px;font-weight:500;text-decoration:none;cursor:pointer;white-space:nowrap}
+.pill.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--sep)}
+.pill[disabled]{opacity:.55;cursor:default}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow);min-width:0}
+.tile .k{font-size:13px;color:var(--muted)}
+.tile .v{font-family:'Playfair Display',Georgia,serif;font-size:30px;line-height:1.1}
+.live{font-size:13px;color:var(--good)}.live.warn{color:var(--warn)}.live.off{color:var(--muted)}
+.lrow{display:flex;align-items:center;gap:16px;padding:14px 20px;text-decoration:none;color:var(--text);position:relative;cursor:pointer;background:none;border:0;width:100%;text-align:left}
+.lrow+.lrow:before{content:"";position:absolute;top:0;left:100px;right:0;height:1px;background:var(--sep)}
+.thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--ph);flex:none}
+.chev{color:var(--chev);flex:none}
+.empty{padding:18px 20px;color:var(--muted);font-size:15px}
+.note{margin:12px 4px 0;font-size:13px;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;font-weight:500;letter-spacing:.04em;padding:3px 9px;border-radius:10px;background:var(--raised);color:var(--text2);margin-right:6px}
+.tag.now{background:var(--iconbg);color:var(--accent)}
+.dock{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,var(--bg) 38%);z-index:5}
+.dock form{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:54px;padding:0 8px 0 18px;border-radius:27px;background:var(--surface);box-shadow:0 2px 14px rgba(0,0,0,.08),inset 0 0 0 1px var(--sep)}
+.dock input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:16px}
+.dock button{width:40px;height:40px;border-radius:50%;border:0;background:var(--btn);color:var(--btnText);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet .card{background:var(--bg);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:26px 22px calc(26px + env(safe-area-inset-bottom))}
+.sheet h3{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:26px;margin:4px 0 12px}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.field label{font-size:13px;color:var(--muted)}
+.field input,.field textarea,.field select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--sep);background:var(--surface)}
+.field textarea{min-height:140px;resize:vertical;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--btn);color:var(--btnText);padding:11px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.skel{height:14px;border-radius:7px;background:var(--raised);width:60%;margin:6px 0}
+
+/* section color: each area of the business carries its own quiet tone */
+section{--tone:var(--accent)}
+section[data-tone=need]{--tone:var(--t-need)}section[data-tone=day]{--tone:var(--t-day)}section[data-tone=mail]{--tone:var(--t-mail)}section[data-tone=run]{--tone:var(--t-run)}section[data-tone=list]{--tone:var(--t-list)}section[data-tone=biz]{--tone:var(--t-biz)}
+section h2{display:flex;align-items:center;gap:10px;color:var(--text2)}
+section h2:before{content:"";width:18px;height:2px;border-radius:2px;background:var(--tone)}
+section .group:before{content:"";display:block;height:3px;background:linear-gradient(90deg,var(--tone),color-mix(in srgb,var(--tone) 35%,transparent))}
+section .ico{background:color-mix(in srgb,var(--tone) var(--tint),var(--surface));color:var(--tone)}
+section[data-tone=need] .group{background:linear-gradient(180deg,color-mix(in srgb,var(--tone) 5%,var(--surface)),var(--surface) 55%)}
+.who{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;background:color-mix(in srgb,var(--tone) var(--tint),var(--surface));color:var(--tone)}
+.tag{background:color-mix(in srgb,var(--tone,var(--accent)) var(--tint),var(--surface));color:var(--tone,var(--text2))}
+.tag.now{background:color-mix(in srgb,var(--t-need) 16%,var(--surface));color:var(--t-need)}
+.tile{position:relative;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--tone) 5%,var(--surface)),var(--surface) 70%)}
+.tile:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--tone),color-mix(in srgb,var(--tone) 35%,transparent))}
+.tile .v{color:var(--text)}
+.tile:nth-child(6n+1){--tone:var(--t-run)}.tile:nth-child(6n+2){--tone:var(--t-need)}.tile:nth-child(6n+3){--tone:var(--t-list)}.tile:nth-child(6n+4){--tone:var(--t-day)}.tile:nth-child(6n+5){--tone:var(--t-mail)}.tile:nth-child(6n+6){--tone:var(--t-biz)}
+.timecol{color:var(--tone)!important;font-weight:500}
+.brand{display:flex;flex-direction:column;line-height:1.1}.brand .sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+/* ============================================================
+   RANCH — the hub. Reads and writes the business Sheet, triages
+   Gmail with Claude, shows Metricool drafts and (once connected)
+   Google Calendar. Nothing is sent without a tap.
+   ============================================================ */
+const SHEET = '1ROkc-18VbSn7kkLZYrTyJYiooMDLbBxYR0SSWItll2E';
+const METRICOOL_BRAND = '6646044';
+const DESK_19917 = 'https://claude.ai/artifact/E6iKnuAbJ77ML5sArMqhEq#desk';
+const CALENDARS = ['chrisranch@kw.com', 'chrisranch15@gmail.com']; // work first: new events go on the KW calendar
+const NET_AGENTS = '~600 agents in 10 offices';
+const KITS = { '19917 145th St E': { brochure: 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf', social: ['just-listed-post', 'greenbelt-post', 'inside-1', 'inside-2', 'inside-3', 'inside-4', 'just-listed-story', 'greenbelt-story', 'inside-story'].map(n => 'https://homes.ranchpnw.com/social/' + n + '.jpg') } };
+const caps = { mcp: null, sample: null, db: null };
+const KIT = [
+  { ico: 'chart', t: 'Listing presentation', s: 'Seller slides: how you market and sell a home', links: [['Present', 'https://claude.ai/artifact/EeSHsjer6ZmdwBeXiqkh41'], ['Web version', 'https://homes.ranchpnw.com/sell']] },
+  { ico: 'doc', t: 'Seller brochure', s: 'Print piece to leave behind at the appointment', links: [['Open to print', 'https://claude.ai/artifact/Lhphx7onzrptYRs3VVsihc']] },
+  { ico: 'globe', t: 'Aaron & Holly · launch plan', s: 'Private plan from their Cloud CMA · 19917 145th St E', links: [['Open', 'https://homes.ranchpnw.com/plan/aaron-holly-4d7d4e75ad.html']] },
+  { ico: 'doc', t: '19917 · listing brochure', s: 'Two pages, letter size, QR to the listing page', links: [['Print PDF', 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf']] },
+  { ico: 'chart', t: '19917 · listing films', s: 'Full tour (64s) and vertical for Reels', links: [['Full tour', 'https://homes.ranchpnw.com/social/video/19917-full-tour.mp4'], ['Vertical', 'https://homes.ranchpnw.com/social/video/19917-vertical-30.mp4']] },
+  { ico: 'phone', t: 'For agents', s: 'Why agents join The Ranch Real Estate Group', links: [['Present', 'https://claude.ai/artifact/2tnLxKwbXZZkFd4Gz41SxZ']] },
+  { ico: 'globe', t: 'For brokerages', s: 'Groundwork: the system as a product', links: [['Present', 'https://claude.ai/artifact/D8brh9kw3wY32NKdebFzqE']] }
+];
+const S = { theme: 'daylight', data: {}, err: {}, busy: {}, sheet: null, inbox: null, cal: null, posts: null, at: null };
+
+/* ---------- tiny helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => n == null || n === '' || isNaN(Number(n)) ? '—' : '$' + Math.round(Number(n)).toLocaleString('en-US');
+const k$ = n => n == null || isNaN(n) ? '—' : n >= 1e6 ? '$' + (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M' : n >= 1e3 ? '$' + Math.round(n / 1e3) + 'K' : '$' + Math.round(n);
+const ago = t => { if (!t) return ''; const s = (Date.now() - t) / 1000; return s < 90 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 ? Math.round(s / 3600) + 'h ago' : Math.round(s / 86400) + 'd ago'; };
+const toDate = v => { if (!v) return null; const t = new Date(String(v).replace(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/, '$3-$1-$2')).getTime(); return isNaN(t) ? null : t; };
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => el.classList.remove('on'), 2600); }
+function doneIds() { const ids = new Set(((S.sheet && S.sheet.done) || []).map(r => r[1])); try { JSON.parse(store('done') || '[]').forEach(i => ids.add(i)); } catch (e) { } return ids; }
+function markDone(m, how) { try { const l = JSON.parse(store('done') || '[]'); l.push(m.id); store('done', JSON.stringify(l.slice(-300))); } catch (e) { }
+  append('Hub done', [[nowStamp(), m.id, how, m.subject]]).catch(() => { }); }
+function inboxView() { const done = doneIds(), all = S.inbox || [];
+  return { open: all.filter(m => !done.has(m.id) && !m.replied), replied: all.filter(m => !done.has(m.id) && m.replied), cleared: all.filter(m => done.has(m.id)) }; }
+function store(k, v) { try { if (v === undefined) return localStorage.getItem('ranch.' + k); localStorage.setItem('ranch.' + k, v); } catch (e) { return null; } }
+function payloadOf(r) { let p = r && (r.payload !== undefined ? r.payload : r); if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) {} } if (p && p.content && Array.isArray(p.content)) { const t = p.content.find(c => c.type === 'text'); if (t) { try { p = JSON.parse(t.text); } catch (e) { p = t.text; } } } return p; }
+async function tool(server, name, input) { if (!caps.mcp) throw new Error('Open Ranch on claude.ai to connect your accounts.'); return payloadOf(await caps.mcp.callTool(server, name, input)); }
+const rows = p => ((p && p.values) || []);
+const sheetRows = async range => rows(await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range })).slice(1);
+const append = (tab, values) => tool('Google Sheets', 'append_values', { spreadsheetId: SHEET, range: tab + '!A1', values });
+const nowStamp = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+const I = {
+  check: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l3 3 5-6"/></svg>',
+  mail: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>',
+  phone: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  globe: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+  cal: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  chart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  doc: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>',
+  chev: '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+  plus: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  up: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
+};
+
+/* ---------- loading ---------- */
+async function loadSheet() {
+  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200" };
+  const out = {};
+  await Promise.all(Object.keys(tabs).map(async k => { try { out[k] = await sheetRows(tabs[k]); } catch (e) { out[k] = null; S.err.sheet = e.message || String(e); } }));
+  S.sheet = out; S.at = Date.now();
+}
+async function loadPosts() {
+  try {
+    const now = new Date(), to = new Date(Date.now() + 21 * 864e5);
+    const iso = d => d.toISOString().slice(0, 19) + '-08:00';
+    const p = await tool('Metricool Social Media Management', 'getScheduledPosts', { brandId: METRICOOL_BRAND, fromDate: iso(now), toDate: iso(to), timezone: 'America/Los_Angeles' });
+    const list = Array.isArray(p) ? p : (p && (p.data || p.posts)) || [];
+    S.posts = list.map(x => ({ text: String(x.text || ''), draft: !!x.draft, when: x.publicationDate && x.publicationDate.dateTime, url: x.plannerUrl || 'https://app.metricool.com/planner' }));
+  } catch (e) { S.posts = null; S.err.posts = e.message || String(e); }
+}
+async function loadCalendar() {
+  try {
+    const loc = d => { const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T00:00:00`; };
+    const start = new Date(); start.setHours(0, 0, 0, 0); const end = new Date(start.getTime() + 2 * 864e5);
+    const got = await Promise.all(CALENDARS.map(c => tool('Google Calendar', 'list_events', { calendarId: c, startTime: loc(start), endTime: loc(end), pageSize: 25, orderBy: 'startTime' }).then(p => ({ c, list: (p && p.events) || [] })).catch(() => ({ c, list: [] }))));
+    const byId = {};
+    got.forEach(({ c, list }) => list.filter(e => e.status !== 'cancelled').forEach(e => {
+      const me = (e.attendees || []).find(a => a.self), mine = (e.attendees || []).filter(a => CALENDARS.indexOf(a.email) >= 0);
+      const answered = mine.some(a => a.responseStatus && a.responseStatus !== 'needsAction');
+      const item = byId[e.id] || { id: e.id, title: e.summary || 'Busy', start: (e.start && (e.start.dateTime || e.start.date)), where: e.location || '', link: e.htmlLink || '', from: e.organizer && e.organizer.email, invite: false, cal: c, answered: false };
+      item.answered = item.answered || answered || !!(e.organizer && e.organizer.self);
+      if (me && me.responseStatus === 'needsAction') item.cal = c;
+      item.invite = !item.answered && !!(me && me.responseStatus === 'needsAction');
+      byId[e.id] = item;
+    }));
+    S.cal = Object.values(byId).filter(e => e.start).sort((a, b) => new Date(a.start) - new Date(b.start));
+  } catch (e) { S.cal = null; S.err.cal = e.message || String(e); }
+}
+async function loadInbox() {
+  S.busy.inbox = true; render();
+  try {
+    const p = await tool('Gmail', 'search_threads', { query: 'in:inbox newer_than:3d -category:promotions -category:social -category:updates -from:me', pageSize: 25, view: 'THREAD_VIEW_SUMMARY' });
+    const th = ((p && p.threads) || []).map(t => { const m = (t.messages || [])[0] || {}; return { id: t.id, msgId: m.id, from: m.sender || '', subject: m.subject || '(no subject)', snippet: m.snippet || '', date: m.date, url: t.viewUrl || m.viewUrl }; }).filter(t => t.msgId);
+    try {
+      const sp = await tool('Gmail', 'search_threads', { query: 'in:sent newer_than:4d', pageSize: 50, view: 'THREAD_VIEW_SUMMARY' });
+      const sent = {}; ((sp && sp.threads) || []).forEach(t => { const ds = (t.messages || []).map(m => Date.parse(m.date)).filter(n => !isNaN(n)); sent[t.id] = ds.length ? Math.max(...ds) : Infinity; });
+      th.forEach(t => { if (t.id in sent) { const got = Date.parse(t.date); t.replied = isNaN(got) || sent[t.id] >= got; } });
+    } catch (e) { /* sent check is best-effort */ }
+    let triage = [];
+    if (caps.sample && th.length) {
+      const addrs = (S.sheet && S.sheet.listings || []).map(r => r[0]).filter(Boolean).join('; ');
+      const out = await caps.sample.json(`You triage email for Chris Ranch, a luxury real estate agent (The Ranch Real Estate Group, Keller Williams, Puget Sound). Active listings: ${addrs}.
+For each email decide urgency: "now" (someone is waiting on a reply or action from Chris today: a client, buyer, seller, agent, lender, escrow or title with a question, deadline, offer or inspection item), "today" (needs a reply or action, but this week is fine), "fyi" (worth knowing but no reply needed: confirmations, receipts, signed-document notices, CCs, ShowingTime notices, FYI updates), "later" (low priority), or "skip" (newsletters, marketing, automated noise). Only use "now" or "today" when Chris actually has to respond or act.
+Only when urgency is "now" or "today" and a reply from Chris is expected, write a short, warm, professional reply in his voice (first person, no sign-off name, no promises about price or legal terms, never invent facts — if a fact is unknown, say he'll confirm). Otherwise reply = "".
+Match "deal" to one listing address if clearly related, else "".
+Return JSON array: [{"i": index, "urgency": "now"|"today"|"fyi"|"later"|"skip", "why": "<= 12 words", "deal": "", "reply": ""}]
+EMAILS:
+${th.map((t, i) => `[${i}] From: ${t.from}\nSubject: ${t.subject}\nPreview: ${t.snippet.slice(0, 400)}`).join('\n\n')}`, { modelTier: 'default', cache: false });
+      triage = Array.isArray(out) ? out : (out && out.items) || [];
+    }
+    const rank = { now: 0, today: 1, fyi: 2, later: 3, skip: 4 };
+    S.inbox = th.map((t, i) => Object.assign(t, triage.find(x => Number(x.i) === i) || { urgency: caps.sample ? 'later' : 'today', why: '', reply: '' }))
+      .filter(t => t.urgency !== 'skip').sort((a, b) => rank[a.urgency] - rank[b.urgency]);
+    store('inbox', JSON.stringify({ at: Date.now(), items: S.inbox }));
+  } catch (e) { S.err.inbox = e.message || String(e); }
+  S.busy.inbox = false; render();
+}
+async function loadAll() {
+  S.busy.all = true; render();
+  await loadSheet(); render();
+  await Promise.all([loadPosts(), loadCalendar()]);
+  S.busy.all = false; render();
+  const cached = JSON.parse(store('inbox') || 'null');
+  if (cached && Date.now() - cached.at < 20 * 60e3) { S.inbox = cached.items; render(); } else loadInbox();
+}
+
+/* ---------- derived ---------- */
+function latestBy(list, key) { const m = {}; (list || []).forEach(r => { const k = r[key]; if (k) m[k] = r; }); return Object.values(m); }
+function localPhoto(u) { if (S.officeMode) return u; const m = /\/photos\/([a-z0-9-]+?)(?:-\d+)?\.(?:webp|jpe?g)$/i.exec(String(u || '')); return m ? 'thumbs/' + m[1] + '.jpg' : u; }
+const RAINIER = { name: 'Anthony', sms: '+12539880028', email: 'anthony@rainierrephoto.com', order: 'https://view.rainierrephoto.com/order' };
+const PKGS = ['Essentials: HDR photos, 2D floor plan, aerial, marketing kit', 'HDR photos + 2D floor plan', 'HDR photos only'];
+const ADDONS = ['Aerial photos', 'Twilight photos', 'Video', '3D tour', 'Floor plan'];
+function hk(s) { const m = String(s || '').toLowerCase().replace(/street/g, 'st').replace(/[^a-z0-9 ]/g, ' ').match(/^\s*(\d+)\s+(\S+)(?:\s+(\S+))?/); return m ? m.slice(1).filter(Boolean).join(' ') : ''; }
+function shoots() { const by = {}; ((S.sheet && S.sheet.shoots) || []).slice(1).forEach(r => { if (r[0]) by[r[0]] = { address: r[1], status: r[2], order: r[3], pkg: r[4], total: r[5], ordered: r[6], ready: r[7], page: r[8], photos: r[9] }; }); return by; }
+function shootFor(a) { return shoots()[hk(a)]; }
+const KNOWN = { '19917 145th st': { sqft: 2772, beds: 5, baths: 2.75, city: 'Bonney Lake', zip: '98391' } };
+function listings() { return (S.sheet && S.sheet.listings || []).filter(r => r[0]).map(r => ({ address: r[0], city: r[1], price: r[2], status: r[3] || 'Active', sellers: r[4], page: r[5], desk: r[6], code: r[7], listed: toDate(r[8]), photo: r[9] })); }
+function deals() { return latestBy(S.sheet && S.sheet.deals, 1).map(r => ({ address: r[1], side: r[2], status: r[3], price: Number(String(r[4]).replace(/[^\d.]/g, '')) || 0, pct: Number(String(r[5]).replace(/[^\d.]/g, '')) || 0, gci: Number(String(r[6]).replace(/[^\d.]/g, '')) || 0, contract: toDate(r[7]), closing: toDate(r[8]), notes: r[9] })); }
+function business() {
+  const ds = deals(), y = new Date().getFullYear(), gci = d => d.gci || (d.price && d.pct ? d.price * d.pct / 100 : 0);
+  const closed = ds.filter(d => /closed|sold/i.test(d.status) && d.closing && new Date(d.closing).getFullYear() === y);
+  const pending = ds.filter(d => /pending|contract/i.test(d.status));
+  const soon = pending.filter(d => d.closing && d.closing - Date.now() < 30 * 864e5 && d.closing > Date.now() - 864e5);
+  const active = ds.filter(d => /active|coming/i.test(d.status));
+  const missingPct = ds.filter(d => !d.gci && !d.pct && !/closed/i.test(d.status)).length;
+  return { ytd: closed.reduce((a, d) => a + gci(d), 0), pending: pending.reduce((a, d) => a + gci(d), 0), soon, active, activeVolume: active.reduce((a, d) => a + d.price, 0), missingPct, any: ds.length };
+}
+function checks() {
+  const r = (S.sheet && S.sheet.checks) || []; if (!r.length) return null;
+  const last = r.map(x => toDate(x[0])).filter(Boolean).sort((a, b) => b - a)[0];
+  const run = r.filter(x => Math.abs(toDate(x[0]) - last) < 30 * 60e3);
+  return { at: last, total: run.length, bad: run.filter(x => !/^ok/i.test(x[3] || '')).map(x => ({ site: x[1], url: x[2], detail: x[4] })) };
+}
+function needs() {
+  const out = [], sh = S.sheet || {};
+  (sh.showings || []).forEach(r => {
+    const at = toDate(r[2]), ph = String(r[5] || '').replace(/[^\d]/g, '').replace(/^1?(\d{10})$/, '+1$1');
+    if (!at || !ph || /cancel|declin/i.test(r[7] || '') || Date.now() - at < 3600e3 || Date.now() - at > 3 * 864e5) return;
+    const first = String(r[3] || '').split(' ')[0] || 'there', street = String(r[1] || '').replace(/ Unit#.*$/, '');
+    const body = showText('fb', first, showAddr(r[1]), at);
+    out.push({ ico: I.phone, t: `Feedback · ${street}`, s: `${r[3] || 'Buyer’s agent'}${r[4] ? ' · ' + r[4] : ''} · showed ${new Date(at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`, acts: `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(body)}">Text for feedback</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a>` });
+  });
+  (sh.leads || []).filter(r => r[9] === 'New' && r[8] !== 'test' && Date.now() - toDate(r[0]) < 7 * 864e5).slice(-6).reverse().forEach(r => {
+    const tel = String(r[3] || '').replace(/[^\d+]/g, '');
+    out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : ''].join('') });
+  });
+  { const nw = inboxView().open.filter(m => m.urgency === 'now'); if (nw.length) out.push({ ico: I.mail, t: `${nw.length} email${nw.length > 1 ? 's' : ''} need${nw.length > 1 ? '' : 's'} you today`, s: nw.slice(0, 3).map(m => m.from.replace(/<.*>/, '').replace(/"/g, '').trim()).join(' · '), acts: `<button class="pill ghost" data-act="goinbox">See inbox</button>` }); }
+  (S.cal || []).filter(e => e.invite).forEach(e => out.push({ ico: I.cal, t: 'Invitation · ' + e.title, s: new Date(e.start).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) + (e.from ? ' · from ' + e.from : ''), acts: `<button class="pill" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="accepted">Accept</button><button class="pill ghost" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="declined">Decline</button>` }));
+  Object.values(shoots()).filter(x => /ready/i.test(x.status) && x.ready && Date.now() - toDate(x.ready) < 4 * 864e5).forEach(x => out.push({ ico: I.check, t: `Photos ready · ${x.address}`, s: 'From Rainier · download all, or ask Claude to bring them into the listing', acts: `<a class="pill" href="${esc(x.page)}" target="_blank" rel="noopener">Open photos</a>` }));
+  const drafts = (S.posts || []).filter(p => p.draft);
+  if (drafts.length) out.push({ ico: I.check, t: `Approve ${drafts.length} social post${drafts.length > 1 ? 's' : ''}`, s: 'Drafts in Metricool · nothing posts until you schedule', acts: `<a class="pill" href="${esc(drafts[0].url)}" target="_blank" rel="noopener">Review</a>` });
+  const ck = checks(); if (ck && ck.bad.length) out.push({ ico: I.globe, t: `${ck.bad.length} website issue${ck.bad.length > 1 ? 's' : ''}`, s: ck.bad.map(b => b.site + ': ' + b.detail).join(' · ').slice(0, 160), acts: `<a class="pill ghost" href="${esc(ck.bad[0].url)}" target="_blank" rel="noopener">Look</a>` });
+  const mk = (sh.marketing || []).map(r => r[2] || '');
+  listings().filter(l => /active/i.test(l.status) && l.page).forEach(l => {
+    if (!mk.some(w => /agent network/i.test(w))) out.push({ ico: I.mail, t: `Agent-network email · ${l.address}`, s: `${NET_AGENTS} · draft is waiting in Gmail`, acts: `<a class="pill" href="https://mail.google.com/mail/u/0/#drafts" target="_blank" rel="noopener">Open draft</a><button class="pill ghost" data-act="sent-network" data-a="${esc(l.address)}">I sent it</button>` });
+    const pr = latestBy((sh.portals || []).filter(r => r[1] === l.address), 2);
+    const last = pr.map(r => toDate(r[0])).sort((a, b) => b - a)[0];
+    if (!last || Date.now() - last > 7 * 864e5) out.push({ ico: I.chart, t: `Zillow & Redfin numbers · ${l.address}`, s: last ? 'Last updated ' + ago(last) : 'Not entered yet — the sellers see these first', acts: `<button class="pill ghost" data-act="portals" data-a="${esc(l.address)}">Update</button>` });
+  });
+  listings().filter(l => /active/i.test(l.status) && !l.page).forEach(l => out.push({ ico: I.plus, t: `${l.address} has no page yet`, s: 'Launch kit: page, Desk, seller portal, posts', acts: `<button class="pill ghost" data-act="launch" data-a="${esc(l.address)}">Launch</button>` }));
+  return out;
+}
+
+/* ---------- views ---------- */
+function mailRow(m, faded) {
+  const who = (m.from.replace(/<.*>/, '').replace(/"/g, '').trim().match(/\b\w/g) || ['·']).slice(0, 2).join('').toUpperCase();
+  return `<div class="row${faded ? ' faded' : ''}"><span class="who" aria-hidden="true">${esc(who)}</span><div class="body"><div class="t">${faded ? `<span class="tag">${m.replied ? 'Replied' : 'Cleared'}</span>` : m.urgency === 'now' ? '<span class="tag now">Reply today</span>' : m.urgency === 'today' ? '<span class="tag">Reply this week</span>' : m.urgency === 'fyi' ? '<span class="tag">No reply needed</span>' : ''}${esc(m.subject)}</div><div class="s">${esc(m.from.replace(/<.*>/, '').trim())}${m.why ? ' · ' + esc(m.why) : ''}${m.deal ? ' · ' + esc(m.deal) : ''}</div></div><div class="acts">${!faded && m.reply ? `<button class="pill ghost" data-act="reply" data-id="${esc(m.id)}">Reply</button>` : ''}${m.url ? `<a class="pill ghost" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}${faded ? '' : `<button class="xbtn" data-act="mdone" data-id="${esc(m.id)}" aria-label="Done with ${esc(m.subject)}" title="Done — clear it">✕</button>`}</div></div>`;
+}
+function inboxHtml() {
+  if (S.inbox == null) return `<div class="group"><div class="empty">${S.busy.inbox ? 'Claude is reading the last three days…' : esc(S.err.inbox || 'Not loaded yet.')}</div></div>`;
+  const v = inboxView(), main = v.open.filter(m => m.urgency === 'now' || m.urgency === 'today'), later = v.open.filter(m => m.urgency !== 'now' && m.urgency !== 'today'), past = v.replied.concat(v.cleared);
+  const showLater = S.showLater || !main.length, rows = main.concat(showLater ? later : []);
+  return `<div class="group">${rows.length ? rows.map(m => mailRow(m)).join('') : '<div class="empty">You’re caught up. Nothing needs a reply.</div>'}</div>
+    <div class="moreline">${!showLater && later.length ? `<button class="linkbtn" data-act="later">${later.length} FYI or can wait · show</button>` : ''}${past.length ? `<button class="linkbtn" data-act="past">${S.showPast ? 'Hide' : 'Show'} ${v.replied.length ? v.replied.length + ' replied' : ''}${v.replied.length && v.cleared.length ? ' · ' : ''}${v.cleared.length ? v.cleared.length + ' cleared' : ''}</button>` : ''}</div>
+    ${S.showPast && past.length ? `<div class="group">${past.map(m => mailRow(m, true)).join('')}</div>` : ''}`;
+}
+function todayList(d) { // calendar + showings; Gmail-made "Showing confirmed" events give way to the full showing
+  const sh = showRows(), near = e => sh.some(x => Math.abs(x.at - new Date(e.start).getTime()) < 10 * 60e3);
+  const ev = (S.cal || []).filter(e => !(/^showing (confirmed|requested)/i.test(e.title) && near(e))).map(e => ({ e, at: new Date(e.start).getTime() }));
+  return ev.concat(sh.map(x => Object.assign({ show: true }, x))).sort((a, b) => a.at - b.at).slice(0, 8);
+}
+function dayWord(at) { const a = new Date(at), n = new Date(); a.setHours(0, 0, 0, 0); n.setHours(0, 0, 0, 0); const d = Math.round((a - n) / 864e5);
+  return d === 0 ? 'today' : d === 1 ? 'tomorrow' : d === -1 ? 'yesterday' : 'on ' + new Date(at).toLocaleDateString('en-US', { weekday: 'long' }); }
+function showAddr(h) { return String(h || '').replace(/,\s*Washington.*$/i, '').replace(/(,[^,]*),.*$/, '$1').replace(/\s+Unit#\s*/i, ' #').replace(/\bStreet\b/, 'St').replace(/\bAvenue\b/, 'Ave'); }
+function showText(kind, first, addr, at) { const t = new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return kind === 'pre' ? `Hi ${first}, this is Chris Ranch with Keller Williams Realty. Thanks for booking ${addr} ${dayWord(at)} at ${t}. If you have any questions or need help with access, just reach out. I'm here to help! I'll follow up afterward for feedback. Thank you!`
+    : `Hi ${first}, this is Chris Ranch with Keller Williams Realty, following up on your ${t} showing at ${addr} ${dayWord(at)}. Thanks again for showing it! Do you or your buyers have any questions, feedback or interest I can pass along to my sellers? Thank you!`; }
+function showRows() { // seller-side showings from the Sheet, today through tomorrow
+  const now = new Date(), a = new Date(now); a.setHours(0, 0, 0, 0); const b = a.getTime() + 2 * 864e5;
+  const latest = {}; ((S.sheet && S.sheet.showings) || []).forEach(r => { if (r[0]) latest[r[0]] = r; });
+  return Object.values(latest).map(r => ({ r, at: toDate(r[2]) })).filter(x => x.at && x.at >= a.getTime() && x.at < b && !/cancel|declin/i.test(x.r[7] || '')).sort((x, y) => x.at - y.at);
+}
+function showingRow(x, d) {
+  const r = x.r, t = new Date(x.at), first = String(r[3] || '').split(' ')[0] || 'there', street = showAddr(r[1]);
+  const ph = String(r[5] || '').replace(/[^\d]/g, '').replace(/^1?(\d{10})$/, '+1$1'), day = t.toDateString() === d.toDateString() ? 'today' : t.toLocaleDateString('en-US', { weekday: 'long' });
+  const when = t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }), past = Date.now() > x.at + 30 * 60e3;
+  const msg = showText(past ? 'fb' : 'pre', first, showAddr(r[1]), x.at);
+  const sms = ph ? `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}">${past ? 'Text for feedback' : 'Text agent'}</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a>`
+    : r[6] ? `<a class="pill ghost" href="mailto:${esc(r[6])}?subject=${encodeURIComponent(street)}&body=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Email agent</a><span class="s" style="align-self:center">No phone in ShowingTime</span>` : '';
+  return `<div class="row plain"><div class="timecol" style="width:64px;flex:none;font-size:14px;color:var(--muted)">${when}${t.toDateString() !== d.toDateString() ? '<br>' + t.toLocaleDateString('en-US', { weekday: 'short' }) : ''}</div><div class="body"><div class="t">Showing · ${esc(street)}</div><div class="s">${esc([r[3] || 'Buyer’s agent', r[4], r[7]].filter(Boolean).join(' · '))}</div></div><div class="acts">${sms}</div></div>`;
+}
+function render() {
+  document.documentElement.className = 't-' + S.theme;
+  const d = new Date(), h = d.getHours();
+  const hi = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const n = S.sheet ? needs() : [], ck = checks(), biz = business();
+  const statusLine = !S.sheet ? 'Getting your day ready…' : n.length === 0 ? 'Everything is running. Nothing needs you.' : `Everything is running. ${n.length === 1 ? 'One thing needs' : (n.length < 10 ? ['', '', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][n.length] : n.length) + ' things need'} a tap.`;
+  $('#root').innerHTML = `<div class="wrap">
+  <header class="top"><span class="brand"><span class="mark">The Hub</span><span class="sub">Your whole business</span></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="seg" role="group" aria-label="Look">${[['daylight', 'Daylight'], ['evening', 'Evening'], ['heritage', 'Heritage']].map(([k, l]) => `<button type="button" data-act="theme" data-v="${k}" aria-pressed="${S.theme === k}">${l}</button>`).join('')}</div>
+      <span class="avatar" aria-hidden="true">CR</span></div></header>
+  <div class="hello"><p class="date">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+    <h1>${hi}, Chris.</h1>
+    <p class="status"><span class="dot${n.length ? '' : ''}"></span>${esc(statusLine)}</p></div>
+  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['kit','Presentations'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+  ${!caps.mcp && S.ready && !S.officeMode ? `<section><div class="group"><div class="row"><div class="ico">${I.globe}</div><div class="body"><div class="t">Open Ranch on claude.ai</div><div class="s">Your Gmail, Sheet and social accounts connect there. This view is a preview.</div></div></div></div></section>` : ''}
+
+  <section aria-label="Listings" data-tone="list" id="listings"><div class="h2row"><h2>Listings</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pill ghost launch" data-act="shoot">${I.cal}<span>Order photos</span></button><button class="pill launch" data-act="launch">${I.plus}<span>Launch a listing</span></button></span></div>
+    <div class="group">${listings().length ? '' : '<div class="empty">No listings yet. Launch your first one.</div>'}${listings().map(l => `<button class="lrow" data-act="listing" data-a="${esc(l.address)}">${l.photo ? `<img class="thumb" src="${esc(localPhoto(l.photo))}" alt="" onerror="this.onerror=null;this.src='${esc(l.photo)}'">` : '<span class="thumb" aria-hidden="true"></span>'}<span class="body"><span class="t" style="display:block">${esc(l.address)}</span><span class="s" style="display:block">${esc([l.city, money(l.price), l.listed ? 'Day ' + (Math.floor((Date.now() - l.listed) / 864e5) + 1) : l.page ? '' : 'needs a page', (shootFor(l.address) || {}).status ? 'Photos: ' + shootFor(l.address).status.toLowerCase() : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('')}</div></section>
+
+
+  <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; print</h2></div>
+    <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
+    <p class="note">Slides present full screen and download as PowerPoint or PDF from the top of the deck. Brochures print from the Print button.</p></section>
+
+  <section aria-label="Needs you" data-tone="need" id="needs"><div class="h2row"><h2>Needs you</h2><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Refreshing…' : 'Refresh'}</button></div>
+    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div><div class="skel" style="width:40%"></div></div>' : n.length ? n.map(x => `<div class="row"><div class="ico">${x.ico}</div><div class="body"><div class="t">${esc(x.t)}</div>${x.s ? `<div class="s">${esc(x.s)}</div>` : ''}</div><div class="acts">${x.acts}</div></div>`).join('') : '<div class="empty">All clear. Enjoy the quiet.</div>'}</div></section>
+
+  <section aria-label="Today" data-tone="day" id="today"><div class="h2row"><h2>Today</h2></div>
+    <div class="group">${S.cal ? (todayList(d).length ? todayList(d).map(x => x.show ? showingRow(x, d) : (e => { const t = new Date(e.start); const allDay = String(e.start).length <= 10; return `<div class="row plain"><div class="timecol" style="width:64px;flex:none;font-size:14px;color:var(--muted)">${allDay ? 'All day' : t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}${t.getDate() !== d.getDate() ? '<br>' + t.toLocaleDateString('en-US', { weekday: 'short' }) : ''}</div><div class="body"><div class="t">${esc(e.title)}</div>${e.where ? `<div class="s">${esc(e.where)}</div>` : ''}</div>${e.invite ? `<div class="acts"><button class="pill" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="accepted">Accept</button><button class="pill ghost" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="declined">Decline</button></div>` : e.link ? `<a class="pill ghost" href="${esc(e.link)}" target="_blank" rel="noopener">Open</a>` : ''}</div>`; })(x.e)).join('') : '<div class="empty">Nothing on the calendar today or tomorrow.</div>')
+      : `<div class="row"><div class="ico">${I.cal}</div><div class="body"><div class="t">Connect Google Calendar</div><div class="s">Your day appears here, and “Tell Ranch” can add showings and open houses. Connect it in claude.ai → Settings → Connectors.</div></div></div>`}</div></section>
+
+  <section aria-label="Inbox" data-tone="mail" id="inbox"><div class="h2row"><h2>Inbox, sorted</h2><button class="linkbtn" data-act="inbox" ${S.busy.inbox ? 'disabled' : ''}>${S.busy.inbox ? 'Reading…' : 'Re-sort'}</button></div>
+    ${inboxHtml()}
+    <p class="note">Claude reads, ranks and drafts. Replies go to your Gmail drafts. You press send. Tap ✕ when one is handled.</p></section>
+
+  <section aria-label="Running for you" data-tone="run"><div class="h2row"><h2>Running for you</h2></div>
+    <div class="tiles">
+      ${tile(ck ? (ck.bad.length ? 'warn' : '') : 'off', ck ? (ck.bad.length ? ck.bad.length + ' issue' + (ck.bad.length > 1 ? 's' : '') : '● Healthy') : '○ First check tonight', 'Websites', ck ? `${ck.total} pages checked ${ago(ck.at)}` : 'Every page, price and form, checked each morning')}
+      ${tile('', '● Live', 'Leads', 'Emailed to you the moment they come in')}
+      ${tile('', '● Live', 'Seller portals', 'Visits, social and feedback, always current')}
+      ${tile(S.posts ? '' : 'off', S.posts ? '● Connected' : '○ Not reached', 'Social', S.posts ? `${S.posts.length} post${S.posts.length === 1 ? '' : 's'} planned in Metricool` : 'Metricool drafts and results')}
+      ${tile((S.sheet && S.sheet.docs || []).length ? '' : 'off', (S.sheet && S.sheet.docs || []).length ? '● Filing' : '○ Starting tonight', 'Deal documents', (S.sheet && S.sheet.docs || []).length ? `${S.sheet.docs.length} PDF${S.sheet.docs.length > 1 ? 's' : ''} saved to Drive` : 'PDFs from email filed by address in Drive')}
+      ${tile('', '● Live', 'Town guides', 'Bonney Lake questions at 9 each morning')}
+    </div></section>
+
+
+
+  <section aria-label="Business" data-tone="biz"><div class="h2row"><h2>Business</h2><button class="linkbtn" data-act="deal">Add or update a deal</button></div>
+    <div class="tiles">
+      <div class="tile"><span class="k">GCI closed this year</span><span class="v">${biz.ytd ? k$(biz.ytd) : '—'}</span></div>
+      <div class="tile"><span class="k">Pending GCI</span><span class="v">${biz.pending ? k$(biz.pending) : '—'}</span></div>
+      <div class="tile"><span class="k">Active volume</span><span class="v">${biz.activeVolume ? k$(biz.activeVolume) : '—'}</span></div>
+      <div class="tile"><span class="k">Closing in 30 days</span><span class="v">${biz.soon.length}</span></div>
+    </div>
+    ${biz.soon.length ? `<div class="group" style="margin-top:12px">${biz.soon.map(x => `<div class="row plain"><div class="body"><div class="t">${esc(x.address)}</div><div class="s">${esc(x.side)} · closes ${new Date(x.closing).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div></div></div>`).join('')}</div>` : ''}
+    <p class="note">${biz.missingPct ? `Add your commission on ${biz.missingPct} deal${biz.missingPct > 1 ? 's' : ''} to see GCI. ` : ''}Deals live in your Ranch Sheet until KW Command is connected.</p></section>
+  </div>
+  <div class="dock"><form id="tell" autocomplete="off"><input id="tellq" placeholder="Tell Ranch… “open house Saturday 1–4 at 19917”" aria-label="Tell Ranch what to do"><button aria-label="Go">${I.up}</button></form></div>`;
+}
+function tile(cls, live, k, s) { return `<div class="tile"><span class="live ${cls}">${esc(live)}</span><span style="font-size:16px;font-weight:500">${esc(k)}</span><span style="font-size:13px;color:var(--muted);line-height:1.4">${esc(s)}</span></div>`; }
+
+/* ---------- sheets (bottom cards) ---------- */
+function sheet(html) { close(); const el = document.createElement('div'); el.className = 'sheet'; el.id = 'sheet'; el.innerHTML = `<div class="card" role="dialog" aria-modal="true">${html}</div>`; el.addEventListener('click', e => { if (e.target === el) close(); }); document.body.appendChild(el); const f = el.querySelector('input,textarea,button'); if (f) f.focus(); }
+function close() { const s = $('#sheet'); if (s) s.remove(); }
+function replySheet(m) {
+  sheet(`<p class="date">Reply · goes to your Gmail drafts</p><h3>${esc(m.subject)}</h3><p class="s" style="margin:-4px 0 14px">${esc(m.from)}</p>
+  <form id="replyf"><div class="field"><label for="rb">Your reply</label><textarea id="rb" name="body">${esc(m.reply || '')}</textarea></div>
+  <div class="acts"><button class="pill">Save to drafts</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  $('#replyf').onsubmit = async e => { e.preventDefault(); const b = e.target.querySelector('button'); b.disabled = true; b.textContent = 'Saving…';
+    try { const r = await tool('Gmail', 'create_draft', { replyToMessageId: m.msgId, body: e.target.body.value, includeSignature: true }); markDone(m, 'drafted'); render(); const u = (r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts';
+      sheet(`<p class="date">Saved to your Gmail drafts</p><h3>Ready to send</h3><p class="s" style="margin:-4px 0 16px">Your reply is in Gmail, in the same thread. Open it there, give it a last look and send.</p><div class="acts"><a class="pill" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`); }
+    catch (err) { b.disabled = false; b.textContent = 'Save to drafts'; toast('Not saved — ' + (err.message || 'try again')); } };
+}
+function listingSheet(a) {
+  const l = listings().find(x => x.address === a) || { address: a };
+  const desk = l.desk || (/19917/.test(a) ? DESK_19917 : '');
+  sheet(`<p class="date">${esc(l.city || '')} · ${money(l.price)} · ${esc(l.status || '')}</p><h3>${esc(a)}</h3>
+  <div class="group" style="margin-top:6px">
+    ${desk ? `<a class="lrow" href="${esc(desk)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">The Desk</span><span class="s" style="display:block">Everything for this listing</span></span>${I.chev}</a>` : ''}
+    ${l.page ? `<a class="lrow" href="${esc(l.page)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Public page</span><span class="s" style="display:block">${esc(l.page.replace('https://', ''))}</span></span>${I.chev}</a>` : ''}
+    ${l.code ? `<a class="lrow" href="https://homes.ranchpnw.com/sellers#code=${esc(l.code)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Seller portal · ${esc(l.sellers || '')}</span><span class="s" style="display:block">Code ${esc(l.code)}</span></span>${I.chev}</a>` : ''}
+    <button class="lrow" data-act="shoot" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Photo shoot</span><span class="s" style="display:block">${(sh => sh ? esc([sh.status, sh.pkg && sh.pkg.split(':')[0], sh.total].filter(Boolean).join(' · ')) : 'Order from Rainier · text, email or book')(shootFor(a))}</span></span>${I.chev}</button>
+    <button class="lrow" data-act="portals" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Update Zillow &amp; Redfin numbers</span></span>${I.chev}</button>
+    ${KITS[a] ? `<a class="lrow" href="${esc(KITS[a].brochure)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Print brochure</span><span class="s" style="display:block">Two pages, letter size, with QR to the page</span></span>${I.chev}</a><button class="lrow" data-act="kit" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Social graphics</span><span class="s" style="display:block">${KITS[a].social.length} posts and stories, ready to download</span></span>${I.chev}</button>` : ''}
+    <button class="lrow" data-act="market" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Market stats for the sellers</span><span class="s" style="display:block">Paste your numbers — Claude charts them on their portal</span></span>${I.chev}</button>
+    <button class="lrow" data-act="files" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Deal documents</span><span class="s" style="display:block">${(S.sheet && S.sheet.docs || []).filter(r => r[1] === a).length} filed in Drive</span></span>${I.chev}</button>
+    ${!l.page ? `<button class="lrow" data-act="launch" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Launch this listing</span><span class="s" style="display:block">Page, Desk, seller portal, social posts, agent email</span></span>${I.chev}</button>` : ''}
+  </div><div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
+}
+function shootText(f) {
+  const d = Object.fromEntries(new FormData(f).entries()), adds = [...f.querySelectorAll('input[name=addon]:checked')].map(x => x.value);
+  const facts = [d.sqft && Number(d.sqft).toLocaleString() + ' sq ft', d.beds && d.beds + ' bd', d.baths && d.baths + ' ba', d.mls && 'MLS #' + d.mls].filter(Boolean).join(' · ');
+  const times = [d.t1, d.t2, d.t3].filter(Boolean).map(t => new Date(t).toLocaleString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })).join('; ');
+  return { d, adds, body: `Hi ${RAINIER.name}, it's Chris Ranch. I'd like to book a shoot:\n\n${d.address}${d.city ? ', ' + d.city : ''}, WA ${d.zip || ''}\n${facts}\nPackage: ${d.pkg}${adds.length ? '\nAdd: ' + adds.join(', ') : ''}\nPreferred times: ${times || 'first available'}\nVacant: ${d.vacant}${d.access ? '\nAccess: ' + d.access : ''}${d.notes ? '\nNotes: ' + d.notes : ''}\n\nThanks!` };
+}
+function shootSheet(a) {
+  const k = KNOWN[hk(a)] || {}, l = listings().find(x => x.address === a) || {}, sh = a && shootFor(a);
+  const day = n => { const t = new Date(); t.setDate(t.getDate() + n); t.setHours(10, 0, 0, 0); const p = x => String(x).padStart(2, '0'); return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}T10:00`; };
+  sheet(`<p class="date">Rainier Real Estate Photography</p><h3>${a ? 'Photo shoot · ' + esc(a) : 'Order a photo shoot'}</h3>
+  ${sh ? `<p class="s" style="margin:-4px 0 14px">${esc([sh.status, sh.pkg, sh.total, sh.ordered && 'ordered ' + sh.ordered].filter(Boolean).join(' · '))}${sh.page ? ` · <a href="${esc(sh.page)}" target="_blank" rel="noopener">Download page</a>` : ''}</p>` : ''}
+  <form id="shootf">
+    <div class="field"><label for="sa">Address</label><input id="sa" name="address" required value="${esc(a || '')}"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px"><div class="field"><label for="sc">City</label><input id="sc" name="city" value="${esc(k.city || l.city || '')}"></div><div class="field"><label for="sz">Zip</label><input id="sz" name="zip" inputmode="numeric" value="${esc(k.zip || '')}"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"><div class="field"><label for="sq">Sq ft</label><input id="sq" name="sqft" inputmode="numeric" required value="${esc(k.sqft || '')}"></div><div class="field"><label for="sb">Beds</label><input id="sb" name="beds" inputmode="decimal" value="${esc(k.beds || '')}"></div><div class="field"><label for="sba">Baths</label><input id="sba" name="baths" inputmode="decimal" value="${esc(k.baths || '')}"></div><div class="field"><label for="sm">MLS #</label><input id="sm" name="mls" inputmode="numeric"></div></div>
+    <div class="field"><label for="sp">Package</label><select id="sp" name="pkg">${PKGS.map(p => `<option>${esc(p)}</option>`).join('')}</select></div>
+    <div class="field"><label>Add-ons</label><div style="display:flex;flex-wrap:wrap;gap:8px 16px">${ADDONS.map(x => `<label style="display:flex;gap:6px;align-items:center;font-size:15px;white-space:nowrap;margin:0"><input style="width:18px;height:18px;min-height:0;flex:none" type="checkbox" name="addon" value="${esc(x)}">${esc(x)}</label>`).join('')}</div></div>
+    <div class="field"><label>Preferred times (up to three)</label><div style="display:grid;gap:8px"><input type="datetime-local" name="t1" value="${day(1)}"><input type="datetime-local" name="t2"><input type="datetime-local" name="t3"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px"><div class="field"><label for="sv">Vacant?</label><select id="sv" name="vacant"><option>No</option><option>Yes</option></select></div><div class="field"><label for="sx">Gate code or lockbox</label><input id="sx" name="access"></div></div>
+    <div class="field"><label for="sn">Notes for Anthony</label><textarea id="sn" name="notes" style="min-height:70px"></textarea></div>
+    <div class="acts"><a class="pill" id="shoot-sms" href="sms:+12539880028">Text Anthony</a><button type="button" class="pill ghost" data-act="shoot-email">Email Anthony</button><button type="button" class="pill ghost" data-act="shoot-site">Book on Rainier's site</button></div>
+    <p class="s" style="margin-top:12px">Text opens Messages with the order written out; you press send. Email saves a draft in Gmail. Rainier's site opens with the details copied to paste. Prices come from Rainier by square footage.</p>
+  </form>`);
+  const f = $('#shootf'), link = $('#shoot-sms'), upd = () => { link.href = `sms:${RAINIER.sms}?&body=${encodeURIComponent(shootText(f).body)}`; };
+  f.addEventListener('input', upd); f.addEventListener('change', upd); upd();
+  link.addEventListener('click', e => { if (!f.reportValidity()) { e.preventDefault(); return; } upd(); shootLog(shootText(f).d, 'text'); toast('Messages opened with the order. Press send.'); });
+}
+async function shootLog(d, how) { try { await append('Photo shoots', [[hk(d.address), d.address, 'Requested', '', d.pkg, '', new Date().toISOString().slice(0, 10), '', '', '', nowStamp() + ' · ' + how]]); } catch (e) { } }
+function portalsSheet(a) {
+  sheet(`<p class="date">${esc(a)}</p><h3>Zillow &amp; Redfin today</h3><p class="s" style="margin:-4px 0 16px">Copy the views and saves from each listing page. The sellers see them at the top of their portal.</p>
+  <form id="pf"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="zv">Zillow views</label><input id="zv" name="zv" inputmode="numeric"></div><div class="field"><label for="zs">Zillow saves</label><input id="zs" name="zs" inputmode="numeric"></div><div class="field"><label for="rv">Redfin views</label><input id="rv" name="rv" inputmode="numeric"></div><div class="field"><label for="rs">Redfin favorites</label><input id="rs" name="rs" inputmode="numeric"></div></div>
+  <div class="acts"><button class="pill">Update their portal</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  $('#pf').onsubmit = async e => { e.preventDefault(); const f = e.target, v = n => f[n].value.replace(/\D/g, ''), r = [];
+    if (v('zv') || v('zs')) r.push([nowStamp(), a, 'Zillow', v('zv'), v('zs'), '']); if (v('rv') || v('rs')) r.push([nowStamp(), a, 'Redfin', v('rv'), v('rs'), '']);
+    if (!r.length) return toast('Add at least one number.');
+    try { await append('Portals', r); close(); toast('Updated. The sellers see it now.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } };
+}
+function dealSheet() {
+  const ls = listings().map(l => l.address);
+  sheet(`<p class="date">Business</p><h3>Add or update a deal</h3><p class="s" style="margin:-4px 0 16px">The newest entry for an address wins. GCI = price × your commission, unless you enter GCI.</p>
+  <form id="df"><div class="field"><label for="da">Address</label><input id="da" name="a" list="dl" required><datalist id="dl">${ls.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="field"><label for="ds">Side</label><select id="ds" name="side"><option>Listing</option><option>Buyer</option><option>Both</option></select></div>
+    <div class="field"><label for="dst">Status</label><select id="dst" name="st"><option>Active</option><option>Coming soon</option><option>Pending</option><option>Closed</option><option>Withdrawn</option></select></div>
+    <div class="field"><label for="dp">Price</label><input id="dp" name="price" inputmode="numeric"></div>
+    <div class="field"><label for="dc">Commission %</label><input id="dc" name="pct" inputmode="decimal" placeholder="2.5"></div>
+    <div class="field"><label for="dg">GCI (optional)</label><input id="dg" name="gci" inputmode="numeric"></div>
+    <div class="field"><label for="dcl">Closing date</label><input id="dcl" name="close" type="date"></div></div>
+  <div class="field"><label for="dn">Notes</label><input id="dn" name="notes"></div>
+  <div class="acts"><button class="pill">Save</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  const f = $('#df'); f.a.onchange = () => { const d = deals().find(x => x.address === f.a.value); if (d) { f.side.value = d.side || 'Listing'; f.st.value = d.status || 'Active'; f.price.value = d.price || ''; f.pct.value = d.pct || ''; f.gci.value = d.gci || ''; } };
+  f.onsubmit = async e => { e.preventDefault(); const n = s => String(s).replace(/[^\d.]/g, '');
+    try { await append('Deals', [[nowStamp(), f.a.value.trim(), f.side.value, f.st.value, n(f.price.value), n(f.pct.value), n(f.gci.value), '', f.close.value, f.notes.value.trim()]]); close(); toast('Saved.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } };
+}
+function filesSheet(a) {
+  const docs = (S.sheet && S.sheet.docs || []).filter(r => r[1] === a);
+  sheet(`<p class="date">${esc(a)}</p><h3>Deal documents</h3>
+  <p class="s" style="margin:-4px 0 14px">Every night, PDFs about this address that arrive by email are saved to Google Drive → Ranch Deals → ${esc(a)}. With Google Drive for desktop, that folder is on your computer too.</p>
+  <div class="group">${docs.length ? docs.slice(-20).reverse().map(r => `<a class="lrow" href="${esc(r[5])}" target="_blank" rel="noopener"><span class="ico">${I.doc}</span><span class="body"><span class="t" style="display:block">${esc(r[2])}</span><span class="s" style="display:block">${esc(r[3])} · ${esc(r[4])}</span></span>${I.chev}</a>`).join('') : '<div class="empty">Nothing filed yet.</div>'}</div>
+  <div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
+}
+function kitSheet(a) {
+  const k = KITS[a];
+  sheet(`<p class="date">${esc(a)}</p><h3>Social graphics</h3><p class="s" style="margin:-4px 0 14px">Tap to open full size; press and hold to save to Photos.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${k.social.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block"></a>`).join('')}</div>
+  <div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
+}
+function marketSheet(a) {
+  sheet(`<p class="date">${esc(a)}</p><h3>Market stats</h3><p class="s" style="margin:-4px 0 14px">Paste the numbers from your market report (any format: a table, an MLS stats export, notes). Claude reads them and charts them, in your brand, on the sellers’ portal. Check them before saving.</p>
+  <form id="mf"><div class="field"><label for="ma">Area name</label><input id="ma" name="area" value="Tehaleh"></div>
+  <div class="field"><label for="mt">Your numbers</label><textarea id="mt" name="txt" placeholder="Oct 2026: median sold $765,000, 18 sold, 54 active, 21 days on market, 2.9 months inventory, 99.1% of list…"></textarea></div>
+  <div class="field"><label for="msrc">Source</label><input id="msrc" name="src" value="NWMLS"></div>
+  <div class="acts"><button class="pill">Read with Claude</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  $('#mf').onsubmit = async e => { e.preventDefault(); const f = e.target; if (!caps.sample) return toast('Needs Claude — open Ranch on claude.ai.');
+    const b = f.querySelector('button'); b.disabled = true; b.textContent = 'Reading…';
+    try {
+      const out = await caps.sample.json(`Extract monthly real estate market statistics from the text. Use ONLY numbers present in the text; never estimate or fill gaps (use null).
+Return JSON array, one object per month: {"month":"YYYY-MM","median":number|null,"sold":number|null,"active":number|null,"dom":number|null,"moi":number|null,"stl":number|null} where median = median sold price in dollars, sold = homes sold/closed, active = active listings, dom = median (or average) days on market, moi = months of inventory, stl = sale-to-list price percent (e.g. 98.7).
+TEXT:
+${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
+      const rowsM = (Array.isArray(out) ? out : []).filter(r => /^\d{4}-\d{2}$/.test(r.month));
+      if (!rowsM.length) throw new Error('No months found');
+      sheet(`<p class="date">${esc(a)} · ${esc(f.area.value)}</p><h3>Look right?</h3>
+      <div class="group">${rowsM.map(r => `<div class="row plain"><div class="body"><div class="t">${esc(r.month)}</div><div class="s">${[r.median != null ? money(r.median) + ' median' : '', r.sold != null ? r.sold + ' sold' : '', r.active != null ? r.active + ' active' : '', r.dom != null ? r.dom + ' DOM' : '', r.moi != null ? r.moi + ' mo. inventory' : '', r.stl != null ? r.stl + '% of list' : ''].filter(Boolean).join(' · ')}</div></div></div>`).join('')}</div>
+      <div class="acts" style="margin-top:16px"><button class="pill" id="msave">Save to their portal</button><button class="pill ghost" data-act="close">Cancel</button></div>`);
+      const area = f.area.value.trim(), src = f.src.value.trim();
+      $('#msave').onclick = async () => { try { await append('Market', rowsM.map(r => [r.month, a, area, r.median, r.sold, r.active, r.dom, r.moi, r.stl, src])); close(); toast('Charted on the sellers’ portal.'); } catch (err) { toast('Not saved — try again.'); } };
+    } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
+}
+function launchSheet(a) {
+  sheet(`<p class="date">Launch a listing</p><h3>Four questions.</h3><p class="s" style="margin:-4px 0 16px">Ranch builds the page, The Desk, the seller portal, three social posts and the agent-network email. Nothing goes public until you approve it.</p>
+  <form id="lf"><div class="field"><label for="la">Address</label><input id="la" name="a" value="${esc(a || '')}" required></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="lc">City or community</label><input id="lc" name="city"></div><div class="field"><label for="lp">Price</label><input id="lp" name="price" inputmode="numeric"></div></div>
+  <div class="field"><label for="lph">Photos (Google Drive folder link)</label><input id="lph" name="photos"></div>
+  <div class="field"><label for="lse">Sellers’ first names</label><input id="lse" name="sellers" placeholder="Aaron and Holly"></div>
+  <div class="acts"><button class="pill">Start the launch</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  $('#lf').onsubmit = async e => { e.preventDefault(); const f = e.target;
+    try { await append('Listings', [[f.a.value.trim(), f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
+      await append('Marketing', [[nowStamp(), f.a.value.trim(), 'Launch requested', '', 'Photos: ' + f.photos.value.trim()]]);
+      close(); toast('Queued. The launch kit is built in your next Claude session.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } };
+}
+
+/* ---------- Tell Ranch ---------- */
+async function tell(q) {
+  if (!caps.sample) return toast('Tell Ranch needs Claude — open Ranch on claude.ai.');
+  const ls = listings().map(l => l.address).join('; ');
+  sheet(`<p class="date">Tell Ranch</p><h3>${esc(q)}</h3><p class="s">Working it out…</p>`);
+  try {
+    const out = await caps.sample.json(`You turn a busy real estate agent's request into ONE action for his system. Today is ${new Date().toString()}. Time zone America/Los_Angeles. Listings: ${ls}.
+Actions:
+- "event": {"title","start" local time "YYYY-MM-DDTHH:mm:ss" with NO offset,"end" same format,"location"} (open houses, showings, meetings; default length 1 hour)
+- "email": {"to" (email or ""),"subject","body"} (a draft he will review; warm, brief, his voice, no invented facts)
+- "seller_update": {"address","title","message"} (a note on the sellers' portal)
+- "marketing": {"address","what","reach","notes"} (log something done to market a listing)
+- "deal": {"address","status","price","pct","closing" YYYY-MM-DD}
+- "answer": {"text"} (a question about his business you can answer from: LISTINGS ${JSON.stringify(listings().map(l => [l.address, l.price, l.status]))} DEALS ${JSON.stringify(deals().map(d => [d.address, d.status, d.price, d.pct, d.closing && new Date(d.closing).toDateString()]))})
+Return JSON {"action": one of the names, "summary": "<= 14 words describing what will happen", "data": {...}}.
+REQUEST: ${q}`, { modelTier: 'default', cache: false });
+    if (!out || !out.action) throw new Error('No action');
+    const dd = out.data || {};
+    if (out.action === 'answer') return sheet(`<p class="date">Ranch</p><h3>${esc(q)}</h3><p style="font-size:17px;line-height:1.6">${esc(dd.text)}</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
+    const fields = Object.keys(dd).map(k => `<div class="field"><label for="tf-${k}">${esc(k)}</label>${k === 'body' || k === 'message' ? `<textarea id="tf-${k}" name="${esc(k)}">${esc(dd[k])}</textarea>` : `<input id="tf-${k}" name="${esc(k)}" value="${esc(dd[k])}">`}</div>`).join('');
+    sheet(`<p class="date">Ready when you are</p><h3>${esc(out.summary || q)}</h3><form id="tf">${fields}<div class="acts"><button class="pill">${{ event: 'Add to calendar', email: 'Save to Gmail drafts', seller_update: 'Post to their portal', marketing: 'Log it', deal: 'Save deal' }[out.action] || 'Do it'}</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+    $('#tf').onsubmit = async e => { e.preventDefault(); const f = e.target, v = k => f[k] ? f[k].value : (dd[k] || ''); const b = f.querySelector('button'); b.disabled = true;
+      try {
+        if (out.action === 'event') await tool('Google Calendar', 'create_event', { calendarId: CALENDARS[0], summary: v('title'), startTime: v('start').replace(/(Z|[+-]\d\d:\d\d)$/, ''), endTime: v('end').replace(/(Z|[+-]\d\d:\d\d)$/, ''), location: v('location') });
+        if (out.action === 'email') await tool('Gmail', 'create_draft', { to: v('to') ? [v('to')] : [], subject: v('subject'), body: v('body'), includeSignature: true });
+        if (out.action === 'seller_update') await append('Seller updates', [[nowStamp(), v('address'), v('title'), v('message'), 'Chris']]);
+        if (out.action === 'marketing') await append('Marketing', [[nowStamp(), v('address'), v('what'), v('reach'), v('notes')]]);
+        if (out.action === 'deal') await append('Deals', [[nowStamp(), v('address'), 'Listing', v('status'), v('price'), v('pct'), '', '', v('closing'), '']]);
+        close(); toast('Done.'); loadSheet().then(render); if (out.action === 'event') loadCalendar().then(render);
+      } catch (err) { b.disabled = false; toast(out.action === 'event' && /connect|unavailable|not_connected|server/i.test(String(err.message || err.code)) ? 'Connect Google Calendar in claude.ai first.' : 'Didn’t go through — ' + (err.message || 'try again')); } };
+  } catch (e) { sheet(`<p class="date">Tell Ranch</p><h3>I didn’t catch that.</h3><p class="s">Try “open house Saturday 1–4 at 19917”, “email the Hendersons a thank-you”, or “what’s pending?”</p><div class="acts" style="margin-top:14px"><button class="pill ghost" data-act="close">OK</button></div>`); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, x = b.dataset.a;
+  if (a === 'theme') { S.theme = b.dataset.v; store('theme', S.theme); render(); }
+  else if (a === 'close') close();
+  else if (a === 'refresh') { store('inbox', ''); loadAll(); }
+  else if (a === 'inbox') { store('inbox', ''); loadInbox(); }
+  else if (a === 'shoot') shootSheet(x || '');
+  else if (a === 'shoot-email' || a === 'shoot-site') {
+    const f = $('#shootf'); if (!f.reportValidity()) return; const o = shootText(f);
+    if (a === 'shoot-email') { b.disabled = true; try { const r = await tool('Gmail', 'create_draft', { to: [RAINIER.email], subject: 'Photo shoot · ' + o.d.address, body: o.body, includeSignature: true }); shootLog(o.d, 'email draft');
+        sheet(`<p class="date">Saved to your Gmail drafts</p><h3>Order ready to send</h3><p class="s" style="margin:-4px 0 16px">Give it a last look and send.</p><div class="acts"><a class="pill" href="${esc((r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts')}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`); }
+      catch (err) { b.disabled = false; toast('Not saved — ' + (err.message || 'try again')); } }
+    else { try { await navigator.clipboard.writeText(o.body); toast('Details copied. Paste into Rainier’s form.'); } catch (e) { } window.open(RAINIER.order, '_blank', 'noopener'); shootLog(o.d, 'site'); }
+  }
+  else if (a === 'mdone') { const m = (S.inbox || []).find(t => t.id === b.dataset.id); if (m) { markDone(m, 'cleared'); render(); toast('Cleared. It’s under “cleared” if you need it.'); } }
+  else if (a === 'later') { S.showLater = true; render(); }
+  else if (a === 'past') { S.showPast = !S.showPast; render(); }
+  else if (a === 'goinbox') { const el = document.getElementById('inbox'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (a === 'reply') { const m = (S.inbox || []).find(t => t.id === b.dataset.id); if (m) replySheet(m); }
+  else if (a === 'listing') listingSheet(x);
+  else if (a === 'portals') portalsSheet(x);
+  else if (a === 'files') filesSheet(x);
+  else if (a === 'launch') launchSheet(x);
+  else if (a === 'deal') dealSheet();
+  else if (a === 'kit') kitSheet(x);
+  else if (a === 'rsvp') { b.disabled = true; try { await tool('Google Calendar', 'respond_to_event', { calendarId: b.dataset.c, eventId: b.dataset.id, responseStatus: b.dataset.v }); toast(b.dataset.v === 'accepted' ? 'Accepted.' : 'Declined.'); await loadCalendar(); render(); } catch (err) { b.disabled = false; toast('Didn’t go through — ' + (err.message || 'try again')); } }
+  else if (a === 'market') marketSheet(x);
+  else if (a === 'sent-network') { try { await append('Marketing', [[nowStamp(), x, 'Agent network email — all 10 offices', '~600 agents', '']]); toast('Logged on the sellers’ portal.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } }
+});
+document.addEventListener('submit', e => { if (e.target.id === 'tell') { e.preventDefault(); const q = $('#tellq').value.trim(); if (q) { $('#tellq').value = ''; tell(q); } } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+
+/* ---------- office mode: outside Claude, the same Hub talks to Chris's own Google engine ---------- */
+const ENGINE = 'https://script.google.com/macros/s/AKfycbz0ALnuwyuwKaRkr2sGS7N_TPJ3DIXYYRiLP7RiNlBvv5HfQMxfy82jS88ihRab7Duu/exec';
+async function engine(body) {
+  const key = store('officeKey'); if (!key) throw new Error('locked');
+  const r = await fetch(ENGINE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ type: 'office', key }, body)) });
+  const j = await r.json(); if (!j.ok) { if (j.reason === 'locked') { store('officeKey', ''); } throw new Error(j.reason || 'Engine error'); } return j;
+}
+const officeCaps = {
+  mcp: { callTool: async (server, name, input) => { if (/Metricool/.test(server)) throw new Error('Metricool opens from its own app.'); return (await engine({ op: 'tool', server, name, input })).result; } },
+  sample: { json: async (prompt, opts) => (await engine({ op: 'ai', prompt, opts: opts && opts.modelTier === 'default' ? {} : {} })).result }
+};
+function unlockSheet(msg) {
+  sheet(`<p class="date">office.ranchpnw.com</p><h3>Unlock your office</h3><p class="s" style="margin:-4px 0 14px">${esc(msg || 'Paste your office key once on this device. It stays on this device only.')}</p>
+  <form id="keyf"><div class="field"><label for="kk">Office key</label><input id="kk" name="k" autocomplete="off" autocapitalize="off" spellcheck="false" required></div><div class="acts"><button class="pill">Unlock</button></div></form>`);
+  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That key didn’t work. Copy it again from the engine.'); } };
+}
+
+/* ---------- start ---------- */
+S.theme = store('theme') || 'daylight';
+render();
+(async () => {
+  if (window.claude && claude.use) {
+    const [m, s, d] = await Promise.all(['mcp', 'sample', 'db'].map(n => claude.use(n).catch(() => null)));
+    caps.mcp = m; caps.sample = s; caps.db = d;
+  } else {
+    S.officeMode = true;
+    if (!store('officeKey')) { S.ready = true; render(); return unlockSheet(); }
+    try { const p = await engine({ op: 'ping' }); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; }
+    catch (err) { S.ready = true; render(); return unlockSheet(err.message === 'locked' ? '' : 'Couldn’t reach your engine: ' + err.message); }
+  }
+  S.ready = true;
+  if (caps.mcp) loadAll(); else render();
+})();
+</script>
+</body>
+</html>
