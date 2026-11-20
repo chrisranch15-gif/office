@@ -596,9 +596,9 @@ const officeCaps = {
   sample: { json: async (prompt, opts) => (await engine({ op: 'ai', prompt, opts: opts && opts.modelTier === 'default' ? {} : {} })).result }
 };
 function unlockSheet(msg) {
-  sheet(`<p class="date">office.ranchpnw.com</p><h3>Unlock your office</h3><p class="s" style="margin:-4px 0 14px">${esc(msg || 'Paste your office key once on this device. It stays on this device only.')}</p>
-  <form id="keyf"><div class="field"><label for="kk">Office key</label><input id="kk" name="k" autocomplete="off" autocapitalize="off" spellcheck="false" required></div><div class="acts"><button class="pill">Unlock</button></div></form>`);
-  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That key didn’t work. Copy it again from the engine.'); } };
+  sheet(`<p class="date">office.ranchpnw.com</p><h3>Sign in to your office</h3><p class="s" style="margin:-4px 0 14px">${esc(msg || 'Enter your office password. This device remembers it.')}</p>
+  <form id="keyf"><div class="field"><label for="kk">Password</label><input id="kk" name="k" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required><input type="text" name="username" value="Chris" autocomplete="username" style="display:none"></div><div class="acts"><button class="pill">Sign in</button></div></form>`);
+  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That password didn’t work. After 8 wrong tries the office locks for an hour.'); } };
 }
 
 /* ---------- start ---------- */
