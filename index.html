@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Office · The Ranch Real Estate Group</title>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -108,7 +109,7 @@ section[data-tone=need] .group{background:linear-gradient(180deg,color-mix(in sr
    ============================================================ */
 const SHEET = '1ROkc-18VbSn7kkLZYrTyJYiooMDLbBxYR0SSWItll2E';
 const METRICOOL_BRAND = '6646044';
-const DESK_19917 = 'https://claude.ai/artifact/E6iKnuAbJ77ML5sArMqhEq#desk';
+const DESK_19917 = (window.claude && window.claude.use) ? 'https://claude.ai/artifact/E6iKnuAbJ77ML5sArMqhEq#desk' : 'https://office.ranchpnw.com/desk/#desk';
 const CALENDARS = ['chrisranch@kw.com', 'chrisranch15@gmail.com']; // work first: new events go on the KW calendar
 const NET_AGENTS = '~600 agents in 10 offices';
 const KITS = { '19917 145th St E': { brochure: 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf', social: ['just-listed-post', 'greenbelt-post', 'inside-1', 'inside-2', 'inside-3', 'inside-4', 'just-listed-story', 'greenbelt-story', 'inside-story'].map(n => 'https://homes.ranchpnw.com/social/' + n + '.jpg') } };
@@ -598,7 +599,7 @@ const officeCaps = {
 function unlockSheet(msg) {
   sheet(`<p class="date">office.ranchpnw.com</p><h3>Sign in to your office</h3><p class="s" style="margin:-4px 0 14px">${esc(msg || 'Enter your office password. This device remembers it.')}</p>
   <form id="keyf"><div class="field"><label for="kk">Password</label><input id="kk" name="k" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required><input type="text" name="username" value="Chris" autocomplete="username" style="display:none"></div><div class="acts"><button class="pill">Sign in</button></div></form>`);
-  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That password didn’t work. After 8 wrong tries the office locks for an hour.'); } };
+  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); if (/desk=1/.test(location.search)) return location.replace('/desk/#desk'); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That password didn’t work. After 8 wrong tries the office locks for an hour.'); } };
 }
 
 /* ---------- start ---------- */
