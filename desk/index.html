@@ -4389,7 +4389,7 @@ async function copy(text) { try { await navigator.clipboard.writeText(text); toa
 /* ---------- open houses: one row per open house in the Sheet's "Open houses" tab ----------
    The Id carries the time (OH-YYYYMMDD-HHMM-HHMM, Pacific) so Sheets can't reformat it.
    The Desk adds rows; the public page reads them through the engine. Last row for an Id wins. */
-const OH_FALLBACK = [{ id: 'OH-20261122-1100-1300', status: 'Published' }];
+const OH_FALLBACK = [{ id: 'OH-20261121-1200-1400', status: 'Published' }, { id: 'OH-20261122-1100-1300', status: 'Published' }]; // built in so the page shows them instantly; the Sheet still updates it live
 function ptOffset(y, m, d) { try { return /PDT/.test(new Date(Date.UTC(y, m - 1, d, 12)).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', timeZoneName: 'short' })) ? 7 : 8; } catch (e) { return 8; } }
 function ohClock(h, mi, withMer) { const mer = h >= 12 ? 'pm' : 'am', h12 = h % 12 || 12; return h12 + (mi ? ':' + String(mi).padStart(2, '0') : '') + (withMer ? ' ' + mer : ''); }
 function ohFromId(id) {
