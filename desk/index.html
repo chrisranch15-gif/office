@@ -516,6 +516,7 @@ sup.fn a{color:var(--accent);text-decoration:none;font-family:var(--sans);font-w
 .mbar a.ic{display:inline-flex;align-items:center;justify-content:center;color:#F7F5F1}
 .agent-card a.btn{text-decoration:none}
 .ohinv{display:inline-flex;align-items:center;gap:10px;margin:22px 0 0;padding:6px 12px 6px 10px;border:1px solid rgba(231,215,191,.5);background:rgba(14,16,18,.38);color:#F7F5F1;font:inherit;font-size:13px;letter-spacing:.04em;white-space:nowrap;cursor:pointer;transition:border-color .3s ease}
+.ohstack{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:22px 0 0}.ohstack .ohinv{margin:0}
 .ohinv:hover{border-color:#E7D7BF}
 .ohinv .k{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#E7D7BF;padding-right:10px;border-right:1px solid rgba(231,215,191,.45)}
 .ptiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px}
@@ -4545,9 +4546,10 @@ function story() {
         <span class="sep2"></span><a href="#seller" data-act="menu-go"><span>Sellers</span><span class="small">Your private portal</span></a><a href="#desk" data-act="menu-go"><span>Agents</span><span class="small">The Desk</span></a>`}</nav>` : ''}</div>
     <div class="photo">${img(l.heroPhoto || 'great-room', '', 'fetchpriority="high" loading="eager"')}</div><div class="scrim"></div>
     <div class="copy"><h1><span class="h1k">${esc(street())} · ${esc(V('community'))}, Bonney Lake, WA 98391</span>${esc(a.headline)}</h1>
-      ${(() => { const o = l.openHouses.find(x => x.status === 'scheduled'); if (!o) return ''; const [d, t] = String(o.label || '').split(' · ');
+      ${(() => { const list = l.openHouses.filter(x => x.status === 'scheduled').slice(0, 3); if (!list.length) return '';
+      return `<div class="ohstack">${list.map(o => { const [d, t] = String(o.label || '').split(' · ');
       const sd = o.start ? new Date(o.start).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' }) : (d || '');
-      return `<button class="ohinv" data-act="oh-register" data-id="${esc(o.id)}"><span class="k">Open House</span><span class="d">${esc(sd)} · ${esc(t || '')}</span></button>`; })()}
+      return `<button class="ohinv" data-act="oh-register" data-id="${esc(o.id)}"><span class="k">Open House</span><span class="d">${esc(sd)} · ${esc(t || '')}</span></button>`; }).join('')}</div>`; })()}
       <div class="meta">${pending ? '<span class="tag" style="color:#E7D7BF">Pending</span>' : ''}<span class="price">${V('price') != null ? LC.money(V('price')) : ''}</span><span>${V('beds')} Bedrooms*</span><span>${V('baths')} Baths</span>${V('sqft') ? `<span>${Number(V('sqft')).toLocaleString()} sq ft</span>` : ''}<span>Backs to greenbelt</span></div><div class="listedby">Listed by ${esc(t.agent.name)} · ${esc(t.name)} · ${esc(t.firm || t.affiliation)}</div></div>
   </header>
   <section class="lede narrow remarks" id="s-story"><div class="eyebrow">${esc(street())} · ${esc(V('community'))}</div>
