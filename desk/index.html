@@ -5086,10 +5086,10 @@ function desk() {
   const s = l.saved;
   return deskShell('desk', `<div class="narrow" style="padding:0">
   <p class="say">${esc(lead)} ${n <= 3 ? words[n] : n + ' decisions are yours.'}</p>
+  ${offerBlock()}
   ${shareBar()}
   ${ohBlock()}
   ${photoBlock()}
-  ${offerBlock()}
   ${showBlock()}
   <form data-form="tell" class="tell"><label for="tell" class="eyebrow">Tell the Concierge</label><div class="tellrow"><input id="tell" name="q" placeholder="Schedule an open house Saturday, 1–4 pm" autocomplete="off"><button class="btn" ${ui.busy === 'tell' ? 'disabled' : ''}>${ui.busy === 'tell' ? '…' : 'Go'}</button></div>
     <div class="chips" style="margin-top:10px">${['What needs me today?', 'How is the listing doing?', 'Send my seller a quick update', 'Open house next Saturday 1–4 pm'].map(q => `<button type="button" class="chip" data-act="tell-q" data-q="${q}">${q}</button>`).join('')}</div></form>
@@ -6041,17 +6041,28 @@ function showList() {
     .filter(x => !isNaN(x.at)).sort((a, b) => b.at - a.at);
 }
 /* ---------- offers on the Desk: from the Offers tab (logged in the Office). Staff only; never on the seller portal. ---------- */
+function mailTid(u) { u = String(u || ''); const f = /thread-f:(\d+)/.exec(u); if (f) { try { return BigInt(f[1]).toString(16); } catch (e) { return ''; } } const h = /#[a-z]+\/([0-9a-f]{12,20})\b/i.exec(u); return h ? h[1] : ''; }
+function offerMailHtml(tid, url) {
+  const m = (ui.offerMail || {})[tid];
+  if (!m) return `<div class="chips" style="margin:10px 0 0"><button class="chip" data-act="offer-mail" data-t="${esc(tid)}">Read the email here</button></div>`;
+  if (m === 'loading') return '<p class="small muted" style="margin:10px 0 0">Opening the email…</p>';
+  if (m.error) return `<p class="small muted" style="margin:10px 0 0">Couldn’t open it here (${esc(m.error)}). <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open in Gmail</a></p>`;
+  return `<div style="margin-top:12px">${m.map(x => `<div style="padding:12px 14px;margin-top:8px;background:var(--paper2,rgba(128,120,108,.08));border-radius:10px"><div class="small"><b>${esc(String(x.sender || '').replace(/<.*>/, '').replace(/"/g, '').trim())}</b> · <span class="muted">${esc(new Date(x.date).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span></div>
+    <div class="small" style="white-space:pre-wrap;margin-top:6px;line-height:1.5">${esc(String(x.plaintextBody || x.snippet || '').replace(/\n\s*On .{10,120}wrote:[\s\S]*$/, '').replace(/\n{3,}/g, '\n\n').trim().slice(0, 4000))}</div>
+    ${(x.attachments || []).filter(a => a.filename).length ? `<div class="small muted" style="margin-top:6px">Attached: ${esc(x.attachments.map(a => a.filename).filter(Boolean).join(', '))}</div>` : ''}</div>`).join('')}
+    <div class="chips" style="margin:10px 0 0"><button class="chip" data-act="offer-mail-close" data-t="${esc(tid)}">Hide email</button><a class="chip" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Reply in Gmail</a></div></div>`;
+}
 function offerBlock() {
   if (!isStaff() || !caps.mcp || !ui.live) return '';
   const k = homeKeyJs(street()), rs = (ui.offerRows || []).filter(r => homeKeyJs(r[1]) === k && !/withdrawn|rejected|expired/i.test(r[9] || ''));
   if (!rs.length) return '';
   const num = v => +String(v || '').replace(/[^\d.]/g, '') || 0, $ = v => '$' + Math.round(v).toLocaleString('en-US'), lp = num(V('price'));
   const line = (a, b) => b ? `<div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line)"><span class="small muted">${esc(a)}</span><span class="small" style="text-align:right">${b}</span></div>` : '';
-  return `<div class="sharebar" id="offers"><div class="eyebrow">Offers to review</div>
+  return `<div class="sharebar" id="offers" style="border-color:var(--ink,#1E2327)"><div class="eyebrow">Offer received · needs your review</div>
     ${rs.slice().reverse().map(r => { const p = num(r[5]), c = num(r[8]);
       return `<div style="padding:14px 0 6px"><div><b>${p ? $(p) : 'Price not stated'}</b>${lp && p ? ` · <span class="small">${p === lp ? 'full price' : p > lp ? $(p - lp) + ' over list' : $(lp - p) + ' under list'}</span>` : ''}${r[9] ? ' · ' + esc(r[9]) : ''}<br><span class="small muted">${esc([r[2], r[3] && 'agent ' + r[3], r[4]].filter(Boolean).join(' · '))}</span></div>
       <div style="margin-top:8px">${line('Financing', esc(r[6]))}${line('Earnest money', num(r[7]) ? $(num(r[7])) : '')}${line('Seller credit asked', c ? $(c) : '')}${line('Price minus credit', c && p ? $(p - c) : '')}${line('Response due', esc(r[10]))}${line('Received', esc(r[0]))}${line('Notes', esc(r[11]))}</div>
-      ${r[12] && /^https?:/.test(r[12]) ? `<div class="chips" style="margin:10px 0 0"><a class="chip" href="${esc(r[12])}" target="_blank" rel="noopener noreferrer">Open the email</a></div>` : ''}</div>`; }).join('<hr style="border:0;border-top:1px solid var(--line);margin:0">')}
+      ${mailTid(r[12]) ? offerMailHtml(mailTid(r[12]), r[12]) : ''}</div>`; }).join('<hr style="border:0;border-top:1px solid var(--line);margin:0">')}
     <p class="small muted" style="margin-top:10px">Private to you. The sellers’ portal never shows offers or agent details.</p></div>`;
 }
 function showBlock() {
@@ -6147,6 +6158,10 @@ Object.assign(A, {
   'photo-save': async () => { const d = photoDraft(); ui.busy = 'photos'; render();
     const ok = await liveAppend('Photo layout', [liveNow(), '19917', JSON.stringify(d.list), JSON.stringify(d.hidden), JSON.stringify(d.featured), T().agent.name], 'Published. The listing page updates within a minute.');
     ui.busy = null; if (ok) { applyLayout({ order: d.list, hidden: d.hidden, featured: d.featured }); ui.layoutSaved = liveNow(); ui.photoOpen = false; ui.photoDraft = null; } render(); },
+  'offer-mail': async (el) => { const t = el.dataset.t; ui.offerMail = Object.assign({}, ui.offerMail, { [t]: 'loading' }); render();
+    try { const g = await callTool('Gmail', 'get_thread', { threadId: t, messageFormat: 'PLAIN_TEXT' }); ui.offerMail[t] = ((g && g.messages) || []).filter(x => !/no-?reply|do-?not-?reply|mailer-daemon|notifications?@/i.test(x.sender || '')); }
+    catch (e) { ui.offerMail[t] = { error: (e && e.message) || 'not available' }; } render(); },
+  'offer-mail-close': (el) => { delete (ui.offerMail || {})[el.dataset.t]; render(); },
   'show-fbok': async (el) => {
     const x = showList().find(s => s.key === el.dataset.k); if (!x) return;
     ui.fbOk = Object.assign({}, ui.fbOk, { [x.key]: 1 }); render();
