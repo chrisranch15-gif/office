@@ -59,6 +59,8 @@ h2{margin:0;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:u
 .thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--ph);flex:none}
 .chev{color:var(--chev);flex:none}
 .empty{padding:18px 20px;color:var(--muted);font-size:15px}
+.mini{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 4px 8px}
+.draftbox{white-space:pre-wrap;margin-top:8px;padding:12px 14px;border-radius:12px;background:var(--raised);font-size:14px;line-height:1.5;color:var(--text)}
 .note{margin:12px 4px 0;font-size:13px;color:var(--muted)}
 .tag{display:inline-block;font-size:12px;font-weight:500;letter-spacing:.04em;padding:3px 9px;border-radius:10px;background:var(--raised);color:var(--text2);margin-right:6px}
 .tag.now{background:var(--iconbg);color:var(--accent)}
@@ -95,6 +97,14 @@ section[data-tone=need] .group{background:linear-gradient(180deg,color-mix(in sr
 .timecol{color:var(--tone)!important;font-weight:500}
 .brand{display:flex;flex-direction:column;line-height:1.1}.brand .sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.cg{max-height:min(56vh,520px);overflow:auto;display:flex;flex-direction:column;gap:10px;margin:6px 0 12px;padding:2px}
+.cgu{align-self:flex-end;max-width:85%;background:var(--ink,#16191B);color:#fff;padding:10px 14px;border-radius:16px 16px 4px 16px;font-size:15px;line-height:1.45}
+.cga{align-self:flex-start;max-width:92%;background:rgba(128,120,108,.12);padding:12px 14px;border-radius:16px 16px 16px 4px;font-size:15px;line-height:1.55}
+.cgp{margin-top:10px;padding:10px;border:1px solid rgba(128,120,108,.35);border-radius:12px;background:rgba(255,255,255,.5)}
+.cgin{width:100%;box-sizing:border-box;margin-top:6px;font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid rgba(128,120,108,.35);background:transparent;color:inherit}
+.cgtag{margin-top:6px;font-size:11px;letter-spacing:.06em;opacity:.65}
+.cgf{display:flex;gap:8px}.cgf input{flex:1;min-width:0;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid rgba(128,120,108,.35);background:transparent;color:inherit}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}.fl{display:grid;gap:4px;font-size:13px;color:var(--muted)}.fl input{font:inherit;font-size:15px;color:var(--ink,#1E2327);padding:10px 12px;border:1px solid var(--line,#DCD4C8);border-radius:10px;background:var(--card,#fff)}
 </style>
 </head>
 <body>
@@ -110,14 +120,14 @@ section[data-tone=need] .group{background:linear-gradient(180deg,color-mix(in sr
 const SHEET = '1ROkc-18VbSn7kkLZYrTyJYiooMDLbBxYR0SSWItll2E';
 const METRICOOL_BRAND = '6646044';
 const DESK_19917 = (window.claude && window.claude.use) ? 'https://claude.ai/artifact/E6iKnuAbJ77ML5sArMqhEq#desk' : 'https://office.ranchpnw.com/desk/#desk';
-const CALENDARS = ['chrisranch@kw.com', 'chrisranch15@gmail.com']; // work first: new events go on the KW calendar
+const CALENDARS = []; // Chris's addresses, work first (new events go on the KW calendar). Filled in only in the private claude.ai copy; never in public source.
 const NET_AGENTS = '~600 agents in 10 offices';
 const KITS = { '19917 145th St E': { brochure: 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf', social: ['just-listed-post', 'greenbelt-post', 'inside-1', 'inside-2', 'inside-3', 'inside-4', 'just-listed-story', 'greenbelt-story', 'inside-story'].map(n => 'https://homes.ranchpnw.com/social/' + n + '.jpg') } };
 const caps = { mcp: null, sample: null, db: null };
 const KIT = [
   { ico: 'chart', t: 'Listing presentation', s: 'Seller slides: how you market and sell a home', links: [['Present', 'https://claude.ai/artifact/EeSHsjer6ZmdwBeXiqkh41'], ['Web version', 'https://homes.ranchpnw.com/sell']] },
   { ico: 'doc', t: 'Seller brochure', s: 'Print piece to leave behind at the appointment', links: [['Open to print', 'https://claude.ai/artifact/Lhphx7onzrptYRs3VVsihc']] },
-  { ico: 'globe', t: 'Aaron & Holly · launch plan', s: 'Private plan from their Cloud CMA · 19917 145th St E', links: [['Open', 'https://homes.ranchpnw.com/plan/aaron-holly-4d7d4e75ad.html']] },
+  { ico: 'globe', t: 'Aaron & Holly · CMA & launch plan', s: '19917 145th St E', links: [['Open', 'https://homes.ranchpnw.com/plan/aaron-holly-4d7d4e75ad.html']] },
   { ico: 'doc', t: '19917 · listing brochure', s: 'Two pages, letter size, QR to the listing page', links: [['Print PDF', 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf']] },
   { ico: 'chart', t: '19917 · listing films', s: 'Full tour (64s) and vertical for Reels', links: [['Full tour', 'https://homes.ranchpnw.com/social/video/19917-full-tour.mp4'], ['Vertical', 'https://homes.ranchpnw.com/social/video/19917-vertical-30.mp4']] },
   { ico: 'phone', t: 'For agents', s: 'Why agents join The Ranch Real Estate Group', links: [['Present', 'https://claude.ai/artifact/2tnLxKwbXZZkFd4Gz41SxZ']] },
@@ -160,10 +170,11 @@ const I = {
 
 /* ---------- loading ---------- */
 async function loadSheet() {
-  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200" };
+  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:M300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000" };
   const out = {};
   await Promise.all(Object.keys(tabs).map(async k => { try { out[k] = await sheetRows(tabs[k]); } catch (e) { out[k] = null; S.err.sheet = e.message || String(e); } }));
   S.sheet = out; S.at = Date.now();
+  try { store('sheet', JSON.stringify({ at: S.at, out })); } catch (e) { }
 }
 async function loadPosts() {
   try {
@@ -192,32 +203,58 @@ async function loadCalendar() {
     S.cal = Object.values(byId).filter(e => e.start).sort((a, b) => new Date(a.start) - new Date(b.start));
   } catch (e) { S.cal = null; S.err.cal = e.message || String(e); }
 }
+const ME = { test: a => CALENDARS.some(c => String(a || '').toLowerCase().indexOf(c) >= 0) }; // his own addresses, from the calendar list
+const DEAL_WORDS = '(offer OR offers OR "purchase and sale" OR PSA OR counteroffer OR counter OR addendum OR inspection OR escrow OR "earnest money" OR appraisal OR closing OR "mutual acceptance" OR repair OR contingency)';
 async function loadInbox() {
   S.busy.inbox = true; render();
   try {
-    const p = await tool('Gmail', 'search_threads', { query: 'in:inbox newer_than:3d -category:promotions -category:social -category:updates -from:me', pageSize: 25, view: 'THREAD_VIEW_SUMMARY' });
-    const th = ((p && p.threads) || []).map(t => { const m = (t.messages || [])[0] || {}; return { id: t.id, msgId: m.id, from: m.sender || '', subject: m.subject || '(no subject)', snippet: m.snippet || '', date: m.date, url: t.viewUrl || m.viewUrl }; }).filter(t => t.msgId);
+    const nums = listings().map(l => (String(l.address).match(/^\d{3,6}/) || [])[0]).filter(Boolean);
+    const q1 = `in:inbox newer_than:6d -category:promotions -category:social -from:me`;
+    const q2 = `in:inbox newer_than:14d -from:me (${DEAL_WORDS}${nums.length ? ' OR ' + nums.join(' OR ') : ''})`;
+    const [p1, p2] = await Promise.all([q1, q2].map(q => tool('Gmail', 'search_threads', { query: q, pageSize: 50, view: 'THREAD_VIEW_SUMMARY' }).catch(() => null)));
+    const seen = {}, th = [];
+    [p2, p1].forEach(p => ((p && p.threads) || []).forEach(t => { if (seen[t.id]) return; seen[t.id] = 1;
+      const m = (t.messages || []).slice(-1)[0] || {}; if (!m.id) return;
+      th.push({ id: t.id, msgId: m.id, from: m.sender || '', subject: m.subject || '(no subject)', snippet: m.snippet || '', date: m.date, count: t.messageCount || 1, url: t.viewUrl || m.viewUrl, replied: ME.test(m.sender || '') }); }));
+    // threads Chris has answered since their last incoming message
     try {
-      const sp = await tool('Gmail', 'search_threads', { query: 'in:sent newer_than:4d', pageSize: 50, view: 'THREAD_VIEW_SUMMARY' });
+      const sp = await tool('Gmail', 'search_threads', { query: 'in:sent newer_than:14d', pageSize: 50, view: 'THREAD_VIEW_SUMMARY' });
       const sent = {}; ((sp && sp.threads) || []).forEach(t => { const ds = (t.messages || []).map(m => Date.parse(m.date)).filter(n => !isNaN(n)); sent[t.id] = ds.length ? Math.max(...ds) : Infinity; });
-      th.forEach(t => { if (t.id in sent) { const got = Date.parse(t.date); t.replied = isNaN(got) || sent[t.id] >= got; } });
-    } catch (e) { /* sent check is best-effort */ }
+      th.forEach(t => { if (t.id in sent) { const got = Date.parse(t.date); if (isNaN(got) || sent[t.id] >= got) t.replied = true; } });
+    } catch (e) { }
+    th.sort((x, y) => (Date.parse(y.date) || 0) - (Date.parse(x.date) || 0));
+    // in a back-and-forth, the last word that counts is the last one a person wrote (auto-replies and archive notices don't count)
+    const AUTO = /no-?reply|do-?not-?reply|mailer-daemon|notifications?@|postmaster|bounce/i;
+    await Promise.all(th.filter(t => t.count > 1 || AUTO.test(t.from)).slice(0, 15).map(async t => { try {
+      const g = await tool('Gmail', 'get_thread', { threadId: t.id, messageFormat: 'MINIMAL' });
+      const ms = ((g && g.messages) || []).filter(m => !AUTO.test(m.sender || ''));
+      const last = ms[ms.length - 1]; if (last) { t.replied = ME.test(last.sender || ''); if (!t.replied) { t.from = last.sender || t.from; t.snippet = last.snippet || t.snippet; t.date = last.date || t.date; } }
+    } catch (e) { } }));
+    // read the back-and-forth on threads that look like deals, so the sort knows where each one stands
+    const dealish = th.filter(t => new RegExp(DEAL_WORDS.replace(/[()"]/g, '').split(' OR ').join('|') + (nums.length ? '|' + nums.join('|') : ''), 'i').test(t.subject + ' ' + t.snippet)).slice(0, 6);
+    await Promise.all(dealish.map(async t => { try { const g = await tool('Gmail', 'get_thread', { threadId: t.id, messageFormat: 'PLAIN_TEXT' });
+      t.convo = ((g && g.messages) || []).slice(-4).map(m => `${ME.test(m.sender || '') ? 'CHRIS' : m.sender}: ${String(m.plaintextBody || m.snippet || '').replace(/\n>.*$/gs, '').replace(/\s+/g, ' ').slice(0, 500)}`).join('\n'); } catch (e) { } }));
+    const list = th.slice(0, 60);
     let triage = [];
-    if (caps.sample && th.length) {
-      const addrs = (S.sheet && S.sheet.listings || []).map(r => r[0]).filter(Boolean).join('; ');
-      const out = await caps.sample.json(`You triage email for Chris Ranch, a luxury real estate agent (The Ranch Real Estate Group, Keller Williams, Puget Sound). Active listings: ${addrs}.
-For each email decide urgency: "now" (someone is waiting on a reply or action from Chris today: a client, buyer, seller, agent, lender, escrow or title with a question, deadline, offer or inspection item), "today" (needs a reply or action, but this week is fine), "fyi" (worth knowing but no reply needed: confirmations, receipts, signed-document notices, CCs, ShowingTime notices, FYI updates), "later" (low priority), or "skip" (newsletters, marketing, automated noise). Only use "now" or "today" when Chris actually has to respond or act.
-Only when urgency is "now" or "today" and a reply from Chris is expected, write a short, warm, professional reply in his voice (first person, no sign-off name, no promises about price or legal terms, never invent facts — if a fact is unknown, say he'll confirm). Otherwise reply = "".
-Match "deal" to one listing address if clearly related, else "".
-Return JSON array: [{"i": index, "urgency": "now"|"today"|"fyi"|"later"|"skip", "why": "<= 12 words", "deal": "", "reply": ""}]
+    if (caps.sample && list.length) {
+      const addrs = listings().map(l => l.address).join('; ');
+      const out = await caps.sample.json(`You sort email for Chris Ranch, a real estate agent (The Ranch Real Estate Group, Keller Williams, Puget Sound). His active listings: ${addrs}.
+For each email decide:
+kind: "deal" (an offer, counteroffer, inspection, escrow, title, lender, appraisal, closing or anything about a transaction or one of his listings under contract), "lead" (a new person wanting to buy, sell, tour or get a value, including Ranch Leads notices from his website), "person" (a real human writing to him: client, agent, vendor, friend, colleague), "auto" (newsletters, notifications, receipts, system alerts, tests, marketing, anything nobody personally wrote).
+urgency: "now" (a real person is waiting on Chris: any offer or deal item, any new lead, any question or request for his opinion or decision), "today" (a real person expects a reply this week), "fyi" (worth knowing, no reply needed), "skip" (tests, junk, automated noise).
+Rules: an offer on one of his listings is always deal + now. A new lead is always lead + now. Test emails and automated notices are never now. If THREAD shows Chris already answered (from any of his addresses) and no person has written back since, it is fyi; automated archive notices and auto-replies do not count as writing back. An offer Chris acknowledged is still kind deal, urgency today, why = "offer received, decision pending". If the other side wrote back after Chris, it needs a reply again.
+Only for now/today with a reply expected, write a short, warm reply in Chris's voice (first person, no sign-off name, never invent facts or make promises on price or terms; if something is unknown, say he'll confirm). Otherwise reply = "".
+Match "deal" to one listing address if related, else "".
+Return a JSON array: [{"i": index, "kind": "...", "urgency": "...", "why": "<= 12 words", "deal": "", "reply": ""}]
 EMAILS:
-${th.map((t, i) => `[${i}] From: ${t.from}\nSubject: ${t.subject}\nPreview: ${t.snippet.slice(0, 400)}`).join('\n\n')}`, { modelTier: 'default', cache: false });
+${list.map((t, i) => `[${i}] From: ${t.from}\nSubject: ${t.subject}\nPreview: ${t.snippet.slice(0, 300)}${t.convo ? '\nTHREAD (latest last):\n' + t.convo : ''}`).join('\n\n')}`, { modelTier: 'default', cache: false });
       triage = Array.isArray(out) ? out : (out && out.items) || [];
     }
-    const rank = { now: 0, today: 1, fyi: 2, later: 3, skip: 4 };
-    S.inbox = th.map((t, i) => Object.assign(t, triage.find(x => Number(x.i) === i) || { urgency: caps.sample ? 'later' : 'today', why: '', reply: '' }))
-      .filter(t => t.urgency !== 'skip').sort((a, b) => rank[a.urgency] - rank[b.urgency]);
-    store('inbox', JSON.stringify({ at: Date.now(), items: S.inbox }));
+    const rank = { now: 0, today: 1, fyi: 2, later: 3, skip: 4 }, krank = { deal: 0, lead: 1, person: 2, auto: 3 };
+    S.inbox = list.map((t, i) => Object.assign(t, triage.find(x => Number(x.i) === i) || { kind: 'person', urgency: caps.sample ? 'later' : 'today', why: '', reply: '' }))
+      .filter(t => t.urgency !== 'skip').sort((a, b) => (rank[a.urgency] - rank[b.urgency]) || ((krank[a.kind] ?? 2) - (krank[b.kind] ?? 2)) || ((Date.parse(b.date) || 0) - (Date.parse(a.date) || 0)));
+    S.inboxAt = Date.now();
+    store('inbox', JSON.stringify({ at: S.inboxAt, items: S.inbox }));
   } catch (e) { S.err.inbox = e.message || String(e); }
   S.busy.inbox = false; render();
 }
@@ -227,12 +264,13 @@ async function loadAll() {
   await Promise.all([loadPosts(), loadCalendar()]);
   S.busy.all = false; render();
   const cached = JSON.parse(store('inbox') || 'null');
-  if (cached && Date.now() - cached.at < 20 * 60e3) { S.inbox = cached.items; render(); } else loadInbox();
+  if (cached && Date.now() - cached.at < 4 * 60e3) { S.inbox = cached.items; S.inboxAt = cached.at; render(); } else loadInbox();
 }
 
 /* ---------- derived ---------- */
 function latestBy(list, key) { const m = {}; (list || []).forEach(r => { const k = r[key]; if (k) m[k] = r; }); return Object.values(m); }
 function localPhoto(u) { if (S.officeMode) return u; const m = /\/photos\/([a-z0-9-]+?)(?:-\d+)?\.(?:webp|jpe?g)$/i.exec(String(u || '')); return m ? 'thumbs/' + m[1] + '.jpg' : u; }
+const TITLE = { name: 'Title Alliance Puget Sound', email: 'service@tapugetsound.com' }; // the agent's title company (per-agent setting when others use the Office)
 const RAINIER = { name: 'Anthony', sms: '+12539880028', email: 'anthony@rainierrephoto.com', order: 'https://view.rainierrephoto.com/order' };
 const PKGS = ['Essentials: HDR photos, 2D floor plan, aerial, marketing kit', 'HDR photos + 2D floor plan', 'HDR photos only'];
 const ADDONS = ['Aerial photos', 'Twilight photos', 'Video', '3D tour', 'Floor plan'];
@@ -240,8 +278,44 @@ function hk(s) { const m = String(s || '').toLowerCase().replace(/street/g, 'st'
 function shoots() { const by = {}; ((S.sheet && S.sheet.shoots) || []).slice(1).forEach(r => { if (r[0]) by[r[0]] = { address: r[1], status: r[2], order: r[3], pkg: r[4], total: r[5], ordered: r[6], ready: r[7], page: r[8], photos: r[9] }; }); return by; }
 function shootFor(a) { return shoots()[hk(a)]; }
 const KNOWN = { '19917 145th st': { sqft: 2772, beds: 5, baths: 2.75, city: 'Bonney Lake', zip: '98391' } };
-function listings() { return (S.sheet && S.sheet.listings || []).filter(r => r[0]).map(r => ({ address: r[0], city: r[1], price: r[2], status: r[3] || 'Active', sellers: r[4], page: r[5], desk: r[6], code: r[7], listed: toDate(r[8]), photo: r[9] })); }
+function dealFor(a) { const n = (String(a).match(/^\d{3,6}/) || [])[0]; return n && (S.inbox || []).find(m => m.kind === 'deal' && !m.replied && (String(m.deal).indexOf(n) === 0 || (m.subject + m.snippet).indexOf(n) >= 0)); }
+function offersFor(a) { const n = (String(a).match(/^\d{3,6}/) || [])[0]; return ((S.sheet && S.sheet.offers) || []).filter(r => n && String(r[1]).indexOf(n) === 0 && !/withdrawn|rejected|expired/i.test(r[9] || '')); }
+function listings() { return (S.sheet && S.sheet.listings || []).filter(r => r[0] && !/^removed$/i.test(r[3] || '')).map(r => ({ address: r[0], city: r[1], price: r[2], status: r[3] || 'Active', sellers: r[4], page: r[5], desk: r[6], code: r[7], listed: toDate(r[8]), photo: r[9] })); }
 function deals() { return latestBy(S.sheet && S.sheet.deals, 1).map(r => ({ address: r[1], side: r[2], status: r[3], price: Number(String(r[4]).replace(/[^\d.]/g, '')) || 0, pct: Number(String(r[5]).replace(/[^\d.]/g, '')) || 0, gci: Number(String(r[6]).replace(/[^\d.]/g, '')) || 0, contract: toDate(r[7]), closing: toDate(r[8]), notes: r[9] })); }
+/* ---------- TC shadow mode: what the TC would have done, side by side with what happened. Nothing here sends. ---------- */
+function shadowKey(r) { return [r[0], r[1], String(r[2] || '').slice(0, 60)].join(' · '); }
+function shadowRows(a) { const n = (String(a || '').match(/^\d{3,6}/) || [])[0]; return ((S.sheet && S.sheet.shadow) || []).filter(r => r[1] && (!a || (n ? String(r[1]).indexOf(n) === 0 : r[1] === a))); }
+function tcCalls() { const m = {}; ((S.sheet && S.sheet.tcfb) || []).forEach(r => { if (r[2]) m[r[2]] = { call: r[3], note: r[4] }; }); return m; }
+function dueAt(v) { if (!v) return null; v = String(v).trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(v)) v += 'T12:00'; let t = Date.parse(v); if (isNaN(t)) t = Date.parse(String(v).replace(/(\d)(am|pm)/i, '$1 $2') + ' ' + new Date().getFullYear()); return isNaN(t) ? null : t; }
+function liveDeals() {
+  const out = {}, add = (a, from) => { const k = (String(a).match(/^\d{3,6}/) || [a])[0]; if (!out[k]) out[k] = { address: a, from }; };
+  deals().filter(d => /pending|mutual|under contract/i.test(d.status || '')).forEach(d => add(d.address, 'deal'));
+  listings().filter(l => /pending/i.test(l.status || '')).forEach(l => add(l.address, 'listing'));
+  shadowRows().forEach(r => add(r[1], 'shadow'));
+  return Object.values(out).map(d => { const rs = shadowRows(d.address), calls = tcCalls(), now = Date.now() - 864e5 / 2;
+    const next = rs.map(r => ({ r, t: dueAt(r[3]) })).filter(x => x.t && x.t >= now).sort((x, y) => x.t - y.t)[0];
+    return Object.assign(d, { rows: rs, next, waiting: rs.filter(r => r[5] && !calls[shadowKey(r)]).length, urgent: rs.filter(r => /urgent/i.test(r[2] + ' ' + r[4]) && !calls[shadowKey(r)]).length }); });
+}
+function tcSheet(a) {
+  const rs = shadowRows(a), calls = tcCalls(), now = Date.now() - 864e5 / 2;
+  const time = rs.map(r => ({ r, t: dueAt(r[3]) })).filter(x => x.t).sort((x, y) => x.t - y.t);
+  const log = rs.slice().reverse().slice(0, 40);
+  const day = t => new Date(t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  sheet(`<p class="date">Deal · shadow mode</p><h3>${esc(a)}</h3><p class="s" style="margin:-4px 0 16px">Your TC is learning. It reads the deal email every hour and writes what it would do and say. Nothing is sent to anyone. Tell it where it's right and where you'd change it.</p>
+  <h4 class="mini">Timeline</h4><div class="group">${time.length ? time.map(x => `<div class="row plain${x.t < now ? ' faded' : ''}"><div class="timecol" style="width:92px;flex:none;font-size:13px;color:var(--muted)">${esc(day(x.t))}</div><div class="body"><div class="t">${esc(x.r[2])}</div>${x.r[4] ? `<div class="s">${esc(x.r[4])}</div>` : ''}</div></div>`).join('') : '<div class="empty">The timeline fills in the hour mutual acceptance shows up in your email.</div>'}</div>
+  <h4 class="mini">What the TC would have done</h4><div class="group">${log.length ? log.map(r => { const k = shadowKey(r), c = calls[k];
+    return `<div class="row" style="align-items:flex-start"><div class="body"><div class="t">${r[7] ? `<span class="tag">${esc(r[7])}</span>` : ''}${r[9] ? `<span class="tag${/missed|worse/i.test(r[9]) ? ' now' : ''}">${esc(r[9])}</span>` : ''}${esc(r[2])}</div>
+      <div class="s">${esc([r[0], r[4]].filter(Boolean).join(' · '))}</div>
+      ${r[5] ? `<details style="margin-top:8px"><summary class="s" style="cursor:pointer">Draft it would send${r[6] ? ' · ' + esc(r[6]) : ''}</summary><div class="draftbox">${esc(r[5])}</div></details>` : ''}
+      ${r[8] ? `<div class="s" style="margin-top:6px"><b>What really happened:</b> ${esc(r[8])}</div>` : ''}
+      ${r[10] ? `<div class="s" style="margin-top:6px"><b>Lesson:</b> ${esc(r[10])}</div>` : ''}
+      ${c ? `<div class="s" style="margin-top:6px"><b>Your call:</b> ${esc(c.call)}${c.note ? ' · ' + esc(c.note) : ''}</div>` : r[5] || r[4] ? `<div class="acts" style="margin-top:10px">${r[5] ? `<button class="pill ghost" data-act="tccopy" data-k="${esc(k)}">Copy draft</button>` : ''}<button class="pill ghost" data-act="tccall" data-k="${esc(k)}" data-v="Right call">Right call</button><button class="pill ghost" data-act="tcfix" data-k="${esc(k)}">I'd change it</button></div>` : ''}
+    </div></div>`; }).join('') : '<div class="empty">Nothing logged yet. The first entries appear after the next hourly read.</div>'}</div>
+  <div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
+  const el = $('#sheet'); if (el) el.dataset.tc = a;
+}
+async function tcCall(k, call, note) { const r = ((S.sheet && S.sheet.shadow) || []).find(x => shadowKey(x) === k); if (!r) return;
+  try { await append('TC feedback', [[nowStamp(), r[1], k, call, note || '']]); toast('Saved. Your TC reads this on its next run.'); await loadSheet(); render(); tcSheet(r[1]); } catch (e) { toast('Not saved — try again.'); } }
 function business() {
   const ds = deals(), y = new Date().getFullYear(), gci = d => d.gci || (d.price && d.pct ? d.price * d.pct / 100 : 0);
   const closed = ds.filter(d => /closed|sold/i.test(d.status) && d.closing && new Date(d.closing).getFullYear() === y);
@@ -261,16 +335,19 @@ function needs() {
   const out = [], sh = S.sheet || {};
   (sh.showings || []).forEach(r => {
     const at = toDate(r[2]), ph = String(r[5] || '').replace(/[^\d]/g, '').replace(/^1?(\d{10})$/, '+1$1');
-    if (!at || !ph || /cancel|declin/i.test(r[7] || '') || Date.now() - at < 3600e3 || Date.now() - at > 3 * 864e5) return;
+    if (!at || !ph || /cancel|declin/i.test(r[7] || '') || Date.now() - at < 3600e3 || Date.now() - at > 3 * 864e5 || doneIds().has('fb:' + r[0])) return;
     const first = String(r[3] || '').split(' ')[0] || 'there', street = String(r[1] || '').replace(/ Unit#.*$/, '');
     const body = showText('fb', first, showAddr(r[1]), at);
-    out.push({ ico: I.phone, t: `Feedback · ${street}`, s: `${r[3] || 'Buyer’s agent'}${r[4] ? ' · ' + r[4] : ''} · showed ${new Date(at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`, acts: `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(body)}">Text for feedback</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a>` });
+    out.push({ ico: I.phone, t: `Feedback · ${street}`, s: `${r[3] || 'Buyer’s agent'}${r[4] ? ' · ' + r[4] : ''} · showed ${new Date(at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`, acts: `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(body)}">Text for feedback</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a><button class="pill ghost" data-act="fbok" data-k="${esc(r[0])}" data-a="${esc(street + ' · ' + (r[3] || 'Agent'))}">Got feedback</button>` });
   });
   (sh.leads || []).filter(r => r[9] === 'New' && r[8] !== 'test' && Date.now() - toDate(r[0]) < 7 * 864e5).slice(-6).reverse().forEach(r => {
     const tel = String(r[3] || '').replace(/[^\d+]/g, '');
     out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : ''].join('') });
   });
-  { const nw = inboxView().open.filter(m => m.urgency === 'now'); if (nw.length) out.push({ ico: I.mail, t: `${nw.length} email${nw.length > 1 ? 's' : ''} need${nw.length > 1 ? '' : 's'} you today`, s: nw.slice(0, 3).map(m => m.from.replace(/<.*>/, '').replace(/"/g, '').trim()).join(' · '), acts: `<button class="pill ghost" data-act="goinbox">See inbox</button>` }); }
+  ((S.sheet && S.sheet.offers) || []).filter(r => /^received|^countered/i.test(r[9] || '')).forEach(r => out.unshift({ ico: I.doc, t: `Offer on ${r[1]} · ${money(r[5])}`, s: [r[6], r[8] ? 'asks ' + money(r[8]) + ' toward closing' : '', r[3], r[10] ? 'respond by ' + r[10] : 'waiting on your sellers'].filter(Boolean).join(' · '), acts: `${r[12] ? `<a class="pill ghost" href="${esc(r[12])}" target="_blank" rel="noopener">Open email</a>` : ''}` }));
+  inboxView().open.filter(m => m.kind === 'deal' && m.urgency === 'now').slice(0, 4).forEach(m => out.unshift({ ico: I.doc, t: `Deal · ${m.subject}`, s: `${m.from.replace(/<.*>/, '').replace(/"/g, '').trim()}${m.why ? ' · ' + m.why : ''}`, acts: `${m.url ? `<a class="pill" href="${esc(m.url)}" target="_blank" rel="noopener">Open in Gmail</a>` : ''}<button class="pill ghost" data-act="goinbox">Reply from inbox</button>` }));
+  liveDeals().filter(d => d.urgent).forEach(d => out.unshift({ ico: I.doc, t: `Deal · ${d.address}`, s: `${d.urgent} urgent item${d.urgent > 1 ? 's' : ''} from your TC`, acts: `<button class="pill" data-act="tc" data-a="${esc(d.address)}">Open deal</button>` }));
+  { const nw = inboxView().open.filter(m => m.urgency === 'now' && m.kind !== 'deal'); if (nw.length) out.push({ ico: I.mail, t: `${nw.length} email${nw.length > 1 ? 's' : ''} need${nw.length > 1 ? '' : 's'} you today`, s: nw.slice(0, 3).map(m => m.from.replace(/<.*>/, '').replace(/"/g, '').trim()).join(' · '), acts: `<button class="pill ghost" data-act="goinbox">See inbox</button>` }); }
   (S.cal || []).filter(e => e.invite).forEach(e => out.push({ ico: I.cal, t: 'Invitation · ' + e.title, s: new Date(e.start).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) + (e.from ? ' · from ' + e.from : ''), acts: `<button class="pill" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="accepted">Accept</button><button class="pill ghost" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="declined">Decline</button>` }));
   Object.values(shoots()).filter(x => /ready/i.test(x.status) && x.ready && Date.now() - toDate(x.ready) < 4 * 864e5).forEach(x => out.push({ ico: I.check, t: `Photos ready · ${x.address}`, s: 'From Rainier · download all, or ask Claude to bring them into the listing', acts: `<a class="pill" href="${esc(x.page)}" target="_blank" rel="noopener">Open photos</a>` }));
   const drafts = (S.posts || []).filter(p => p.draft);
@@ -290,7 +367,7 @@ function needs() {
 /* ---------- views ---------- */
 function mailRow(m, faded) {
   const who = (m.from.replace(/<.*>/, '').replace(/"/g, '').trim().match(/\b\w/g) || ['·']).slice(0, 2).join('').toUpperCase();
-  return `<div class="row${faded ? ' faded' : ''}"><span class="who" aria-hidden="true">${esc(who)}</span><div class="body"><div class="t">${faded ? `<span class="tag">${m.replied ? 'Replied' : 'Cleared'}</span>` : m.urgency === 'now' ? '<span class="tag now">Reply today</span>' : m.urgency === 'today' ? '<span class="tag">Reply this week</span>' : m.urgency === 'fyi' ? '<span class="tag">No reply needed</span>' : ''}${esc(m.subject)}</div><div class="s">${esc(m.from.replace(/<.*>/, '').trim())}${m.why ? ' · ' + esc(m.why) : ''}${m.deal ? ' · ' + esc(m.deal) : ''}</div></div><div class="acts">${!faded && m.reply ? `<button class="pill ghost" data-act="reply" data-id="${esc(m.id)}">Reply</button>` : ''}${m.url ? `<a class="pill ghost" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}${faded ? '' : `<button class="xbtn" data-act="mdone" data-id="${esc(m.id)}" aria-label="Done with ${esc(m.subject)}" title="Done — clear it">✕</button>`}</div></div>`;
+  return `<div class="row${faded ? ' faded' : ''}"><span class="who" aria-hidden="true">${esc(who)}</span><div class="body"><div class="t">${faded ? `<span class="tag">${m.replied ? 'Replied' : 'Cleared'}</span>` : m.urgency === 'now' ? `<span class="tag now">${m.kind === 'deal' ? 'Deal · reply now' : m.kind === 'lead' ? 'New lead' : 'Reply today'}</span>` : m.urgency === 'today' ? '<span class="tag">Reply this week</span>' : m.urgency === 'fyi' ? '<span class="tag">No reply needed</span>' : ''}${esc(m.subject)}</div><div class="s">${esc(m.from.replace(/<.*>/, '').trim())}${m.why ? ' · ' + esc(m.why) : ''}${m.deal ? ' · ' + esc(m.deal) : ''}</div></div><div class="acts">${!faded && m.reply ? `<button class="pill ghost" data-act="reply" data-id="${esc(m.id)}">Reply</button>` : ''}${m.kind === 'deal' && /offer|counter/i.test(m.subject + ' ' + m.snippet) && !offerLogged(m) ? `<button class="pill ghost" data-act="logoffer" data-id="${esc(m.id)}">Log offer</button>` : ''}${m.url ? `<a class="pill ghost" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer">Open</a>` : ''}${faded ? '' : `<button class="xbtn" data-act="mdone" data-id="${esc(m.id)}" aria-label="Done with ${esc(m.subject)}" title="Done — clear it">✕</button>`}</div></div>`;
 }
 function inboxHtml() {
   if (S.inbox == null) return `<div class="group"><div class="empty">${S.busy.inbox ? 'Claude is reading the last three days…' : esc(S.err.inbox || 'Not loaded yet.')}</div></div>`;
@@ -320,8 +397,9 @@ function showingRow(x, d) {
   const r = x.r, t = new Date(x.at), first = String(r[3] || '').split(' ')[0] || 'there', street = showAddr(r[1]);
   const ph = String(r[5] || '').replace(/[^\d]/g, '').replace(/^1?(\d{10})$/, '+1$1'), day = t.toDateString() === d.toDateString() ? 'today' : t.toLocaleDateString('en-US', { weekday: 'long' });
   const when = t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }), past = Date.now() > x.at + 30 * 60e3;
-  const msg = showText(past ? 'fb' : 'pre', first, showAddr(r[1]), x.at);
-  const sms = ph ? `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}">${past ? 'Text for feedback' : 'Text agent'}</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a>`
+  const msg = showText(past ? 'fb' : 'pre', first, showAddr(r[1]), x.at), fbIn = past && doneIds().has('fb:' + r[0]);
+  if (fbIn) return `<div class="row plain faded"><div class="timecol" style="width:64px;flex:none;font-size:14px;color:var(--muted)">${when}</div><div class="body"><div class="t">Showing · ${esc(street)}</div><div class="s">${esc([r[3] || 'Buyer’s agent', r[4], 'feedback in'].filter(Boolean).join(' · '))}</div></div></div>`;
+  const sms = ph ? `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(msg)}">${past ? 'Text for feedback' : 'Text agent'}</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a>${past ? `<button class="pill ghost" data-act="fbok" data-k="${esc(r[0])}" data-a="${esc(street + ' · ' + (r[3] || 'Agent'))}">Got feedback</button>` : ''}`
     : r[6] ? `<a class="pill ghost" href="mailto:${esc(r[6])}?subject=${encodeURIComponent(street)}&body=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Email agent</a><span class="s" style="align-self:center">No phone in ShowingTime</span>` : '';
   return `<div class="row plain"><div class="timecol" style="width:64px;flex:none;font-size:14px;color:var(--muted)">${when}${t.toDateString() !== d.toDateString() ? '<br>' + t.toLocaleDateString('en-US', { weekday: 'short' }) : ''}</div><div class="body"><div class="t">Showing · ${esc(street)}</div><div class="s">${esc([r[3] || 'Buyer’s agent', r[4], r[7]].filter(Boolean).join(' · '))}</div></div><div class="acts">${sms}</div></div>`;
 }
@@ -332,19 +410,22 @@ function render() {
   const n = S.sheet ? needs() : [], ck = checks(), biz = business();
   const statusLine = !S.sheet ? 'Getting your day ready…' : n.length === 0 ? 'Everything is running. Nothing needs you.' : `Everything is running. ${n.length === 1 ? 'One thing needs' : (n.length < 10 ? ['', '', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][n.length] : n.length) + ' things need'} a tap.`;
   $('#root').innerHTML = `<div class="wrap">
-  <header class="top"><span class="brand"><span class="mark">The Hub</span><span class="sub">Your whole business</span></span>
+  <header class="top"><span class="brand"><span class="mark">The Office</span><span class="sub">Your whole business</span></span>
     <div style="display:flex;align-items:center;gap:10px">
       <div class="seg" role="group" aria-label="Look">${[['daylight', 'Daylight'], ['evening', 'Evening'], ['heritage', 'Heritage']].map(([k, l]) => `<button type="button" data-act="theme" data-v="${k}" aria-pressed="${S.theme === k}">${l}</button>`).join('')}</div>
       <span class="avatar" aria-hidden="true">CR</span></div></header>
   <div class="hello"><p class="date">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
     <h1>${hi}, Chris.</h1>
     <p class="status"><span class="dot${n.length ? '' : ''}"></span>${esc(statusLine)}</p></div>
-  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['kit','Presentations'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['deals','Deals'],['kit','Presentations'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
   ${!caps.mcp && S.ready && !S.officeMode ? `<section><div class="group"><div class="row"><div class="ico">${I.globe}</div><div class="body"><div class="t">Open Ranch on claude.ai</div><div class="s">Your Gmail, Sheet and social accounts connect there. This view is a preview.</div></div></div></div></section>` : ''}
 
-  <section aria-label="Listings" data-tone="list" id="listings"><div class="h2row"><h2>Listings</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pill ghost launch" data-act="shoot">${I.cal}<span>Order photos</span></button><button class="pill launch" data-act="launch">${I.plus}<span>Launch a listing</span></button></span></div>
-    <div class="group">${listings().length ? '' : '<div class="empty">No listings yet. Launch your first one.</div>'}${listings().map(l => `<button class="lrow" data-act="listing" data-a="${esc(l.address)}">${l.photo ? `<img class="thumb" src="${esc(localPhoto(l.photo))}" alt="" onerror="this.onerror=null;this.src='${esc(l.photo)}'">` : '<span class="thumb" aria-hidden="true"></span>'}<span class="body"><span class="t" style="display:block">${esc(l.address)}</span><span class="s" style="display:block">${esc([l.city, money(l.price), l.listed ? 'Day ' + (Math.floor((Date.now() - l.listed) / 864e5) + 1) : l.page ? '' : 'needs a page', (shootFor(l.address) || {}).status ? 'Photos: ' + shootFor(l.address).status.toLowerCase() : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('')}</div></section>
+  <section aria-label="Listings" data-tone="list" id="listings"><div class="h2row"><h2>Listings</h2><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Updating…' : (S.at ? 'Updated ' + new Date(S.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · Refresh' : 'Refresh')}</button><button class="pill ghost launch" data-act="shoot">${I.cal}<span>Order photos</span></button><button class="pill launch" data-act="launch">${I.plus}<span>Launch a listing</span></button></span></div>
+    <div class="group">${listings().length ? '' : '<div class="empty">No listings yet. Launch your first one.</div>'}${listings().map(l => `<button class="lrow" data-act="listing" data-a="${esc(l.address)}">${l.photo ? `<img class="thumb" src="${esc(localPhoto(l.photo))}" alt="" onerror="this.onerror=null;this.src='${esc(l.photo)}'">` : '<span class="thumb" aria-hidden="true"></span>'}<span class="body"><span class="t" style="display:block">${esc(l.address)}</span><span class="s" style="display:block">${esc([l.city, money(l.price), l.listed ? 'Day ' + (Math.floor((Date.now() - l.listed) / 864e5) + 1) : l.page ? '' : 'needs a page', offersFor(l.address).length ? offersFor(l.address).length + ' offer' + (offersFor(l.address).length > 1 ? 's' : '') + ' · best ' + money(Math.max(...offersFor(l.address).map(r => +r[5] || 0))) : dealFor(l.address) ? 'Offer / deal email waiting' : '', (shootFor(l.address) || {}).status ? 'Photos: ' + shootFor(l.address).status.toLowerCase() : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('')}</div></section>
 
+
+  <section aria-label="Deals" data-tone="need" id="deals"><div class="h2row"><h2>Deals</h2><span class="note" style="margin:0">Shadow mode · nothing sends</span></div>
+    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : liveDeals().length ? liveDeals().map(d => `<button class="lrow" data-act="tc" data-a="${esc(d.address)}"><span class="body"><span class="t" style="display:block">${d.urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(d.address)}</span><span class="s" style="display:block">${esc([d.next ? 'Next: ' + String(d.next.r[2]).slice(0, 60) + ' · ' + new Date(d.next.t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : d.rows.length ? '' : 'Waiting on mutual acceptance', d.waiting ? d.waiting + ' draft' + (d.waiting > 1 ? 's' : '') + ' for your call' : '', d.rows.length ? d.rows.length + ' logged' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No live deals. When one goes pending, its timeline and your TC’s drafts show up here.</div>'}</div></section>
 
   <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; print</h2></div>
     <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
@@ -383,7 +464,7 @@ function render() {
     ${biz.soon.length ? `<div class="group" style="margin-top:12px">${biz.soon.map(x => `<div class="row plain"><div class="body"><div class="t">${esc(x.address)}</div><div class="s">${esc(x.side)} · closes ${new Date(x.closing).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div></div></div>`).join('')}</div>` : ''}
     <p class="note">${biz.missingPct ? `Add your commission on ${biz.missingPct} deal${biz.missingPct > 1 ? 's' : ''} to see GCI. ` : ''}Deals live in your Ranch Sheet until KW Command is connected.</p></section>
   </div>
-  <div class="dock"><form id="tell" autocomplete="off"><input id="tellq" placeholder="Tell Ranch… “open house Saturday 1–4 at 19917”" aria-label="Tell Ranch what to do"><button aria-label="Go">${I.up}</button></form></div>`;
+  <div class="dock"><form id="tell" autocomplete="off"><input id="tellq" placeholder="Ask your Concierge… “who should I call today?”" aria-label="Ask your Concierge"><button aria-label="Go">${I.up}</button></form></div>`;
 }
 function tile(cls, live, k, s) { return `<div class="tile"><span class="live ${cls}">${esc(live)}</span><span style="font-size:16px;font-weight:500">${esc(k)}</span><span style="font-size:13px;color:var(--muted);line-height:1.4">${esc(s)}</span></div>`; }
 
@@ -395,7 +476,7 @@ function replySheet(m) {
   <form id="replyf"><div class="field"><label for="rb">Your reply</label><textarea id="rb" name="body">${esc(m.reply || '')}</textarea></div>
   <div class="acts"><button class="pill">Save to drafts</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
   $('#replyf').onsubmit = async e => { e.preventDefault(); const b = e.target.querySelector('button'); b.disabled = true; b.textContent = 'Saving…';
-    try { const r = await tool('Gmail', 'create_draft', { replyToMessageId: m.msgId, body: e.target.body.value, includeSignature: true }); markDone(m, 'drafted'); render(); const u = (r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts';
+    try { const r = await mail('draft', { replyToMessageId: m.msgId, body: e.target.body.value }); markDone(m, 'drafted'); render(); const u = (r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts';
       sheet(`<p class="date">Saved to your Gmail drafts</p><h3>Ready to send</h3><p class="s" style="margin:-4px 0 16px">Your reply is in Gmail, in the same thread. Open it there, give it a last look and send.</p><div class="acts"><a class="pill" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`); }
     catch (err) { b.disabled = false; b.textContent = 'Save to drafts'; toast('Not saved — ' + (err.message || 'try again')); } };
 }
@@ -408,12 +489,49 @@ function listingSheet(a) {
     ${l.page ? `<a class="lrow" href="${esc(l.page)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Public page</span><span class="s" style="display:block">${esc(l.page.replace('https://', ''))}</span></span>${I.chev}</a>` : ''}
     ${l.code ? `<a class="lrow" href="https://homes.ranchpnw.com/sellers#code=${esc(l.code)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Seller portal · ${esc(l.sellers || '')}</span><span class="s" style="display:block">Code ${esc(l.code)}</span></span>${I.chev}</a>` : ''}
     <button class="lrow" data-act="shoot" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Photo shoot</span><span class="s" style="display:block">${(sh => sh ? esc([sh.status, sh.pkg && sh.pkg.split(':')[0], sh.total].filter(Boolean).join(' · ')) : 'Order from Rainier · text, email or book')(shootFor(a))}</span></span>${I.chev}</button>
+    <button class="lrow" data-act="title" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Open title</span><span class="s" style="display:block">Email ${esc(TITLE.name)}, ready to send</span></span>${I.chev}</button>
     <button class="lrow" data-act="portals" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Update Zillow &amp; Redfin numbers</span></span>${I.chev}</button>
+    <button class="lrow" data-act="prep" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Seller checklist &amp; home facts</span><span class="s" style="display:block">Their progress, your items for this home, photo day</span></span>${I.chev}</button>
+    <button class="lrow" data-act="feedback" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Open house feedback</span><span class="s" style="display:block">Review, edit and publish to the sellers</span></span>${I.chev}</button>
     ${KITS[a] ? `<a class="lrow" href="${esc(KITS[a].brochure)}" target="_blank" rel="noopener"><span class="body"><span class="t" style="display:block">Print brochure</span><span class="s" style="display:block">Two pages, letter size, with QR to the page</span></span>${I.chev}</a><button class="lrow" data-act="kit" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Social graphics</span><span class="s" style="display:block">${KITS[a].social.length} posts and stories, ready to download</span></span>${I.chev}</button>` : ''}
     <button class="lrow" data-act="market" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Market stats for the sellers</span><span class="s" style="display:block">Paste your numbers — Claude charts them on their portal</span></span>${I.chev}</button>
     <button class="lrow" data-act="files" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Deal documents</span><span class="s" style="display:block">${(S.sheet && S.sheet.docs || []).filter(r => r[1] === a).length} filed in Drive</span></span>${I.chev}</button>
     ${!l.page ? `<button class="lrow" data-act="launch" data-a="${esc(a)}"><span class="body"><span class="t" style="display:block">Launch this listing</span><span class="s" style="display:block">Page, Desk, seller portal, social posts, agent email</span></span>${I.chev}</button>` : ''}
-  </div><div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
+  </div><div class="acts" style="margin-top:18px;justify-content:space-between"><button class="pill ghost" data-act="close">Done</button><button class="linkbtn" data-act="rmask" data-a="${esc(a)}" style="color:var(--warn)">Remove listing…</button></div>`);
+}
+function removeAsk(a) {
+  sheet(`<p class="date">Remove listing</p><h3>${esc(a)}</h3><p class="s" style="margin:-4px 0 16px">It disappears from The Office. The row stays in your Sheet marked “Removed,” so nothing is lost and you can bring it back by changing the status.</p>
+  <div class="acts"><button class="pill" id="rmgo" style="background:var(--warn);color:#fff">Remove</button><button class="pill ghost" data-act="close">Keep it</button></div>`);
+  $('#rmgo').onclick = async () => { const b = $('#rmgo'); b.disabled = true; b.textContent = 'Removing…';
+    try { await removeListing(a); close(); toast('Removed.'); render(); } catch (err) { b.disabled = false; b.textContent = 'Remove'; toast('Not removed — ' + (err.message || 'try again')); } };
+}
+async function removeListing(a) {
+  if (S.officeMode) await engine({ op: 'listingStatus', address: a, status: 'Removed' });
+  else {
+    const col = rows(await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: 'Listings!A1:A80' }));
+    let row = -1; col.forEach((r, i) => { if (String(r[0] || '').trim() === a.trim()) row = i + 1; });
+    if (row < 2) throw new Error('Couldn’t find it in the Sheet');
+    await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: 'Listings!D' + row, values: [['Removed']] });
+  }
+  (S.sheet.listings || []).forEach(r => { if (r[0] === a) r[3] = 'Removed'; });
+  loadSheet().then(render);
+}
+function titleSheet(a) {
+  const l = listings().find(x => x.address === a) || { address: a };
+  const draft = (addr, sellers) => ['Hi team,', '', `Could you please open title for ${addr}?` + (sellers ? `\nSeller${/ and |&|,/.test(sellers) ? 's' : ''}: ${sellers}` : ''), '', 'Thank you so much. Looking forward to working with you!'].join('\n');
+  sheet(`<p class="date">Open title · ${esc(TITLE.name)}</p><h3>${esc(a)}</h3><p class="s" style="margin:-4px 0 16px">To ${esc(TITLE.email)}. Edit anything below, then send it from here.</p>
+  <form id="ttf"><div class="field"><label for="ttsu">Subject</label><input id="ttsu" name="subject" value="${esc('Open title · ' + a)}" required></div>
+  <div class="field"><label for="ttb">Email</label><textarea id="ttb" name="body" rows="9" style="min-height:200px">${esc(draft(a, l.sellers || ''))}</textarea></div>
+  <p class="s" style="margin:-6px 0 14px;font-size:13px">Your Gmail signature is added at the end.</p>
+  <div class="acts"><button class="pill" id="ttgo" data-how="send">Send</button><button type="button" class="pill ghost" id="ttdr">Save to drafts</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  const go = async how => { const f = $('#ttf'); if (!f.reportValidity()) return; const b = $('#ttgo'), d = $('#ttdr'); if (b.disabled) return; b.disabled = d.disabled = true; (how === 'send' ? b : d).textContent = how === 'send' ? 'Sending…' : 'Saving…';
+    const msg = { to: [TITLE.email], subject: f.subject.value.trim(), body: f.body.value };
+    try { const r = await mail(how, msg);
+      try { await append('Marketing', [[nowStamp(), a, how === 'send' ? 'Title opened (email sent)' : 'Title opened (email drafted)', '', TITLE.name]]); } catch (e) { }
+      sheet(how === 'send' ? `<p class="date">Sent</p><h3>${esc(msg.subject)}</h3><p class="s" style="margin:-4px 0 16px">To ${esc(TITLE.email)}. It’s in your Gmail Sent folder, and replies come to your inbox.</p><div class="acts"><button type="button" class="pill" data-act="close">Done</button></div>`
+        : `<p class="date">Saved to your Gmail drafts</p><h3>${esc(msg.subject)}</h3><p class="s" style="margin:-4px 0 16px">To ${esc(TITLE.email)}. Send it from Gmail.</p><div class="acts"><a class="pill" href="${esc((r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts')}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`);
+    } catch (err) { b.disabled = d.disabled = false; b.textContent = 'Send'; d.textContent = 'Save to drafts'; toast((how === 'send' ? 'Not sent — ' : 'Not saved — ') + (err.message || 'try again')); } };
+  $('#ttf').onsubmit = e => { e.preventDefault(); go('send'); }; $('#ttdr').onclick = () => go('draft');
 }
 function shootText(f) {
   const d = Object.fromEntries(new FormData(f).entries()), adds = [...f.querySelectorAll('input[name=addon]:checked')].map(x => x.value);
@@ -444,13 +562,87 @@ function shootSheet(a) {
 }
 async function shootLog(d, how) { try { await append('Photo shoots', [[hk(d.address), d.address, 'Requested', '', d.pkg, '', new Date().toISOString().slice(0, 10), '', '', '', nowStamp() + ' · ' + how]]); } catch (e) { } }
 function portalsSheet(a) {
-  sheet(`<p class="date">${esc(a)}</p><h3>Zillow &amp; Redfin today</h3><p class="s" style="margin:-4px 0 16px">Copy the views and saves from each listing page. The sellers see them at the top of their portal.</p>
+  sheet(`<p class="date">${esc(a)}</p><h3>Zillow &amp; Redfin today</h3><p class="s" style="margin:-4px 0 12px">Copy the views and saves from each listing page. The sellers see them at the top of their portal.</p>
+  ${(l => { const q = encodeURIComponent(a + (l.city ? ' ' + l.city : '') + ' WA'); return `<div class="acts" style="margin:0 0 14px"><a class="pill ghost" href="https://www.zillow.com/homes/${q}_rb/" target="_blank" rel="noopener">Open on Zillow</a><a class="pill ghost" href="https://www.google.com/search?q=${encodeURIComponent('site:redfin.com ' + a + (l.city ? ' ' + l.city : ''))}" target="_blank" rel="noopener">Find on Redfin</a></div>`; })(listings().find(x => x.address === a) || {})}
   <form id="pf"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="zv">Zillow views</label><input id="zv" name="zv" inputmode="numeric"></div><div class="field"><label for="zs">Zillow saves</label><input id="zs" name="zs" inputmode="numeric"></div><div class="field"><label for="rv">Redfin views</label><input id="rv" name="rv" inputmode="numeric"></div><div class="field"><label for="rs">Redfin favorites</label><input id="rs" name="rs" inputmode="numeric"></div></div>
   <div class="acts"><button class="pill">Update their portal</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
   $('#pf').onsubmit = async e => { e.preventDefault(); const f = e.target, v = n => f[n].value.replace(/\D/g, ''), r = [];
     if (v('zv') || v('zs')) r.push([nowStamp(), a, 'Zillow', v('zv'), v('zs'), '']); if (v('rv') || v('rs')) r.push([nowStamp(), a, 'Redfin', v('rv'), v('rs'), '']);
     if (!r.length) return toast('Add at least one number.');
     try { await append('Portals', r); close(); toast('Updated. The sellers see it now.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } };
+}
+/* Open house feedback: private until Chris edits and publishes it to the sellers' portal */
+/* ---------- seller checklist: the shared list + Chris's items for this home + the sellers' own; ticks come from their portal ---------- */
+const FACTQ = [['love', 'Favorite thing buyers only discover living here'], ['life', 'A day here'], ['community', 'What only locals know'], ['updates', 'Updates'], ['systems', 'Roof, furnace, water heater'], ['utilities', 'Utilities'], ['hoa', 'HOA'], ['know', 'Anything else']];
+const prepKey = t => { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return (h >>> 0).toString(36).slice(0, 6); };
+let PREPLIST = null;
+async function prepSheet(a, keep) {
+  if (!keep) sheet(`<p class="date">${esc(a)}</p><h3>Seller checklist</h3><p class="s">Loading…</p>`);
+  let all;
+  try { PREPLIST = PREPLIST || await loadPrepList(); all = (await eng({ op: 'prep' })).sellers; }
+  catch (e) { return sheet(`<p class="date">${esc(a)}</p><h3>Seller checklist</h3><p class="s" style="margin:-4px 0 16px">${/locked/.test(e.message) ? 'This opens in The Office at homes.ranchpnw.com/office, where your engine key is saved.' : 'Couldn’t load it — ' + esc(e.message)}</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`); }
+  const mine = all.filter(x => hk(x.home) === hk(a));
+  if (!mine.length) return sheet(`<p class="date">${esc(a)}</p><h3>Seller checklist</h3><p class="s" style="margin:-4px 0 16px">No seller portal for this home yet. It appears here once their portal code is set up.</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
+  const master = []; PREPLIST.groups.filter(g => g.when === 'before').forEach(g => g.items.forEach(t => master.push({ key: g.id + '-' + prepKey(t), text: t, group: g.name })));
+  const box = 'border:1px solid rgba(128,120,108,.3);border-radius:16px;padding:14px;margin-bottom:12px';
+  const one = sl => {
+    const done = k => sl.prep.some(r => r.key === k && r.done), chris = sl.prep.filter(r => r.from === 'Chris'), own = sl.prep.filter(r => r.from === 'Seller');
+    const keys = master.map(m => m.key).concat(chris.map(r => r.key), own.map(r => r.key)), n = keys.filter(done).length;
+    const left = master.filter(m => !done(m.key)), pd = sl.photoDay ? new Date(sl.photoDay).toISOString().slice(0, 10) : '';
+    const f = sl.facts || {};
+    return `<div data-code="${esc(sl.code)}">
+    <p class="s" style="margin:0 0 4px"><b>${esc(sl.names)}</b> · ${n} of ${keys.length} done before listing</p>
+    <div style="height:6px;border-radius:3px;background:rgba(128,120,108,.25);overflow:hidden;margin:6px 0 14px"><i style="display:block;height:100%;width:${keys.length ? Math.round(n / keys.length * 100) : 0}%;background:#8C6A43"></i></div>
+    <div style="${box}"><p class="s" style="margin:0 0 8px"><b>Photo day</b> · drives the countdown on their checklist</p>
+      <div class="acts" style="margin:0"><input type="date" class="pd" value="${pd}" style="font:inherit;padding:8px 10px;border-radius:10px;border:1px solid rgba(128,120,108,.35);background:transparent;color:inherit"><button type="button" class="pill ghost" data-pp="day">Save date</button></div></div>
+    <div style="${box}"><p class="s" style="margin:0 0 8px"><b>Your items for this home</b> · they see these as “From Chris”</p>
+      ${chris.map(r => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px"><span style="flex:none;width:18px">${r.done ? '✓' : '○'}</span><textarea rows="2" data-k="${esc(r.key)}" style="flex:1;font:15px/1.45 inherit;border:1px solid rgba(128,120,108,.35);border-radius:10px;padding:8px;background:transparent;color:inherit">${esc(r.text)}</textarea><button type="button" class="pill ghost" data-pp="edit" data-k="${esc(r.key)}">Save</button><button type="button" class="xbtn" data-pp="rm" data-k="${esc(r.key)}" aria-label="Remove">✕</button></div>`).join('')}
+      <div style="display:flex;gap:8px"><input class="pnew" placeholder="Add an item for their home, like “Touch up the hallway by the garage door”" style="flex:1;font:inherit;padding:9px 12px;border-radius:10px;border:1px solid rgba(128,120,108,.35);background:transparent;color:inherit"><button type="button" class="pill" data-pp="add">Add</button></div></div>
+    ${own.length ? `<div style="${box}"><p class="s" style="margin:0 0 8px"><b>Their own list</b></p>${own.map(r => `<p style="margin:4px 0">${r.done ? '✓' : '○'} ${esc(r.text)}</p>`).join('')}</div>` : ''}
+    <details style="${box}"><summary class="s"><b>Still to do from the checklist</b> · ${left.length}</summary>${left.map(m => `<p style="margin:6px 0;font-size:14px">○ ${esc(m.text)}</p>`).join('') || '<p class="s">All done.</p>'}</details>
+    <div style="${box}"><p class="s" style="margin:0 0 8px"><b>Home facts</b>${f.at ? ' · saved ' + new Date(f.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ' · not filled in yet'}</p>
+      ${FACTQ.filter(q => f[q[0]]).map(q => `<p style="margin:8px 0 0"><span class="s">${esc(q[1])}</span><br>${esc(f[q[0]])}</p>`).join('')}</div></div>`;
+  };
+  sheet(`<p class="date">${esc(a)}</p><h3>Seller checklist &amp; home facts</h3>${mine.map(one).join('<hr style="border:0;border-top:1px solid rgba(128,120,108,.3);margin:18px 0">')}<div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
+  const card = $('#sheet');
+  card.addEventListener('click', async e => {
+    const b = e.target.closest('[data-pp]'); if (!b) return;
+    const wrap = b.closest('[data-code]'), code = wrap.dataset.code, act = b.dataset.pp; b.disabled = true;
+    try {
+      if (act === 'day') { await eng({ op: 'photoDay', code, date: wrap.querySelector('.pd').value }); toast('Photo day saved. Their countdown updates on their next visit.'); }
+      else if (act === 'add') { const t = wrap.querySelector('.pnew').value.trim(); if (!t) { b.disabled = false; return; } await eng({ op: 'prepItem', code, action: 'add', text: t }); toast('Added to their checklist.'); }
+      else if (act === 'edit') { await eng({ op: 'prepItem', code, action: 'edit', key: b.dataset.k, text: wrap.querySelector(`textarea[data-k="${b.dataset.k}"]`).value.trim() }); toast('Saved.'); }
+      else if (act === 'rm') { await eng({ op: 'prepItem', code, action: 'remove', key: b.dataset.k }); toast('Removed from their checklist.'); }
+      if (act !== 'day') prepSheet(a, true); else b.disabled = false;
+    } catch (err) { b.disabled = false; toast('Didn’t save — ' + (err.message || 'try again')); }
+  });
+}
+async function feedbackSheet(a) {
+  sheet(`<p class="date">${esc(a)}</p><h3>Open house feedback</h3><p class="s">Loading…</p>`);
+  let all;
+  try { all = rows(await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: "'Open house feedback'!A1:G500" })); }
+  catch (e) { return sheet(`<p class="date">${esc(a)}</p><h3>Open house feedback</h3><p class="s" style="margin:-4px 0 16px">Nothing yet. Feedback from guests shows up here after your next open house.</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`); }
+  const items = all.slice(1).map((r, i) => ({ row: i + 2, when: r[0], home: r[1], name: r[2], verdict: r[4] || '', text: r[5] || '', shared: /^yes/i.test(r[6] || '') })).filter(x => x.home === a).reverse();
+  const open = items.filter(x => !x.shared);
+  const card = x => `<div class="fbi" data-row="${x.row}" style="border:1px solid rgba(128,120,108,.3);border-radius:16px;padding:14px;margin-bottom:12px;${x.shared ? 'opacity:.55' : ''}">
+    <p class="s" style="margin:0 0 8px">${esc(x.name || 'Guest')} · ${esc(String(x.when).slice(0, 16))}${x.verdict ? ' · ' + esc(x.verdict) : ''}${x.shared ? ' · <b>Published</b>' : ''}</p>
+    <textarea name="t${x.row}" rows="3" style="width:100%;font:15px/1.5 inherit;border:1px solid rgba(128,120,108,.35);border-radius:12px;padding:10px;background:transparent;color:inherit">${esc(x.text)}</textarea>
+    ${x.shared ? '' : `<div class="acts" style="margin-top:8px"><button type="button" class="pill" data-fb="one" data-row="${x.row}">Publish</button></div>`}</div>`;
+  sheet(`<p class="date">${esc(a)} · private to you</p><h3>Open house feedback</h3>
+  <p class="s" style="margin:-4px 0 14px">Edit anything first. Published feedback shows on the sellers’ portal without the guest’s name.</p>
+  ${open.length > 1 ? `<div class="acts" style="margin:0 0 14px"><button type="button" class="pill" data-fb="all">Publish all ${open.length}</button></div>` : ''}
+  <form id="fbf">${items.length ? items.map(card).join('') : '<p class="s">No feedback yet for this home.</p>'}</form>
+  <div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
+  const publish = async list => {
+    const f = $('#fbf'), out = list.map(x => ({ x, text: (f['t' + x.row].value || '').trim() })).filter(o => o.text);
+    if (!out.length) return toast('Nothing to publish.');
+    try {
+      await append('Showings', out.map(o => [nowStamp(), a, 'Open house' + (o.x.verdict ? ' · ' + o.x.verdict : ''), o.text]));
+      await Promise.all(out.map(o => tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: `'Open house feedback'!F${o.x.row}:G${o.x.row}`, values: [[o.text, 'Yes ' + nowStamp()]] })));
+      toast(out.length > 1 ? `Published ${out.length}. The sellers see them now.` : 'Published. The sellers see it now.'); feedbackSheet(a);
+    } catch (err) { toast('Not published — ' + (err.message || 'try again')); }
+  };
+  document.querySelectorAll('[data-fb]').forEach(b => b.onclick = () => { b.disabled = true; publish(b.dataset.fb === 'all' ? open : items.filter(x => String(x.row) === b.dataset.row)); });
 }
 function dealSheet() {
   const ls = listings().map(l => l.address);
@@ -504,17 +696,94 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
       $('#msave').onclick = async () => { try { await append('Market', rowsM.map(r => [r.month, a, area, r.median, r.sold, r.active, r.dom, r.moi, r.stl, src])); close(); toast('Charted on the sellers’ portal.'); } catch (err) { toast('Not saved — try again.'); } };
     } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
 }
-function launchSheet(a) {
-  sheet(`<p class="date">Launch a listing</p><h3>Four questions.</h3><p class="s" style="margin:-4px 0 16px">Ranch builds the page, The Desk, the seller portal, three social posts and the agent-network email. Nothing goes public until you approve it.</p>
-  <form id="lf"><div class="field"><label for="la">Address</label><input id="la" name="a" value="${esc(a || '')}" required></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="lc">City or community</label><input id="lc" name="city"></div><div class="field"><label for="lp">Price</label><input id="lp" name="price" inputmode="numeric"></div></div>
-  <div class="field"><label for="lph">Photos (Google Drive folder link)</label><input id="lph" name="photos"></div>
-  <div class="field"><label for="lse">Sellers’ first names</label><input id="lse" name="sellers" placeholder="Aaron and Holly"></div>
-  <div class="acts"><button class="pill">Start the launch</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
-  $('#lf').onsubmit = async e => { e.preventDefault(); const f = e.target;
-    try { await append('Listings', [[f.a.value.trim(), f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
-      await append('Marketing', [[nowStamp(), f.a.value.trim(), 'Launch requested', '', 'Photos: ' + f.photos.value.trim()]]);
-      close(); toast('Queued. The launch kit is built in your next Claude session.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } };
+function launchSheet(a, pre) {
+  pre = pre || {}; const v = k => esc(pre[k] || '');
+  sheet(`<p class="date">Launch a listing</p><h3>${pre.address ? esc(pre.address) : 'A few details.'}</h3><p class="s" style="margin:-4px 0 16px">Ranch builds the page, The Desk, the seller portal, three social posts and the agent-network email. Nothing goes public until you approve it. Leave anything you don’t know yet blank.</p>
+  <form id="lf"><div class="field"><label for="la">Address</label><input id="la" name="a" value="${esc(a || pre.address || '')}" required></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="lc">City or community</label><input id="lc" name="city" value="${v('city')}"></div><div class="field"><label for="lp">Price</label><input id="lp" name="price" inputmode="numeric" value="${v('price')}"></div></div>
+  <div class="field"><label for="lse">Sellers</label><input id="lse" name="sellers" placeholder="Aaron and Holly" value="${v('sellers')}"></div>
+  <div class="field"><label for="lph">Photos (Google Drive folder link)</label><input id="lph" name="photos" value="${v('photos')}"></div>
+  <div class="field"><label for="lno">Anything else</label><textarea id="lno" name="notes" placeholder="Photo day, list date, what makes it special…">${v('notes')}</textarea></div>
+  <div class="acts"><button class="pill" id="lgo">Start the launch</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+  $('#lf').onsubmit = async e => { e.preventDefault(); const f = e.target, btn = $('#lgo'); if (btn.disabled) return;
+    btn.disabled = true; btn.textContent = 'Starting…';
+    const addr = f.a.value.trim();
+    try { await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
+      await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'), f.notes.value.trim()].filter(Boolean).join(' · ')]]);
+      sheet(`<p class="date">Launch started</p><h3>${esc(addr)}</h3><p style="font-size:17px;line-height:1.6;margin:0 0 14px">It’s in your Listings now as <b>Preparing</b>.</p>
+      <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, three posts and the agent email.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
+      <div class="acts"><button class="pill" data-act="close">Done</button></div>`);
+      loadSheet().then(render); } catch (err) { btn.disabled = false; btn.textContent = 'Start the launch'; toast('Not saved — ' + (err.message || 'try again')); } };
+}
+
+
+/* ---------- in Claude: the same seller tools, read and written straight to the Sheet (no engine, no API cost) ---------- */
+async function loadPrepList() {
+  for (const u of ['prep.json', '../prep.json']) { try { const r = await fetch(new URL(u, location.href)); if (r.ok) return await r.json(); } catch (e) { } }
+  throw new Error('Checklist file missing');
+}
+const getRaw = async range => rows(await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range }));
+const FACTKEYS = ['updates', 'systems', 'utilities', 'hoa', 'love', 'life', 'community', 'know'];
+const isYes = v => v === true || /^(yes|true)$/i.test(String(v || ''));
+function pdTime(v) { if (!v) return null; const t = Date.parse(v); return isNaN(t) ? null : t; }
+async function eng(body) {
+  if (S.officeMode) return engine(body);
+  const code = String(body.code || '').toUpperCase(), now = nowStamp();
+  if (body.op === 'prep') {
+    const [sel, prep, facts] = await Promise.all([getRaw('Sellers!A1:G300'), getRaw("'Seller prep'!A1:G4000"), getRaw("'Home facts'!A1:K400")]);
+    return { ok: true, sellers: sel.slice(1).filter(r => r[0]).map(r => { const c = String(r[0]).toUpperCase(), f = facts.slice(1).find(x => String(x[0] || '').toUpperCase() === c);
+      return { code: c, names: r[1] || '', home: r[2] || '', status: r[5] || 'Active', photoDay: pdTime(r[6]),
+        prep: prep.slice(1).filter(x => String(x[0] || '').toUpperCase() === c && x[4] !== 'Removed').map(x => ({ key: String(x[2] || ''), text: String(x[3] || ''), from: x[4] || 'List', done: isYes(x[5]) })),
+        facts: f ? Object.assign({ at: pdTime(f[2]) }, ...FACTKEYS.map((k, i) => ({ [k]: String(f[3 + i] || '') }))) : null }; }) };
+  }
+  if (body.op === 'photoDay') {
+    const sel = await getRaw('Sellers!A1:A300'); const i = sel.findIndex(r => String(r[0] || '').toUpperCase() === code); if (i < 1) throw new Error('No seller with that code');
+    await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: 'Sellers!G' + (i + 1), values: [[body.date || '']] }); return { ok: true };
+  }
+  if (body.op === 'prepItem') {
+    const text = String(body.text || '').trim().slice(0, 200);
+    if (body.action === 'add') { if (!text) throw new Error('Empty item'); const sel = await getRaw('Sellers!A1:C300'), r = sel.find(x => String(x[0] || '').toUpperCase() === code);
+      await append('Seller prep', [[code, r ? r[2] : '', 'c-' + Date.now().toString(36), text, 'Chris', '', now]]); return { ok: true }; }
+    const all = await getRaw("'Seller prep'!A1:E4000"), i = all.findIndex(x => String(x[0] || '').toUpperCase() === code && String(x[2]) === String(body.key) && x[4] === 'Chris');
+    if (i < 1) throw new Error('Only your own items can be changed');
+    if (body.action === 'edit') { if (!text) throw new Error('Empty item'); await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Seller prep'!D" + (i + 1), values: [[text]] }); }
+    else if (body.action === 'remove') await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Seller prep'!E" + (i + 1), values: [['Removed']] });
+    return { ok: true };
+  }
+  throw new Error('Open The Office for this one');
+}
+
+
+/* ---------- email: every message the Office saves or sends carries the agent's branded signature ---------- */
+const SIG = { name: 'Chris Ranch', team: 'The Ranch Real Estate Group', phone: '(253) 335-5630', tel: '+12533355630', site: 'homes.ranchpnw.com', brokerage: 'Keller Williams Realty Puget Sound', badge: 'KW Luxury',
+  cta: { text: 'Looking for something that isn’t on the market?', url: 'https://homes.ranchpnw.com/unlisted' } }; // per-agent settings when others use the Office
+let SIGIMG = null;
+async function sigImage() {
+  if (SIGIMG !== null) return SIGIMG;
+  for (const u of ['chris-sig.jpg', '../marketing/chris-sig.jpg', 'https://homes.ranchpnw.com/marketing/chris-sig.jpg']) {
+    try { const r = await fetch(new URL(u, location.href)); if (!r.ok) continue; const b = new Uint8Array(await r.arrayBuffer()); let t = ''; b.forEach(x => t += String.fromCharCode(x)); return (SIGIMG = btoa(t)); } catch (e) { }
+  }
+  return (SIGIMG = '');
+}
+function sigHtml(full, img) {
+  const a = 'color:#8C6A43;text-decoration:none', serif = "font-family:'Playfair Display',Georgia,'Times New Roman',serif;color:#1E2327";
+  if (!full) return `<table cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;font-family:Arial,Helvetica,sans-serif"><tr><td style="border-left:2px solid #8C6A43;padding-left:12px"><div style="${serif};font-size:17px">${esc(SIG.name)}</div><div style="font-size:12px;color:#6B655C">${esc(SIG.team)} &nbsp;·&nbsp; <a href="tel:${SIG.tel}" style="color:#1E2327;text-decoration:none;font-weight:bold">${esc(SIG.phone)}</a></div></td></tr></table>`;
+  return `<table cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif"><tr>${img ? `<td style="padding:0 16px 0 0;vertical-align:top"><img src="cid:att0" width="76" height="76" alt="${esc(SIG.name)}" style="display:block;border-radius:50%;width:76px;height:76px"></td>` : ''}
+<td style="vertical-align:top;border-left:2px solid #8C6A43;padding:0 0 0 16px"><div style="${serif};font-size:21px;line-height:1.15">${esc(SIG.name)}</div>
+<div style="font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#8C6A43;margin:5px 0 8px">${esc(SIG.team)}</div>
+<div style="font-size:13px;line-height:1.55;color:#3A3F43"><a href="tel:${SIG.tel}" style="color:#1E2327;text-decoration:none;font-weight:bold">${esc(SIG.phone)}</a> &nbsp;·&nbsp; <a href="https://${SIG.site}" style="${a}">${esc(SIG.site)}</a></div>
+<div style="font-size:12px;color:#6B655C;margin-top:2px">${esc(SIG.brokerage)}${SIG.badge ? ' &nbsp;·&nbsp; ' + esc(SIG.badge) : ''}</div>
+${SIG.cta ? `<div style="margin-top:9px;font-size:12.5px"><a href="${SIG.cta.url}" style="${a};border-bottom:1px solid #D9C7AE">${esc(SIG.cta.text)}&nbsp;&rarr;</a></div>` : ''}</td></tr>
+<tr><td colspan="2" style="padding-top:12px;font-size:10px;line-height:1.4;color:#9A948B">Licensed real estate broker with ${esc(SIG.brokerage)}. Each office is independently owned and operated.</td></tr></table>`;
+}
+// how: 'send' | 'draft'; msg: { to, subject, body, replyToMessageId? }; replies get the compact signature
+async function mail(how, msg) {
+  const full = !msg.replyToMessageId, img = full ? await sigImage() : '';
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.55;color:#222">${esc(msg.body || '').replace(/\n/g, '<br>')}</div>` + sigHtml(full, img);
+  const text = (msg.body || '') + `\n\n${SIG.name}\n${SIG.team}\n${SIG.phone}` + (full ? `\n${SIG.site}` : '');
+  const out = Object.assign({}, msg, { body: text, htmlBody: html, includeSignature: false });
+  if (img) out.attachments = [{ content: img, mimeType: 'image/jpeg', filename: 'chris-ranch.jpg', inline: true }];
+  return tool('Gmail', how === 'send' ? 'send_message' : 'create_draft', out);
 }
 
 /* ---------- Tell Ranch ---------- */
@@ -530,24 +799,53 @@ Actions:
 - "seller_update": {"address","title","message"} (a note on the sellers' portal)
 - "marketing": {"address","what","reach","notes"} (log something done to market a listing)
 - "deal": {"address","status","price","pct","closing" YYYY-MM-DD}
+- "launch": {"address","city","price","sellers","photos","notes"} (he wants to launch, list or set up a NEW listing; fill only what he said, "" for the rest)
 - "answer": {"text"} (a question about his business you can answer from: LISTINGS ${JSON.stringify(listings().map(l => [l.address, l.price, l.status]))} DEALS ${JSON.stringify(deals().map(d => [d.address, d.status, d.price, d.pct, d.closing && new Date(d.closing).toDateString()]))})
 Return JSON {"action": one of the names, "summary": "<= 14 words describing what will happen", "data": {...}}.
 REQUEST: ${q}`, { modelTier: 'default', cache: false });
     if (!out || !out.action) throw new Error('No action');
     const dd = out.data || {};
+    if (out.action === 'launch') return launchSheet(dd.address || '', dd);
     if (out.action === 'answer') return sheet(`<p class="date">Ranch</p><h3>${esc(q)}</h3><p style="font-size:17px;line-height:1.6">${esc(dd.text)}</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
     const fields = Object.keys(dd).map(k => `<div class="field"><label for="tf-${k}">${esc(k)}</label>${k === 'body' || k === 'message' ? `<textarea id="tf-${k}" name="${esc(k)}">${esc(dd[k])}</textarea>` : `<input id="tf-${k}" name="${esc(k)}" value="${esc(dd[k])}">`}</div>`).join('');
     sheet(`<p class="date">Ready when you are</p><h3>${esc(out.summary || q)}</h3><form id="tf">${fields}<div class="acts"><button class="pill">${{ event: 'Add to calendar', email: 'Save to Gmail drafts', seller_update: 'Post to their portal', marketing: 'Log it', deal: 'Save deal' }[out.action] || 'Do it'}</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
     $('#tf').onsubmit = async e => { e.preventDefault(); const f = e.target, v = k => f[k] ? f[k].value : (dd[k] || ''); const b = f.querySelector('button'); b.disabled = true;
       try {
         if (out.action === 'event') await tool('Google Calendar', 'create_event', { calendarId: CALENDARS[0], summary: v('title'), startTime: v('start').replace(/(Z|[+-]\d\d:\d\d)$/, ''), endTime: v('end').replace(/(Z|[+-]\d\d:\d\d)$/, ''), location: v('location') });
-        if (out.action === 'email') await tool('Gmail', 'create_draft', { to: v('to') ? [v('to')] : [], subject: v('subject'), body: v('body'), includeSignature: true });
+        if (out.action === 'email') await mail('draft', { to: v('to') ? [v('to')] : [], subject: v('subject'), body: v('body') });
         if (out.action === 'seller_update') await append('Seller updates', [[nowStamp(), v('address'), v('title'), v('message'), 'Chris']]);
         if (out.action === 'marketing') await append('Marketing', [[nowStamp(), v('address'), v('what'), v('reach'), v('notes')]]);
         if (out.action === 'deal') await append('Deals', [[nowStamp(), v('address'), 'Listing', v('status'), v('price'), v('pct'), '', '', v('closing'), '']]);
         close(); toast('Done.'); loadSheet().then(render); if (out.action === 'event') loadCalendar().then(render);
       } catch (err) { b.disabled = false; toast(out.action === 'event' && /connect|unavailable|not_connected|server/i.test(String(err.message || err.code)) ? 'Connect Google Calendar in claude.ai first.' : 'Didn’t go through — ' + (err.message || 'try again')); } };
   } catch (e) { sheet(`<p class="date">Tell Ranch</p><h3>I didn’t catch that.</h3><p class="s">Try “open house Saturday 1–4 at 19917”, “email the Hendersons a thank-you”, or “what’s pending?”</p><div class="acts" style="margin-top:14px"><button class="pill ghost" data-act="close">OK</button></div>`); }
+}
+
+/* ---------- Log an offer: read the email, fill the Offers tab, Chris checks it first ---------- */
+const OFFER_COLS = ['Received', 'Address', 'Buyers', "Buyer's agent", 'Brokerage', 'Price', 'Financing', 'Earnest money', 'Seller credit asked', 'Status', 'Response due', 'Notes', 'Email'];
+function offerLogged(m) { return ((S.sheet && S.sheet.offers) || []).some(r => String(r[12] || '').indexOf(m.id) >= 0 || (r[12] && m.url && r[12] === m.url)); }
+async function offerSheet(m, pre) {
+  sheet(`<p class="date">Log an offer</p><h3>Reading the offer…</h3><p class="s">Pulling the terms from the email. You check them before anything is saved.</p>`);
+  let o = pre || {};
+  if (!pre) try {
+    const g = await tool('Gmail', 'get_thread', { threadId: m.id, messageFormat: 'PLAIN_TEXT' });
+    const text = ((g && g.messages) || []).map(x => `${x.date} ${x.sender}: ${String(x.plaintextBody || x.snippet || '').slice(0, 2500)}\nAttachments: ${(x.attachments || []).map(a => a.filename).filter(Boolean).join(', ')}`).join('\n---\n');
+    o = await caps.sample.json(`Pull the offer terms from this email thread for Chris Ranch's listing. Listings: ${listings().map(l => l.address).join('; ')}.
+Return JSON {"address": one listing address exactly as written above, "buyers": "", "agent": "", "brokerage": "", "price": number or "", "financing": "", "earnest": number or "", "credit": number or "" (closing costs or credit the buyer asks the seller for), "due": "response deadline if stated, else empty", "notes": "one line: lender, contingencies, attachments, and whether Chris has already replied"}.
+Only use what the email says. Leave anything not stated empty.
+THREAD:
+${text}`, { modelTier: 'default', cache: false }) || {};
+  } catch (e) { o = {}; }
+  const f = (k, label, v) => `<label class="fl"><span>${label}</span><input name="${k}" value="${esc(v == null ? '' : v)}"></label>`;
+  sheet(`<p class="date">Log an offer · check it, then save</p><h3>${esc(o.address || m.subject)}</h3>
+  <form id="offf" class="form">${f('address', 'Listing', o.address)}${f('buyers', 'Buyers', o.buyers)}${f('agent', 'Buyer’s agent', o.agent)}${f('brokerage', 'Brokerage', o.brokerage)}${f('price', 'Price', o.price)}${f('financing', 'Financing', o.financing)}${f('earnest', 'Earnest money', o.earnest)}${f('credit', 'Seller credit asked', o.credit)}${f('due', 'Response due', o.due)}${f('notes', 'Notes', o.notes)}</form>
+  <p class="s" style="margin:10px 0 0;font-size:13px">Saves to the Offers tab in your Sheet (private: sellers and agents never see it). The listing stays Active until you mark it pending.</p>
+  <div class="acts" style="margin-top:12px"><button class="pill" id="offsave">Save offer</button><button class="pill ghost" data-act="close">Cancel</button></div>`);
+  $('#offsave').onclick = async ev => { const v = Object.fromEntries(new FormData($('#offf'))); if (!v.address) return toast('Which listing?'); ev.target.disabled = true;
+    try { await append('Offers', [[nowStamp(), v.address, v.buyers, v.agent, v.brokerage, String(v.price).replace(/[^\d.]/g, ''), v.financing, String(v.earnest).replace(/[^\d.]/g, ''), String(v.credit).replace(/[^\d.]/g, ''), 'Received', v.due, v.notes, m.url || m.id]]);
+      append('Hub done', [[nowStamp(), 'offer:' + m.id, 'offer logged', m.subject]]).catch(() => { });
+      close(); toast('Offer logged. It’s on the listing and in Needs you.'); await loadSheet(); render(); }
+    catch (err) { ev.target.disabled = false; toast('Not saved — ' + (err.message || 'try again')); } };
 }
 
 /* ---------- events ---------- */
@@ -561,7 +859,7 @@ document.addEventListener('click', async e => {
   else if (a === 'shoot') shootSheet(x || '');
   else if (a === 'shoot-email' || a === 'shoot-site') {
     const f = $('#shootf'); if (!f.reportValidity()) return; const o = shootText(f);
-    if (a === 'shoot-email') { b.disabled = true; try { const r = await tool('Gmail', 'create_draft', { to: [RAINIER.email], subject: 'Photo shoot · ' + o.d.address, body: o.body, includeSignature: true }); shootLog(o.d, 'email draft');
+    if (a === 'shoot-email') { b.disabled = true; try { const r = await mail('draft', { to: [RAINIER.email], subject: 'Photo shoot · ' + o.d.address, body: o.body }); shootLog(o.d, 'email draft');
         sheet(`<p class="date">Saved to your Gmail drafts</p><h3>Order ready to send</h3><p class="s" style="margin:-4px 0 16px">Give it a last look and send.</p><div class="acts"><a class="pill" href="${esc((r && r.viewUrl) || 'https://mail.google.com/mail/u/0/#drafts')}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`); }
       catch (err) { b.disabled = false; toast('Not saved — ' + (err.message || 'try again')); } }
     else { try { await navigator.clipboard.writeText(o.body); toast('Details copied. Paste into Rainier’s form.'); } catch (e) { } window.open(RAINIER.order, '_blank', 'noopener'); shootLog(o.d, 'site'); }
@@ -570,20 +868,136 @@ document.addEventListener('click', async e => {
   else if (a === 'later') { S.showLater = true; render(); }
   else if (a === 'past') { S.showPast = !S.showPast; render(); }
   else if (a === 'goinbox') { const el = document.getElementById('inbox'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (a === 'logoffer') { const m = (S.inbox || []).find(t => t.id === b.dataset.id); if (m) offerSheet(m); }
   else if (a === 'reply') { const m = (S.inbox || []).find(t => t.id === b.dataset.id); if (m) replySheet(m); }
   else if (a === 'listing') listingSheet(x);
   else if (a === 'portals') portalsSheet(x);
+  else if (a === 'feedback') feedbackSheet(x);
+  else if (a === 'prep') prepSheet(x);
   else if (a === 'files') filesSheet(x);
   else if (a === 'launch') launchSheet(x);
+  else if (a === 'rmask') removeAsk(x);
+  else if (a === 'title') titleSheet(x);
   else if (a === 'deal') dealSheet();
+  else if (a === 'tc') tcSheet(x);
+  else if (a === 'fbok') { const id = 'fb:' + b.dataset.k; try { const l = JSON.parse(store('done') || '[]'); l.push(id); store('done', JSON.stringify(l.slice(-300))); } catch (err) { } render(); toast('Removed. Feedback is in.'); append('Hub done', [[nowStamp(), id, 'Feedback received', x || '']]).catch(() => { }); }
+  else if (a === 'tccall') { b.disabled = true; tcCall(b.dataset.k, b.dataset.v); }
+  else if (a === 'tccopy') { const r = ((S.sheet && S.sheet.shadow) || []).find(r => shadowKey(r) === b.dataset.k); try { await navigator.clipboard.writeText(r ? r[5] : ''); toast('Draft copied.'); } catch (err) { toast('Couldn’t copy on this device.'); } }
+  else if (a === 'tcfix') { const box = document.createElement('div'); box.className = 'form'; box.innerHTML = `<textarea rows="3" placeholder="What would you change, or say instead?" style="width:100%"></textarea><div class="acts" style="margin-top:8px"><button class="pill" type="button">Save</button></div>`; b.parentElement.replaceWith(box); box.querySelector('textarea').focus(); box.querySelector('button').onclick = () => { const t = box.querySelector('textarea').value.trim(); if (t) tcCall(b.dataset.k, 'Change it', t); }; }
   else if (a === 'kit') kitSheet(x);
   else if (a === 'rsvp') { b.disabled = true; try { await tool('Google Calendar', 'respond_to_event', { calendarId: b.dataset.c, eventId: b.dataset.id, responseStatus: b.dataset.v }); toast(b.dataset.v === 'accepted' ? 'Accepted.' : 'Declined.'); await loadCalendar(); render(); } catch (err) { b.disabled = false; toast('Didn’t go through — ' + (err.message || 'try again')); } }
   else if (a === 'market') marketSheet(x);
   else if (a === 'sent-network') { try { await append('Marketing', [[nowStamp(), x, 'Agent network email — all 10 offices', '~600 agents', '']]); toast('Logged on the sellers’ portal.'); await loadSheet(); render(); } catch (err) { toast('Not saved — try again.'); } }
 });
-document.addEventListener('submit', e => { if (e.target.id === 'tell') { e.preventDefault(); const q = $('#tellq').value.trim(); if (q) { $('#tellq').value = ''; tell(q); } } });
+document.addEventListener('submit', e => { if (e.target.id === 'tell') { e.preventDefault(); const q = $('#tellq').value.trim(); if (q) { $('#tellq').value = ''; caps.sample ? concierge(q) : tell(q); } } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
+
+/* ---------- Concierge (office mode): a conversation with Claude through Chris's engine.
+   Lookups answer free; drafts and changes come back as proposals he approves with one tap. ---------- */
+const CHAT = [];
+function concierge(q) {
+  if (!$('#cg')) {
+    sheet(`<p class="date">Your Concierge</p><h3>How can I help?</h3><div id="cg" class="cg" aria-live="polite"></div>
+    <form id="cgf" class="cgf" autocomplete="off"><input id="cgq" placeholder="Ask, or tell me what to do" aria-label="Message your Concierge"><button type="button" id="cgm" class="pill ghost" aria-label="Talk instead of typing">Talk</button><button class="pill">Send</button></form>
+    <p class="s" style="margin:10px 0 0;font-size:12px">Drafts wait for your OK. Nothing goes to a client until you send it.</p>`);
+    const card = $('#sheet .card'); card.style.maxWidth = '640px';
+    $('#cgf').onsubmit = e => { e.preventDefault(); const v = $('#cgq').value.trim(); if (v) { $('#cgq').value = ''; concierge(v); } };
+    const SRc = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SRc) $('#cgm').remove(); else $('#cgm').onclick = () => { const r = new SRc(); r.lang = 'en-US'; r.interimResults = true; $('#cgm').textContent = 'Listening…';
+      r.onresult = ev => { $('#cgq').value = [...ev.results].map(x => x[0].transcript).join(''); }; r.onend = () => { $('#cgm').textContent = 'Talk'; if ($('#cgq').value.trim()) $('#cgf').requestSubmit(); }; r.start(); };
+    drawChat();
+  }
+  if (!q) return;
+  CHAT.push({ role: 'user', content: q }); CHAT.push({ role: 'assistant', content: '', busy: true }); drawChat();
+  const history = CHAT.slice(0, -2).filter(m => !m.busy && m.content).map(m => ({ role: m.role, content: m.content }));
+  (S.officeMode ? engine({ op: 'ask', q, history, agent: AGENT_NAME_OFFICE }) : claudeAsk(q, history)).then(r => {
+    const m = CHAT[CHAT.length - 1]; m.busy = false; m.content = r.text || ''; m.proposals = r.proposals || []; m.route = r.route; drawChat();
+  }).catch(err => { const m = CHAT[CHAT.length - 1]; m.busy = false; m.content = /locked/.test(err.message) ? 'Please sign in to your office again.' : err.message; drawChat(); });
+}
+
+/* Concierge inside Claude: same chat and approval cards, run on the Claude plan (no API key, no per-use cost) */
+const CC_RULES = `You are the Concierge for Chris Ranch, The Ranch Real Estate Group (Keller Williams Realty Puget Sound). You help him run his real estate business.
+Rules, always:
+- Nothing goes out without Chris. Emails, texts and posts are drafts he sends. You never contact a client.
+- When he asks to launch, list or set up a new listing, never say you cannot: propose launch_listing with whatever details he gave.
+- Sellers never see buyer's-agent names or details, and buyer's agents never see seller information.
+- Every fact comes from the data below, which includes his sorted inbox and the email threads that match his question. Read them; never tell him you cannot see his email. If something is not in the data, say so in one line. Never guess prices, dates or features.
+- Deals come first: an offer, counteroffer or deadline on one of his listings is the most important thing in the business. Point it out even if he asked about something else.
+- Client-facing drafts speak as Chris ("I"), warm, direct, specific and human. Never mention AI, a system or automation in them.
+How you talk to Chris: like a sharp, friendly assistant who knows the business. Lead with the answer. Short paragraphs, plain words, no filler. Ask one clear question if you need something. End with the next step when there is one.
+Put any draft or action in "proposals", not in "text".`;
+async function claudeAsk(q, history) {
+  const sh = S.sheet || {}, tail = (t, n) => (sh[t] || []).slice(-n);
+  let sellers = []; try { sellers = (await getRaw('Sellers!A1:G300')).slice(1).filter(r => r[0]).map(r => [r[1], r[2], r[5], r[6] ? 'photo day ' + r[6] : ''].filter(Boolean).join(' | ')); } catch (e) { }
+  const ctx = `Today: ${new Date().toString()} (America/Los_Angeles).
+LISTINGS (address | city | price | status | sellers | page): ${JSON.stringify(listings().map(l => [l.address, l.city, l.price, l.status, l.sellers, l.page]))}
+SELLERS WITH PORTALS: ${JSON.stringify(sellers)}
+RECENT LEADS (newest last): ${JSON.stringify(tail('leads', 15))}
+DEALS: ${JSON.stringify(tail('deals', 15))}
+OFFERS (received | address | buyers | agent | brokerage | price | financing | earnest | credit asked | status | due | notes): ${JSON.stringify(tail('offers', 20).map(r => r.slice(0, 12)))}
+RECENT MARKETING: ${JSON.stringify(tail('marketing', 10))}
+TODAY'S CALENDAR: ${JSON.stringify((S.cal || []).slice(0, 10).map(e => [e.title, e.start, e.where]))}
+INBOX, SORTED (kind | urgency | replied? | from | subject | date | preview): ${JSON.stringify(inbox)}
+${mail ? 'EMAIL THREADS MATCHING HIS QUESTION:\n' + mail : ''}`;
+  const inbox = (S.inbox || []).slice(0, 25).map(m => [m.kind, m.urgency, m.replied ? 'replied' : 'not replied', m.from, m.subject, (m.date || ''), m.snippet.slice(0, 160)].join(' | '));
+  let mail = '';
+  try {
+    const ask = q + ' ' + history.slice(-2).map(m => m.content).join(' ');
+    const terms = [...new Set((ask.match(/\b\d{3,6}\b/g) || []))];
+    const dealy = /offer|counter|inspection|escrow|deal|clos|appraisal|email|mail|repl|wrote|sent|agent|lead/i.test(ask);
+    if (terms.length || dealy) {
+      const qy = `newer_than:30d ${terms.length ? '(' + terms.join(' OR ') + ')' : ''} ${!terms.length ? DEAL_WORDS : ''}`.trim();
+      const hits = await tool('Gmail', 'search_threads', { query: qy, pageSize: 8, view: 'THREAD_VIEW_SUMMARY' });
+      const ths = ((hits && hits.threads) || []).slice(0, 4);
+      const full = await Promise.all(ths.map(t => tool('Gmail', 'get_thread', { threadId: t.id, messageFormat: 'PLAIN_TEXT' }).catch(() => null)));
+      mail = full.filter(Boolean).map(g => { const ms = (g.messages || []).slice(-4); return `THREAD "${(ms[0] || {}).subject || ''}" (${(g.messages || []).length} messages, latest last):\n` +
+        ms.map(m => `- ${m.date || ''} ${ME.test(m.sender || '') ? 'CHRIS' : m.sender}: ${String(m.plaintextBody || m.snippet || '').replace(/\n>.*$/gs, '').replace(/\s+/g, ' ').slice(0, 700)}`).join('\n'); }).join('\n\n');
+    }
+  } catch (e) { mail = 'Email search failed just now: ' + (e.message || e); }
+  const convo = history.map(m => (m.role === 'user' ? 'Chris: ' : 'You: ') + m.content).join('\n');
+  const out = await caps.sample.json(`${CC_RULES}
+
+${ctx}
+
+CONVERSATION SO FAR:
+${convo}
+Chris: ${q}
+
+Reply as JSON: {"text": "your answer to Chris", "proposals": [{"kind": "email_draft"|"text_draft"|"seller_update"|"event"|"launch_listing"|"log_offer"|"other", "to": "", "subject": "", "body": "", "listing": "", "start": "YYYY-MM-DDTHH:mm:ss local, events only", "end": "same, events only", "location": ""}]}.
+For launch_listing put the address in listing and in body a JSON string with any of address, city, price, sellers, photos, notes he gave. For seller_update put the home address in listing. When an offer email in the threads above is not yet in OFFERS, propose log_offer with listing = the address and body = a JSON string of {buyers, agent, brokerage, price, financing, earnest, credit, due, notes} taken only from the email. Use [] when nothing needs approving.`, { modelTier: 'default', cache: false });
+  return { text: (out && out.text) || '', proposals: (out && Array.isArray(out.proposals)) ? out.proposals.filter(p => p && p.kind) : [] };
+}
+const AGENT_NAME_OFFICE = 'Chris Ranch';
+function drawChat() {
+  const box = $('#cg'); if (!box) return;
+  box.innerHTML = CHAT.map((m, i) => m.role === 'user' ? `<div class="cgu">${esc(m.content)}</div>`
+    : `<div class="cga">${m.busy ? '<span class="s">Thinking…</span>' : esc(m.content).replace(/\n/g, '<br>')}${(m.proposals || []).map((p, j) => proposalCard(p, i, j)).join('')}${m.route === 'lookup' ? '<div class="cgtag">Answered from your Sheet · free</div>' : ''}</div>`).join('');
+  box.scrollTop = box.scrollHeight;
+  box.querySelectorAll('[data-pa]').forEach(b => b.onclick = () => runProposal(+b.dataset.i, +b.dataset.j, b.dataset.pa, b));
+}
+const PLABEL = { log_offer: 'Check and log offer', event: 'Add to calendar', launch_listing: 'Review and launch', email_draft: 'Save to Gmail drafts', text_draft: 'Copy text', seller_update: 'Post to their portal', checklist_item: 'Copy item', publish_feedback: 'Open feedback to publish', other: 'Copy' };
+function proposalCard(p, i, j) {
+  return `<div class="cgp"><div class="s" style="text-transform:uppercase;letter-spacing:.12em;font-size:11px">${esc((p.kind || 'other').replace('_', ' '))}${p.to ? ' · to ' + esc(p.to) : ''}${p.listing ? ' · ' + esc(p.listing) : ''}</div>
+  ${p.subject ? `<input class="cgin" data-f="subject" data-i="${i}" data-j="${j}" value="${esc(p.subject)}" aria-label="Subject">` : ''}
+  <textarea class="cgin" data-f="body" data-i="${i}" data-j="${j}" rows="5" aria-label="Draft">${esc(p.body)}</textarea>
+  <div class="acts" style="margin-top:8px">${p.done ? `<span class="s">${esc(p.done)}</span>` : `<button type="button" class="pill" data-pa="${esc(p.kind)}" data-i="${i}" data-j="${j}">${PLABEL[p.kind] || 'Copy'}</button>${p.kind === 'text_draft' ? `<a class="pill ghost" href="sms:?&body=${encodeURIComponent(p.body)}">Open in Messages</a>` : ''}`}</div></div>`;
+}
+async function runProposal(i, j, kind, btn) {
+  const p = CHAT[i].proposals[j], val = f => { const el = document.querySelector(`.cgin[data-f="${f}"][data-i="${i}"][data-j="${j}"]`); return el ? el.value : (p[f] || ''); };
+  p.body = val('body'); p.subject = val('subject'); btn.disabled = true;
+  try {
+    if (kind === 'email_draft') { await mail('draft', { to: /@/.test(p.to) ? [p.to] : [], subject: p.subject, body: p.body }); p.done = 'Saved to your Gmail drafts. Review and send it from Gmail.'; }
+    else if (kind === 'log_offer') { let o = {}; try { o = JSON.parse(p.body); } catch (e) { } o.address = o.address || p.listing; return offerSheet({ id: 'concierge-' + Date.now(), subject: 'Offer on ' + (p.listing || ''), url: '' }, o); }
+    else if (kind === 'seller_update') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Seller updates', [[nowStamp(), p.listing, p.subject || 'An update from Chris', p.body, 'Chris']]); p.done = 'Posted to their portal.'; }
+    else if (kind === 'publish_feedback') { close(); return feedbackSheet(p.listing || ''); }
+    else if (kind === 'event') { if (!p.start) throw new Error('What time? Ask me again with a day and time.'); const st = String(p.start).replace(/(Z|[+-]\d\d:\d\d)$/, ''), en = String(p.end || new Date(Date.parse(st) + 36e5).toISOString().slice(0, 19)).replace(/(Z|[+-]\d\d:\d\d)$/, '');
+      await tool('Google Calendar', 'create_event', { calendarId: CALENDARS[0], summary: p.subject || p.body.slice(0, 80), startTime: st, endTime: en, location: p.location || p.listing || '' }); p.done = 'On your calendar.'; loadCalendar().then(render); }
+    else if (kind === 'launch_listing') { let d = {}; try { d = JSON.parse(p.body); } catch (e) { d = { notes: p.body }; } close(); return launchSheet(p.listing || d.address || '', Object.assign({ address: p.listing }, d)); }
+    else { await navigator.clipboard.writeText(p.body); p.done = 'Copied.'; }
+  } catch (err) { btn.disabled = false; return toast(err.message || 'That didn’t work. Try again.'); }
+  drawChat();
+}
 
 /* ---------- office mode: outside Claude, the same Hub talks to Chris's own Google engine ---------- */
 const ENGINE = 'https://script.google.com/macros/s/AKfycbz0ALnuwyuwKaRkr2sGS7N_TPJ3DIXYYRiLP7RiNlBvv5HfQMxfy82jS88ihRab7Duu/exec';
@@ -604,7 +1018,12 @@ function unlockSheet(msg) {
 
 /* ---------- start ---------- */
 S.theme = store('theme') || 'daylight';
+try { const c = JSON.parse(store('sheet') || 'null'); if (c && c.out && Date.now() - c.at < 7 * 864e5) { S.sheet = c.out; S.at = c.at; } } catch (e) { }
 render();
+async function quietRefresh() { if (!caps.mcp || S.busy.all || S.busy.quiet) return; S.busy.quiet = true; try { await loadSheet(); render(); if (!S.busy.inbox && Date.now() - (S.inboxAt || 0) > 5 * 60e3) loadInbox(); } finally { S.busy.quiet = false; } }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - (S.at || 0) > 45e3) quietRefresh(); });
+window.addEventListener('pageshow', e => { if (e.persisted) quietRefresh(); });
+setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - (S.at || 0) > 150e3) quietRefresh(); }, 30e3);
 (async () => {
   if (window.claude && claude.use) {
     const [m, s, d] = await Promise.all(['mcp', 'sample', 'db'].map(n => claude.use(n).catch(() => null)));
