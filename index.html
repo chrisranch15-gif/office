@@ -120,7 +120,7 @@ section[data-tone=need] .group{background:linear-gradient(180deg,color-mix(in sr
 const SHEET = '1ROkc-18VbSn7kkLZYrTyJYiooMDLbBxYR0SSWItll2E';
 const METRICOOL_BRAND = '6646044';
 const DESK_19917 = (window.claude && window.claude.use) ? 'https://claude.ai/artifact/E6iKnuAbJ77ML5sArMqhEq#desk' : 'https://office.ranchpnw.com/desk/#desk';
-const CALENDARS = []; // Chris's addresses, work first (new events go on the KW calendar). Filled in only in the private claude.ai copy; never in public source.
+let CALENDARS = []; // Chris's addresses, work first (new events go on the KW calendar). Filled in only in the private claude.ai copy; never in public source.
 const NET_AGENTS = '~600 agents in 10 offices';
 const KITS = { '19917 145th St E': { brochure: 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf', social: ['just-listed-post', 'greenbelt-post', 'inside-1', 'inside-2', 'inside-3', 'inside-4', 'just-listed-story', 'greenbelt-story', 'inside-story'].map(n => 'https://homes.ranchpnw.com/social/' + n + '.jpg') } };
 const caps = { mcp: null, sample: null, db: null };
@@ -1013,7 +1013,7 @@ const officeCaps = {
 function unlockSheet(msg) {
   sheet(`<p class="date">office.ranchpnw.com</p><h3>Sign in to your office</h3><p class="s" style="margin:-4px 0 14px">${esc(msg || 'Enter your office password. This device remembers it.')}</p>
   <form id="keyf"><div class="field"><label for="kk">Password</label><input id="kk" name="k" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required><input type="text" name="username" value="Chris" autocomplete="username" style="display:none"></div><div class="acts"><button class="pill">Sign in</button></div></form>`);
-  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); if (/desk=1/.test(location.search)) return location.replace('/desk/#desk'); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That password didn’t work. After 8 wrong tries the office locks for an hour.'); } };
+  $('#keyf').onsubmit = async e => { e.preventDefault(); store('officeKey', e.target.k.value.trim()); try { const p = await engine({ op: 'ping' }); close(); if (/desk=1/.test(location.search)) return location.replace('/desk/#desk'); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; if (!CALENDARS.length && p.emails) CALENDARS = p.emails; loadAll(); toast('Welcome back, Chris.'); } catch (err) { unlockSheet('That password didn’t work. After 8 wrong tries the office locks for an hour.'); } };
 }
 
 /* ---------- start ---------- */
@@ -1031,7 +1031,7 @@ setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - (
   } else {
     S.officeMode = true;
     if (!store('officeKey')) { S.ready = true; render(); return unlockSheet(); }
-    try { const p = await engine({ op: 'ping' }); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; }
+    try { const p = await engine({ op: 'ping' }); caps.mcp = officeCaps.mcp; caps.sample = p.ai ? officeCaps.sample : null; S.office = p; if (!CALENDARS.length && p.emails) CALENDARS = p.emails; }
     catch (err) { S.ready = true; render(); return unlockSheet(err.message === 'locked' ? '' : 'Couldn’t reach your engine: ' + err.message); }
   }
   S.ready = true;
