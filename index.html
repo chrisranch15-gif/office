@@ -170,7 +170,7 @@ const I = {
 
 /* ---------- loading ---------- */
 async function loadSheet() {
-  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:M300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000" };
+  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:Q300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000" };
   const out = {};
   await Promise.all(Object.keys(tabs).map(async k => { try { out[k] = await sheetRows(tabs[k]); } catch (e) { out[k] = null; S.err.sheet = e.message || String(e); } }));
   S.sheet = out; S.at = Date.now();
@@ -346,7 +346,7 @@ function needs() {
   });
   inboxView().open.filter(m => m.kind === 'deal' && m.urgency === 'now').slice(0, 4).forEach(m => out.unshift({ ico: I.doc, t: `Deal · ${m.subject}`, s: `${m.from.replace(/<.*>/, '').replace(/"/g, '').trim()}${m.why ? ' · ' + m.why : ''}`, acts: `${m.url ? `<a class="pill" href="${esc(m.url)}" target="_blank" rel="noopener">Open in Gmail</a>` : ''}<button class="pill ghost" data-act="goinbox">Reply from inbox</button>` }));
   liveDeals().filter(d => d.urgent).forEach(d => out.unshift({ ico: I.doc, t: `Deal · ${d.address}`, s: `${d.urgent} urgent item${d.urgent > 1 ? 's' : ''} from your TC`, acts: `<button class="pill" data-act="tc" data-a="${esc(d.address)}">Open deal</button>` }));
-  ((S.sheet && S.sheet.offers) || []).filter(r => /^received|^countered/i.test(r[9] || '')).forEach(r => out.unshift({ ico: I.doc, t: `Offer on ${r[1]} · ${money(r[5])}`, s: [r[6], r[8] ? 'asks ' + money(r[8]) + ' toward closing' : '', r[3], r[10] ? 'respond by ' + r[10] : 'waiting on your sellers'].filter(Boolean).join(' · '), acts: `<button class="pill" data-act="offers" data-a="${esc((listings().find(l => hk(l.address) === hk(r[1])) || { address: r[1] }).address)}">Review offer</button>` }));
+  ((S.sheet && S.sheet.offers) || []).filter(r => /^received|^countered/i.test(r[9] || '')).forEach(r => out.unshift({ ico: I.doc, t: `Offer on ${r[1]} · ${money(r[5])}`, s: [socCheck(r).warn ? '⚠ ' + socCheck(r).text : '', r[13] ? 'closing ' + r[13] : '', r[6], r[8] ? 'asks ' + money(r[8]) + ' toward closing' : '', r[3], r[10] ? 'respond by ' + r[10] : 'waiting on your sellers'].filter(Boolean).join(' · '), acts: `<button class="pill" data-act="offers" data-a="${esc((listings().find(l => hk(l.address) === hk(r[1])) || { address: r[1] }).address)}">Review offer</button>` }));
   { const nw = inboxView().open.filter(m => m.urgency === 'now' && m.kind !== 'deal'); if (nw.length) out.push({ ico: I.mail, t: `${nw.length} email${nw.length > 1 ? 's' : ''} need${nw.length > 1 ? '' : 's'} you today`, s: nw.slice(0, 3).map(m => m.from.replace(/<.*>/, '').replace(/"/g, '').trim()).join(' · '), acts: `<button class="pill ghost" data-act="goinbox">See inbox</button>` }); }
   (S.cal || []).filter(e => e.invite).forEach(e => out.push({ ico: I.cal, t: 'Invitation · ' + e.title, s: new Date(e.start).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) + (e.from ? ' · from ' + e.from : ''), acts: `<button class="pill" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="accepted">Accept</button><button class="pill ghost" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="declined">Decline</button>` }));
   Object.values(shoots()).filter(x => /ready/i.test(x.status) && x.ready && Date.now() - toDate(x.ready) < 4 * 864e5).forEach(x => out.push({ ico: I.check, t: `Photos ready · ${x.address}`, s: 'From Rainier · download all, or ask Claude to bring them into the listing', acts: `<a class="pill" href="${esc(x.page)}" target="_blank" rel="noopener">Open photos</a>` }));
@@ -480,6 +480,14 @@ function replySheet(m) {
       sheet(`<p class="date">Saved to your Gmail drafts</p><h3>Ready to send</h3><p class="s" style="margin:-4px 0 16px">Your reply is in Gmail, in the same thread. Open it there, give it a last look and send.</p><div class="acts"><a class="pill" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Open in Gmail</a><button type="button" class="pill ghost" data-act="close">Done</button></div>`); }
     catch (err) { b.disabled = false; b.textContent = 'Save to drafts'; toast('Not saved — ' + (err.message || 'try again')); } };
 }
+const SOC_OFFERED = 2.5; // buyer brokerage compensation the listing offers (Specific Term 17a); per listing later
+function socCheck(r) { const pct = v => { const n = parseFloat(String(v || '').replace(/[^\d.]/g, '')); return isNaN(n) ? null : n; }, a = pct(r[15]), b = pct(r[16]), price = +String(r[5]).replace(/[^\d.]/g, '') || 0, base = a == null ? SOC_OFFERED : a;
+  if (b == null) return { warn: false, text: (a != null ? a + '% offered · ' : '') + 'asked not filled in yet, check 17(b)' };
+  const out = [];
+  if (a != null && a !== SOC_OFFERED) out.push(`17(a) shows ${a}% as your offer; you offer ${SOC_OFFERED}%`);
+  if (b > base) out.push(`asks ${b}%, ${+(b - base).toFixed(3)}% more than offered${price ? ', about ' + money(price * (b - base) / 100) + ' more from the sellers' : ''}`);
+  return out.length ? { warn: true, text: 'Discrepancy: ' + out.join('; ') } : { warn: false, text: `${base}% offered · ${b}% asked · matches` };
+}
 function mailTid(u) { u = String(u || ''); const f = /thread-f:(\d+)/.exec(u); if (f) { try { return BigInt(f[1]).toString(16); } catch (e) { return ''; } } const h = /#[a-z]+\/([0-9a-f]{12,20})\b/i.exec(u); return h ? h[1] : ''; }
 function offerMailHtml(tid, url) {
   const m = (S.offerMail || {})[tid];
@@ -491,10 +499,10 @@ function offerMailHtml(tid, url) {
 }
 function offerCards(rs, listPrice) {
   return rs.slice().reverse().map(r => { const price = +String(r[5]).replace(/[^\d.]/g, '') || 0, credit = +String(r[8]).replace(/[^\d.]/g, '') || 0, lp = +String(listPrice || '').replace(/[^\d.]/g, '') || 0;
-    const line = (k, v) => v ? `<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--sep)"><span class="s">${esc(k)}</span><span style="text-align:right">${v}</span></div>` : '';
+    const line = (k, v) => v ? `<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--sep)"><span class="s" style="flex:0 0 auto;max-width:42%;word-break:normal">${esc(k)}</span><span style="text-align:right">${v}</span></div>` : '';
     return `<div class="row" style="display:block"><div class="t" style="font-size:17px">${r[9] ? `<span class="tag">${esc(r[9])}</span>` : ''}${money(price)}${lp && price ? ` <span class="s">· ${price >= lp ? (price === lp ? 'full price' : money(price - lp) + ' over list') : money(lp - price) + ' under list'}</span>` : ''}</div>
       <div class="s" style="margin:4px 0 8px">${esc([r[2], r[3] && 'agent ' + r[3], r[4]].filter(Boolean).join(' · '))}</div>
-      ${line('Financing', esc(r[6]))}${line('Earnest money', r[7] ? money(r[7]) : '')}${line('Seller credit asked', credit ? money(credit) : '')}${line('Price minus credit', credit && price ? money(price - credit) : '')}${line('Response due', esc(r[10]))}${line('Received', esc(r[0]))}${line('Notes', esc(r[11]))}
+      ${(c => c.warn ? `<div class="tag now" style="display:block;margin:6px 0 8px;white-space:normal;line-height:1.4;padding:8px 10px">${esc(c.text)}</div>` : '')(socCheck(r))}${line('Closing date', r[13] ? esc(new Date(r[13] + 'T12:00').toString() !== 'Invalid Date' && /^\d{4}-\d\d-\d\d$/.test(r[13]) ? new Date(r[13] + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : r[13]) : '')}${line('Inspection', esc(r[14]))}${line('Financing', esc(r[6]))}${line('Earnest money', r[7] ? money(r[7]) : '')}${line('Seller credit asked', credit ? money(credit) : '')}${line('Price minus credit', credit && price ? money(price - credit) : '')}${line('Buyer agent comp (SOC)', esc(socCheck(r).text.replace(/^Discrepancy: /, '')))}${line('Response due', esc(r[10]))}${line('Received', esc(r[0]))}${line('Notes', esc(r[11]))}
       ${mailTid(r[12]) ? offerMailHtml(mailTid(r[12]), r[12]) : ''}</div>`; }).join('');
 }
 function offersSheet(a) { const l = listings().find(x => x.address === a) || {}, rs = offersFor(a);
@@ -853,18 +861,18 @@ async function offerSheet(m, pre) {
     const g = await tool('Gmail', 'get_thread', { threadId: m.id, messageFormat: 'PLAIN_TEXT' });
     const text = ((g && g.messages) || []).map(x => `${x.date} ${x.sender}: ${String(x.plaintextBody || x.snippet || '').slice(0, 2500)}\nAttachments: ${(x.attachments || []).map(a => a.filename).filter(Boolean).join(', ')}`).join('\n---\n');
     o = await caps.sample.json(`Pull the offer terms from this email thread for Chris Ranch's listing. Listings: ${listings().map(l => l.address).join('; ')}.
-Return JSON {"address": one listing address exactly as written above, "buyers": "", "agent": "", "brokerage": "", "price": number or "", "financing": "", "earnest": number or "", "credit": number or "" (closing costs or credit the buyer asks the seller for), "due": "response deadline if stated, else empty", "notes": "one line: lender, contingencies, attachments, and whether Chris has already replied"}.
+Return JSON {"address": one listing address exactly as written above, "buyers": "", "agent": "", "brokerage": "", "price": number or "", "financing": "", "earnest": number or "", "credit": number or "" (closing costs or credit the buyer asks the seller for), "due": "response deadline if stated, else empty", "closing": "closing date YYYY-MM-DD if stated", "inspection": "inspection period, e.g. '5 days after mutual', or 'waived', if stated", "socA": "buyer brokerage compensation 17(a), seller's offer, percent number, if stated", "socB": "17(b), amount to be paid by seller, percent number, if stated", "notes": "one line: lender, contingencies, attachments, and whether Chris has already replied"}.
 Only use what the email says. Leave anything not stated empty.
 THREAD:
 ${text}`, { modelTier: 'default', cache: false }) || {};
   } catch (e) { o = {}; }
   const f = (k, label, v) => `<label class="fl"><span>${label}</span><input name="${k}" value="${esc(v == null ? '' : v)}"></label>`;
   sheet(`<p class="date">Log an offer · check it, then save</p><h3>${esc(o.address || m.subject)}</h3>
-  <form id="offf" class="form">${f('address', 'Listing', o.address)}${f('buyers', 'Buyers', o.buyers)}${f('agent', 'Buyer’s agent', o.agent)}${f('brokerage', 'Brokerage', o.brokerage)}${f('price', 'Price', o.price)}${f('financing', 'Financing', o.financing)}${f('earnest', 'Earnest money', o.earnest)}${f('credit', 'Seller credit asked', o.credit)}${f('due', 'Response due', o.due)}${f('notes', 'Notes', o.notes)}</form>
-  <p class="s" style="margin:10px 0 0;font-size:13px">Saves to the Offers tab in your Sheet (private: sellers and agents never see it). The listing stays Active until you mark it pending.</p>
+  <form id="offf" class="form">${f('address', 'Listing', o.address)}${f('buyers', 'Buyers', o.buyers)}${f('agent', 'Buyer’s agent', o.agent)}${f('brokerage', 'Brokerage', o.brokerage)}${f('price', 'Price', o.price)}${f('financing', 'Financing', o.financing)}${f('earnest', 'Earnest money', o.earnest)}${f('credit', 'Seller credit asked', o.credit)}${f('closing', 'Closing date', o.closing)}${f('inspection', 'Inspection', o.inspection)}${f('socA', 'Buyer agent comp offered, 17(a) %', o.socA || SOC_OFFERED)}${f('socB', 'Buyer agent comp asked, 17(b) %', o.socB)}${f('due', 'Response due', o.due)}${f('notes', 'Notes', o.notes)}</form>
+  <p class="s" style="margin:10px 0 0;font-size:13px">Closing, inspection and comp usually live in the offer PDF, not the email: check 17(a) and 17(b) on the PA. Saves to the Offers tab in your Sheet (private: sellers and agents never see it). The listing stays Active until you mark it pending.</p>
   <div class="acts" style="margin-top:12px"><button class="pill" id="offsave">Save offer</button><button class="pill ghost" data-act="close">Cancel</button></div>`);
   $('#offsave').onclick = async ev => { const v = Object.fromEntries(new FormData($('#offf'))); if (!v.address) return toast('Which listing?'); ev.target.disabled = true;
-    try { await append('Offers', [[nowStamp(), v.address, v.buyers, v.agent, v.brokerage, String(v.price).replace(/[^\d.]/g, ''), v.financing, String(v.earnest).replace(/[^\d.]/g, ''), String(v.credit).replace(/[^\d.]/g, ''), 'Received', v.due, v.notes, m.url || m.id]]);
+    try { await append('Offers', [[nowStamp(), v.address, v.buyers, v.agent, v.brokerage, String(v.price).replace(/[^\d.]/g, ''), v.financing, String(v.earnest).replace(/[^\d.]/g, ''), String(v.credit).replace(/[^\d.]/g, ''), 'Received', v.due, v.notes, m.url || m.id, v.closing, v.inspection, v.socA ? String(v.socA).replace(/[^\d.]/g, '') + '%' : '', v.socB ? String(v.socB).replace(/[^\d.]/g, '') + '%' : '']]);
       append('Hub done', [[nowStamp(), 'offer:' + m.id, 'offer logged', m.subject]]).catch(() => { });
       close(); toast('Offer logged. It’s on the listing and in Needs you.'); await loadSheet(); render(); }
     catch (err) { ev.target.disabled = false; toast('Not saved — ' + (err.message || 'try again')); } };
