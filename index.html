@@ -294,27 +294,36 @@ function liveDeals() {
   const out = {}, add = (a, from) => { const k = (String(a).match(/^\d{3,6}/) || [a])[0]; if (!out[k]) out[k] = { address: a, from }; };
   deals().filter(d => /pending|mutual|under contract/i.test(d.status || '')).forEach(d => add(d.address, 'deal'));
   listings().filter(l => /pending/i.test(l.status || '')).forEach(l => add(l.address, 'listing'));
-  shadowRows().forEach(r => add(r[1], 'shadow'));
+  shadowRows().filter(r => /^seller date:|^urgent/i.test(r[2] || '')).forEach(r => add(r[1], 'shadow'));   // a contract (or something urgent) makes it a deal; notes about a listing alone don't
   return Object.values(out).map(d => { const rs = shadowRows(d.address), calls = tcCalls(), now = Date.now() - 864e5 / 2;
     const next = rs.map(r => ({ r, t: dueAt(r[3]) })).filter(x => x.t && x.t >= now).sort((x, y) => x.t - y.t)[0];
-    return Object.assign(d, { rows: rs, next, waiting: rs.filter(r => r[5] && !calls[shadowKey(r)]).length, urgent: rs.filter(r => /urgent/i.test(r[2] + ' ' + r[4]) && !calls[shadowKey(r)]).length }); });
+    return Object.assign(d, { rows: rs, next, waiting: rs.filter(r => tcNeedsChris(r, calls)).length, urgent: rs.filter(r => /^urgent/i.test(r[2] || '') && !calls[shadowKey(r)] && !r[8]).length }); });
+}
+function tcShort(t, n) { t = String(t || '').replace(/^URGENT:\s*/i, '').trim(); const f = (t.match(/^.{45,}?[.!?](\s|$)/) || [t])[0]; return f.length > (n || 140) ? f.slice(0, (n || 140) - 1).replace(/\s+\S*$/, '') + '…' : f.trim(); }
+function tcNeedsChris(r, calls) {   // only what Chris must act on: urgent items, and fresh drafts to send that haven't been overtaken by events
+  if (calls[shadowKey(r)] || r[8] || /^seller date:|^gmail draft created|^file organized/i.test(r[2] || '')) return false;
+  if (/^urgent/i.test(r[2] || '')) return true;
+  const fresh = Date.now() - (toDate(r[0]) || 0) < 3 * 864e5, due = dueAt(r[3]);
+  return !!(r[5] && fresh && !/internal|seller timeline/i.test(r[7] || '') && !(due && due < Date.now() - 864e5));
 }
 function tcSheet(a) {
-  const rs = shadowRows(a), calls = tcCalls(), now = Date.now() - 864e5 / 2;
-  const time = rs.map(r => ({ r, t: dueAt(r[3]) })).filter(x => x.t).sort((x, y) => x.t - y.t);
-  const log = rs.slice().reverse().slice(0, 40);
-  const day = t => new Date(t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  sheet(`<p class="date">Deal · shadow mode</p><h3>${esc(a)}</h3><p class="s" style="margin:-4px 0 16px">Your TC is learning. It reads the deal email every hour and writes what it would do and say. Nothing is sent to anyone. Tell it where it's right and where you'd change it.</p>
-  <h4 class="mini">Timeline</h4><div class="group">${time.length ? time.map(x => `<div class="row plain${x.t < now ? ' faded' : ''}"><div class="timecol" style="width:92px;flex:none;font-size:13px;color:var(--muted)">${esc(day(x.t))}</div><div class="body"><div class="t">${esc(x.r[2])}</div>${x.r[4] ? `<div class="s">${esc(x.r[4])}</div>` : ''}</div></div>`).join('') : '<div class="empty">The timeline fills in the hour mutual acceptance shows up in your email.</div>'}</div>
-  <h4 class="mini">What the TC would have done</h4><div class="group">${log.length ? log.map(r => { const k = shadowKey(r), c = calls[k];
-    return `<div class="row" style="align-items:flex-start"><div class="body"><div class="t">${r[7] ? `<span class="tag">${esc(r[7])}</span>` : ''}${r[9] ? `<span class="tag${/missed|worse/i.test(r[9]) ? ' now' : ''}">${esc(r[9])}</span>` : ''}${esc(r[2])}</div>
-      <div class="s">${esc([r[0], r[4]].filter(Boolean).join(' · '))}</div>
-      ${r[5] ? `<details style="margin-top:8px"><summary class="s" style="cursor:pointer">Draft it would send${r[6] ? ' · ' + esc(r[6]) : ''}</summary><div class="draftbox">${esc(r[5])}</div></details>` : ''}
-      ${r[8] ? `<div class="s" style="margin-top:6px"><b>What really happened:</b> ${esc(r[8])}</div>` : ''}
-      ${r[10] ? `<div class="s" style="margin-top:6px"><b>Lesson:</b> ${esc(r[10])}</div>` : ''}
-      ${c ? `<div class="s" style="margin-top:6px"><b>Your call:</b> ${esc(c.call)}${c.note ? ' · ' + esc(c.note) : ''}</div>` : r[5] || r[4] ? `<div class="acts" style="margin-top:10px">${r[5] ? `<button class="pill ghost" data-act="tccopy" data-k="${esc(k)}">Copy draft</button>` : ''}<button class="pill ghost" data-act="tccall" data-k="${esc(k)}" data-v="Right call">Right call</button><button class="pill ghost" data-act="tcfix" data-k="${esc(k)}">I'd change it</button></div>` : ''}
-    </div></div>`; }).join('') : '<div class="empty">Nothing logged yet. The first entries appear after the next hourly read.</div>'}</div>
-  <div class="acts" style="margin-top:18px"><button class="pill" data-act="sellerdates" data-a="${esc(a)}">Seller portal dates</button><button class="pill ghost" data-act="close">Done</button></div>`);
+  const rs = shadowRows(a), calls = tcCalls(), day = t => new Date(t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  // 1. what needs Chris: urgent items, notes for him and drafts he hasn't ruled on (newest first, max 6)
+  const need = rs.filter(r => tcNeedsChris(r, calls)).reverse().slice(0, 6);
+  // 2. key dates: the seller dates read from the contract (newest row per step); otherwise upcoming deadlines
+  const sd = {}; rs.filter(r => /^seller date:/i.test(r[2] || '')).forEach(r => { sd[String(r[2]).replace(/^seller date:\s*/i, '')] = r; });
+  const dates = Object.entries(sd).map(([m, r]) => ({ m, t: dueAt(r[3]), note: r[4] }));
+  const card = r => { const k = shadowKey(r), urgent = /^urgent/i.test(r[2] || '');
+    return `<div class="row" style="display:block"><div class="t">${urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(tcShort(r[2]))}</div>
+      ${r[4] ? `<div class="s" style="margin-top:4px"><b>What I’d do:</b> ${esc(tcShort(r[4], 180))}</div>` : ''}
+      <details style="margin-top:6px"><summary class="s" style="cursor:pointer">Full details${r[5] ? ' and the draft' : ''}</summary><div class="draftbox">${esc(r[2])}${r[4] ? '\n\n' + esc(r[4]) : ''}${r[5] ? '\n\nDraft' + (r[6] ? ' (' + esc(r[6]) + ')' : '') + ':\n' + esc(r[5]) : ''}</div></details>
+      <div class="acts" style="margin-top:10px">${r[5] && !/^https?:/.test(r[5]) ? `<button class="pill ghost" data-act="tccopy" data-k="${esc(k)}">Copy draft</button>` : ''}<button class="pill ghost" data-act="tccall" data-k="${esc(k)}" data-v="Handled">Handled</button><button class="pill ghost" data-act="tcfix" data-k="${esc(k)}">I’d change it</button></div></div>`; };
+  sheet(`<p class="date">Deal</p><h3>${esc(a)}</h3>
+  <h4 class="mini">Needs you${need.length ? ' · ' + need.length : ''}</h4><div class="group">${need.length ? need.map(card).join('') : '<div class="empty">Nothing needs you on this deal right now.</div>'}</div>
+  <h4 class="mini">Key dates</h4><div class="group">${dates.length ? dates.map(x => `<div class="row plain${x.t && x.t < Date.now() - 864e5 ? ' faded' : ''}"><div style="width:96px;flex:none;font-size:14px;color:var(--muted)">${x.t ? esc(day(x.t)) : 'To come'}</div><div class="body"><div class="t">${esc(x.m)}</div>${x.note ? `<div class="s">${esc(tcShort(x.note, 110))}</div>` : ''}</div></div>`).join('') : '<div class="empty">Dates fill in the moment the contract is signed.</div>'}</div>
+  <div class="acts" style="margin:14px 0 4px"><button class="pill" data-act="sellerdates" data-a="${esc(a)}">Update the sellers’ portal</button></div>
+  <details style="margin-top:18px"><summary class="mini" style="cursor:pointer;margin:0 4px">Everything your TC logged · ${rs.length} (with sources)</summary><div class="group" style="margin-top:8px">${rs.slice().reverse().map(r => `<div class="row plain" style="display:block"><div class="s">${esc(r[0])}${r[3] ? ' · due ' + esc(r[3]) : ''}${calls[shadowKey(r)] ? ' · your call: ' + esc(calls[shadowKey(r)].call) : ''}</div><div class="t" style="font-size:14px">${esc(r[2])}</div>${r[8] ? `<div class="s">What happened: ${esc(r[8])}</div>` : ''}</div>`).join('')}</div></details>
+  <div class="acts" style="margin-top:18px"><button class="pill ghost" data-act="close">Done</button></div>`);
   const el = $('#sheet'); if (el) el.dataset.tc = a;
 }
 /* ---------- pending: publish seller-safe dates to the seller portal (Seller timeline tab) and switch it to the pending view. Only when Chris taps. ---------- */
@@ -373,9 +382,9 @@ function needs() {
     const body = showText('fb', first, showAddr(r[1]), at);
     out.push({ ico: I.phone, t: `Feedback · ${street}`, s: `${r[3] || 'Buyer’s agent'}${r[4] ? ' · ' + r[4] : ''} · showed ${new Date(at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`, acts: `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(body)}">Text for feedback</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a><button class="pill ghost" data-act="fbok" data-k="${esc(r[0])}" data-a="${esc(street + ' · ' + (r[3] || 'Agent'))}">Got feedback</button>` });
   });
-  (sh.leads || []).filter(r => r[9] === 'New' && r[8] !== 'test' && Date.now() - toDate(r[0]) < 7 * 864e5).slice(-6).reverse().forEach(r => {
+  (sh.leads || []).filter(r => r[9] === 'New' && r[8] !== 'test' && Date.now() - toDate(r[0]) < 7 * 864e5 && !doneIds().has('lead:' + r[0] + '|' + (r[4] || r[3]))).slice(-6).reverse().forEach(r => {
     const tel = String(r[3] || '').replace(/[^\d+]/g, '');
-    out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : ''].join('') });
+    out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : '', `<button class="pill ghost" data-act="leaddone" data-k="${esc('lead:' + r[0] + '|' + (r[4] || r[3]))}" data-a="${esc(r[1] + ' · ' + r[2])}">Handled</button>`].join('') });
   });
   inboxView().open.filter(m => m.kind === 'deal' && m.urgency === 'now').slice(0, 4).forEach(m => out.unshift({ ico: I.doc, t: `Deal · ${m.subject}`, s: `${m.from.replace(/<.*>/, '').replace(/"/g, '').trim()}${m.why ? ' · ' + m.why : ''}`, acts: `${m.url ? `<a class="pill" href="${esc(m.url)}" target="_blank" rel="noopener">Open in Gmail</a>` : ''}<button class="pill ghost" data-act="goinbox">Reply from inbox</button>` }));
   { const tl = (S.sheet && S.sheet.sellertl) || [], seen = {};
@@ -467,7 +476,7 @@ function render() {
 
 
   <section aria-label="Deals" data-tone="need" id="deals"><div class="h2row"><h2>Deals</h2><span class="note" style="margin:0">Shadow mode · nothing sends</span></div>
-    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : liveDeals().length ? liveDeals().map(d => `<button class="lrow" data-act="tc" data-a="${esc(d.address)}"><span class="body"><span class="t" style="display:block">${d.urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(d.address)}</span><span class="s" style="display:block">${esc([d.next ? 'Next: ' + String(d.next.r[2]).slice(0, 60) + ' · ' + new Date(d.next.t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : d.rows.length ? '' : 'Waiting on mutual acceptance', d.waiting ? d.waiting + ' draft' + (d.waiting > 1 ? 's' : '') + ' for your call' : '', d.rows.length ? d.rows.length + ' logged' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No live deals. When one goes pending, its timeline and your TC’s drafts show up here.</div>'}</div></section>
+    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : liveDeals().length ? liveDeals().map(d => `<button class="lrow" data-act="tc" data-a="${esc(d.address)}"><span class="body"><span class="t" style="display:block">${d.urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(d.address)}</span><span class="s" style="display:block">${esc([d.next ? 'Next: ' + String(d.next.r[2]).slice(0, 60) + ' · ' + new Date(d.next.t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : d.rows.length ? '' : 'Waiting on mutual acceptance', d.waiting ? d.waiting + ' need' + (d.waiting > 1 ? '' : 's') + ' you' : '', d.rows.length ? d.rows.length + ' logged' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No live deals. When one goes pending, its timeline and your TC’s drafts show up here.</div>'}</div></section>
 
   <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; print</h2></div>
     <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
@@ -1006,6 +1015,7 @@ document.addEventListener('click', async e => {
   else if (a === 'deal') dealSheet();
   else if (a === 'tc') tcSheet(x);
   else if (a === 'offers') offersSheet(x);
+  else if (a === 'leaddone') { const id = b.dataset.k; try { const l = JSON.parse(store('done') || '[]'); l.push(id); store('done', JSON.stringify(l.slice(-300))); } catch (err) { } render(); toast('Handled. It’s off your list.'); append('Hub done', [[nowStamp(), id, 'Handled by call or text', x || '']]).catch(() => { }); }
   else if (a === 'sellerdates') sellerDatesSheet(x);
   else if (a === 'offeraccept') { const n = +b.dataset.r, r = ((S.sheet && S.sheet.offers) || [])[n - 1];
     if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Tap again: ' + offerWho(r || []) + ' accepted'; b.classList.remove('ghost'); return; }
