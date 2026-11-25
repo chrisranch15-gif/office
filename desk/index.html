@@ -5094,8 +5094,8 @@ function desk() {
   const s = l.saved;
   return deskShell('desk', `<div class="narrow" style="padding:0">
   <p class="say">${pendingDeal() ? 'Under contract' + (pendingDeal()[13] ? ', closing ' + new Date(pendingDeal()[13] + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '') + '.' : esc(lead)} ${n <= 3 ? words[n] : n + ' decisions are yours.'}</p>
-  ${pendingDeal() ? dealBlock() + offerBlock() + sellerBlock() + tellBlock() + assetsBlock() + shareBar() + showBlock() + `<div style="opacity:.6">${ohBlock()}</div>` + photoBlock()
-    : offerBlock() + sellerBlock() + shareBar() + ohBlock() + assetsBlock() + showBlock() + tellBlock() + photoBlock()}
+  ${pendingDeal() ? dealBlock() + tcBlock() + offerBlock() + sellerBlock() + tellBlock() + assetsBlock() + shareBar() + showBlock() + `<div style="opacity:.6">${ohBlock()}</div>` + photoBlock()
+    : offerBlock() + tcBlock() + sellerBlock() + shareBar() + ohBlock() + assetsBlock() + showBlock() + tellBlock() + photoBlock()}
 
   ${n ? `<div class="decisions">${ds.slice(0, 2).map(decisionCard).join('')}</div>${n > 2 ? `<details style="margin-top:20px"><summary class="btn ghost" style="display:inline-flex">${n - 2} more</summary><div class="decisions" style="margin-top:20px">${ds.slice(2).map(decisionCard).join('')}</div></details>` : ''}`
     : `<div class="decision" style="margin-top:40px"><div class="t">All quiet. The Concierge is handling the rest.</div><div class="d">You’ll see something here only when a fact conflicts, a judgment call is needed, a connection breaks, or pricing and contracts are involved.</div></div>`}
@@ -6006,8 +6006,9 @@ async function liveLoad(quiet) {
       callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: "'Photo layout'!A2:F500" }).catch(() => null),
       callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: "'Hub done'!B2:B3000" }).catch(() => null),
       callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: 'Offers!A2:Q300' }).catch(() => null),
-      callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: "'TC shadow'!A2:H600" }).catch(() => null)
-    ]).then(r => { ui.offerRows = liveRows(r[6]); ui.tcRows = liveRows(r[7]); ui.ohRows = liveRows(r[2]); ui.showRows = liveRows(r[3]); ui.fbOk = Object.assign({}, ui.fbOk); liveRows(r[5]).forEach(x => { if (/^fb:/.test(x[0])) ui.fbOk[String(x[0]).slice(3)] = 1; }); try { applyOpenHouses(ui.ohRows); } catch (e) {}
+      callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: "'TC shadow'!A2:L2000" }).catch(() => null),
+      callTool('Google Sheets', 'get_values', { spreadsheetId: LIVE_SHEET, range: "'TC feedback'!A2:E2000" }).catch(() => null)
+    ]).then(r => { ui.offerRows = liveRows(r[6]); ui.tcRows = liveRows(r[7]); ui.tcCalls = {}; liveRows(r[8]).forEach(x => { if (x[2]) ui.tcCalls[x[2]] = x[3]; }); ui.ohRows = liveRows(r[2]); ui.showRows = liveRows(r[3]); ui.fbOk = Object.assign({}, ui.fbOk); liveRows(r[5]).forEach(x => { if (/^fb:/.test(x[0])) ui.fbOk[String(x[0]).slice(3)] = 1; }); try { applyOpenHouses(ui.ohRows); } catch (e) {}
       try { const lr = liveRows(r[4]).filter(x => String(x[1]) === '19917'); const last = lr[lr.length - 1]; if (last && !ui.photoDraft) { const j = v => { try { return JSON.parse(v || '[]'); } catch (e) { return []; } }; applyLayout({ order: j(last[2]), hidden: j(last[3]), featured: j(last[4]) }); ui.layoutSaved = last[0]; } } catch (e) {}
       return r; });
     ui.live = { at: Date.now(), leads: liveRows(leads).filter(r => r[8] !== 'test').reverse(), marketing: liveRows(mk).reverse() };
@@ -6185,6 +6186,49 @@ function offerBlock() {
     ${!acc ? `<div class="chips" style="margin:14px 0 0">${rs.map(r => `<button class="chip" data-act="offer-accept" data-r="${offerRowNo(r)}">${ui.offerSure === offerRowNo(r) ? 'Tap again: ' + esc(offerWho(r)) + ' accepted' : esc(offerWho(r)) + ' accepted'}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Once your sellers sign, tap the accepted one. This folds into a summary and the other offers stay saved.</p>` : `<div class="chips" style="margin:12px 0 0"><button class="chip" data-act="offer-reopen">Not accepted after all</button></div>`}
     <p class="small muted" style="margin-top:10px">Private to you. The sellers’ portal never shows offers or agent details.</p></div>`;
 }
+/* ---------- TC drafts on the Desk: Gmail drafts the TC made for this listing ("Gmail draft created:" rows in TC shadow, column F = the
+   draft link). Shown with the exact recipients and message; the agent taps Send twice or edits in Gmail. Nothing sends on its own. ---------- */
+const tcKey = r => [r[0], r[1], String(r[2] || '').slice(0, 60)].join(' · ');
+function tcDraftIdOf(r) { const m = /msg-a:(r-?\d+)/.exec(String(r[5] || '')); return /^gmail draft created/i.test(r[2] || '') && m ? m[1] : ''; }
+function tcWaiting() { const k = homeKeyJs(street()), calls = ui.tcCalls || {};
+  return (ui.tcRows || []).filter(r => homeKeyJs(r[1]) === k && tcDraftIdOf(r) && !calls[tcKey(r)] && !r[8]).reverse(); }
+const tcFilesOf = d => ((d && d.attachments) || []).filter(x => x.filename && !x.inline);
+async function tcDraftFetch(id) { ui.tcDraft = ui.tcDraft || {}; if (ui.tcDraft[id]) return; ui.tcDraft[id] = 'loading';
+  try { const d = await callTool('Gmail', 'get_draft', { draftId: id, messageFormat: 'FULL_CONTENT' }); ui.tcDraft[id] = d && (d.subject || d.plaintextBody || d.toRecipients) ? d : { error: 'gone' }; }
+  catch (e) { ui.tcDraft[id] = { error: /not ?found|404|no draft/i.test((e && e.message) || '') ? 'gone' : ((e && e.message) || 'not available') }; }
+  render(); }
+function tcBlock() {
+  if (!isStaff() || !caps.mcp || !ui.live) return '';
+  const rs = tcWaiting(); if (!rs.length) return '';
+  const card = r => { const id = tcDraftIdOf(r), d = (ui.tcDraft || {})[id], k = tcKey(r), link = esc(r[5]);
+    const title = esc(String(r[2]).replace(/^gmail draft created:\s*/i, '').replace(/\s*\(.*$/, ''));
+    let inner;
+    if (!d || d === 'loading') { if (!d) setTimeout(() => tcDraftFetch(id)); inner = '<p class="small muted" style="margin:8px 0 0">Opening the draft…</p>'; }
+    else if (d.error) inner = d.error === 'gone' ? '<p class="small muted" style="margin:8px 0 0">This draft isn’t in Gmail anymore (sent or deleted there). Tap Handled to clear it.</p>'
+      : `<p class="small muted" style="margin:8px 0 0">Couldn’t open it here (${esc(d.error)}). <a href="${link}" target="_blank" rel="noopener noreferrer">Open in Gmail</a></p>`;
+    else { const f = tcFilesOf(d), to = (d.toRecipients || []).join(', ');
+      inner = `<div style="padding:12px 14px;margin-top:8px;background:var(--paper2,rgba(128,120,108,.08));border-radius:10px"><div class="small"><b>${esc(d.subject || '(no subject)')}</b></div>
+        <div class="small muted" style="margin-top:4px">To: ${esc(to)}${(d.ccRecipients || []).length ? ' · CC: ' + esc(d.ccRecipients.join(', ')) : ''}${f.length ? ' · Attached: ' + esc(f.map(x => x.filename).join(', ')) : ''}</div>
+        <div class="small" style="white-space:pre-wrap;margin-top:8px;line-height:1.5">${esc(String(d.plaintextBody || '').trim())}</div></div>
+        <div class="chips" style="margin:10px 0 0">${f.length ? `<a class="chip" href="${link}" target="_blank" rel="noopener noreferrer">Send in Gmail (has an attachment)</a>` : `<button class="chip" data-act="tc-send" data-k="${esc(k)}">${ui.tcSure === k ? 'Tap again to send to ' + esc(to) : 'Send'}</button>`}<a class="chip" href="${link}" target="_blank" rel="noopener noreferrer">Edit in Gmail</a><button class="chip" data-act="tc-handled" data-k="${esc(k)}">Handled</button></div>`; }
+    return `<div style="padding:14px 0 6px;border-top:1px solid var(--line)"><div><b>${title}</b></div>${inner}</div>`; };
+  return `<div class="sharebar" id="tcdrafts"><div class="eyebrow">Ready to send · ${rs.length} email${rs.length > 1 ? 's' : ''} from your TC</div>${rs.map(card).join('')}
+    <p class="small muted" style="margin-top:10px">Nothing goes out until you tap Send. The same drafts are in your Gmail drafts and in the Office.</p></div>`;
+}
+async function tcSendDesk(k) { const r = (ui.tcRows || []).find(x => tcKey(x) === k); if (!r) return; const id = tcDraftIdOf(r);
+  if (ui.tcSure !== k) { ui.tcSure = k; return render(); }
+  ui.tcSure = null; toast('Sending…');
+  try { const d = await callTool('Gmail', 'get_draft', { draftId: id, messageFormat: 'FULL_CONTENT' });   // re-read: what goes out is what's in Gmail right now
+    if (!d || !(d.toRecipients || []).length) throw new Error('the draft has no recipient');
+    if (tcFilesOf(d).length) { (ui.tcDraft = ui.tcDraft || {})[id] = d; render(); return toast('It has an attachment now. Send it in Gmail.'); }
+    const msg = { to: d.toRecipients, subject: d.subject || '', body: d.plaintextBody || '' };
+    if ((d.ccRecipients || []).length) msg.cc = d.ccRecipients; if ((d.bccRecipients || []).length) msg.bcc = d.bccRecipients; if (d.htmlBody) msg.htmlBody = d.htmlBody;
+    await callTool('Gmail', 'send_message', msg);
+    await callTool('Gmail', 'delete_draft', { draftId: id }).catch(() => null);
+    (ui.tcDraft = ui.tcDraft || {})[id] = { error: "gone" }; ui.tcCalls = Object.assign({}, ui.tcCalls, { [k]: 'Sent' });
+    await liveAppend("'TC feedback'", [liveNow(), r[1], k, 'Sent', 'Sent from the Desk'], 'Sent.');
+  } catch (e) { toast('Not sent — ' + ((e && e.message) || 'try again') + '.'); }
+  render(); }
 function showBlock() {
   if (!isStaff() || !caps.mcp) return '';
   const all = showList(), now = Date.now();
@@ -6276,6 +6320,9 @@ Object.assign(A, {
   'offer-accept': async (el) => { const n = +el.dataset.r; if (ui.offerSure !== n) { ui.offerSure = n; return render(); }
     ui.offerSure = null; try { await offerSetStatus(n); toast('Marked accepted. The other offers stay saved.'); } catch (e) { toast('Not saved — ' + ((e && e.message) || 'try again') + '.'); } render(); },
   'offer-reopen': async () => { try { await offerSetStatus(0); toast('Back to comparing offers.'); } catch (e) { toast('Not saved — ' + ((e && e.message) || 'try again') + '.'); } render(); },
+  'tc-send': (el) => { el.disabled = true; tcSendDesk(el.dataset.k); },
+  'tc-handled': async (el) => { const k = el.dataset.k, r = (ui.tcRows || []).find(x => tcKey(x) === k); if (!r) return; ui.tcCalls = Object.assign({}, ui.tcCalls, { [k]: 'Handled' }); render();
+    await liveAppend("'TC feedback'", [liveNow(), r[1], k, 'Handled', 'Marked on the Desk'], 'Cleared.'); },
   'offer-mail-close': (el) => { delete (ui.offerMail || {})[el.dataset.t]; render(); },
   'asset-copy': async (el) => { try { await navigator.clipboard.writeText(el.dataset.u); el.textContent = 'Copied'; } catch (e) { el.textContent = el.dataset.u; } },
   'show-fbok': async (el) => {
