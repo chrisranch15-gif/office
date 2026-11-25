@@ -6018,12 +6018,15 @@ function photoBlock() {
     <div class="chips" style="margin-top:16px"><button class="btn" data-act="photo-save" ${ui.busy === 'photos' ? 'disabled' : ''}>${ui.busy === 'photos' ? 'Publishing…' : 'Publish to the listing page'}</button><button class="chip" data-act="photo-reset">Back to the original order</button><button class="chip" data-act="photo-close">Cancel</button></div>
     <p class="small muted" style="margin-top:10px">Shows on homes.ranchpnw.com/19917 within a minute.</p></div>`;
 }
+const SIGN_SETS = { '19917': [['gallery', 'Gallery'], ['noir', 'Noir'], ['daylight', 'Daylight']] }; // printed by source/print/open_house_signs.py
 function ohBlock() {
   if (!isStaff()) return '';
   const up = L().openHouses.filter(o => o.status === 'scheduled');
   const nextSat = (() => { const d = new Date(); d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7)); return d.toISOString().slice(0, 10); })();
   const opt = (sel) => OH_TIMES.map(([v, t]) => `<option value="${v}" ${v === sel ? 'selected' : ''}>${t}</option>`).join('');
-  return `<div class="sharebar" id="openhouses"><div class="eyebrow">Open houses</div>
+  const num = (String(street()).match(/^\d+/) || [''])[0], styles = SIGN_SETS[num] || [];
+  const signs = styles.length ? `<div style="margin-top:12px"><div class="small" style="font-weight:600">Sign-in signs with QR codes · print-ready</div><div class="chips" style="margin-top:8px">${styles.map(([k, t]) => `<a class="chip" href="https://homes.ranchpnw.com/print/open-house-signs-${num}-${k}.pdf" target="_blank" rel="noopener">${t}</a>`).join('')}</div><p class="small muted" style="margin-top:6px">Letter size, 4 pages each. Guests scan, sign in in about 20 seconds, and land in your Leads.</p></div>` : '<p class="small muted" style="margin-top:12px">No sign-in signs for this home yet. Ask your Concierge to make them.</p>';
+  return `<div class="sharebar" id="openhouses"><div class="eyebrow">Open houses</div>${signs}
     ${up.length ? `<div class="list" style="margin-top:10px">${up.map(o => `<div><span aria-hidden="true">●</span><span><b>${esc(o.label)}</b><br><span class="small muted">On the listing page · comes off when it ends</span></span>${caps.mcp ? `<button class="btn text small" data-act="oh-cancel" data-id="${esc(o.id)}">Remove</button>` : ''}</div>`).join('')}</div>` : '<p class="small muted" style="margin:8px 0 0">Nothing scheduled. Add one below when the time is set — it won’t show anywhere until you publish it.</p>'}
     ${caps.mcp ? `<details style="margin-top:14px" ${ui.ohOpen ? 'open' : ''}><summary class="btn ghost" style="display:inline-flex">Add an open house</summary>
     <form data-form="oh-add" style="margin-top:16px"><div class="field"><label for="oh-d">Day</label><input id="oh-d" name="day" type="date" required value="${nextSat}"></div>
