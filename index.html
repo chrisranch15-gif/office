@@ -318,14 +318,20 @@ function tcSheet(a) {
   const el = $('#sheet'); if (el) el.dataset.tc = a;
 }
 /* ---------- pending: publish seller-safe dates to the seller portal (Seller timeline tab) and switch it to the pending view. Only when Chris taps. ---------- */
-const SELLER_STEPS = [['Mutual acceptance', /mutual/i], ['Inspection period ends', /inspect/i], ['Appraisal', /apprais/i], ['Financing deadline', /financ|loan/i], ['Signing with escrow', /sign/i], ['Closing day', /clos/i]];
+const SELLER_STEPS = ['Mutual acceptance', 'Earnest money deposited', 'Home inspection', 'Inspection period ends', 'HOA documents due to the buyers', 'Buyers\u2019 information review ends', 'HOA review ends', 'Appraisal', 'Financing check-in', 'Signing with escrow', 'Closing day'];
 async function sellerDatesSheet(a) {
   const n = (String(a).match(/^\d{3,6}/) || [''])[0], rs = shadowRows(a), off = ((S.sheet && S.sheet.offers) || []).filter(r => String(r[1]).indexOf(n) === 0 && /accept|mutual|pending/i.test(r[9] || ''))[0];
-  const pre = SELLER_STEPS.map(([m, re]) => { const hit = rs.filter(r => re.test(r[2]) && /^\d{4}-\d\d-\d\d/.test(r[3] || '')).pop(); let d = hit ? String(hit[3]).slice(0, 10) : '';
-    if (!d && m === 'Closing day' && off && /^\d{4}-\d\d-\d\d$/.test(off[13] || '')) d = off[13]; return { m, d }; });
+  // the TC writes "Seller date: <step>" rows from the signed contract; older deals fall back to keyword matches
+  const tcRows = rs.filter(r => /^seller date:/i.test(r[2] || '')), names = tcRows.length ? [...new Set(tcRows.map(r => String(r[2]).replace(/^seller date:\s*/i, '').trim()))] : SELLER_STEPS;
+  const today = new Date().toISOString().slice(0, 10);
+  const pre = names.map(m => { const hit = tcRows.filter(r => String(r[2]).replace(/^seller date:\s*/i, '').trim() === m).pop();
+    let d = hit && /^\d{4}-\d\d-\d\d/.test(hit[3] || '') ? String(hit[3]).slice(0, 10) : '', note = hit ? hit[4] || '' : '';
+    if (!hit) { const re = new RegExp(m.split(' ')[0].slice(0, 6), 'i'), k = rs.filter(r => re.test(r[2]) && /^\d{4}-\d\d-\d\d/.test(r[3] || '')).pop(); if (k) d = String(k[3]).slice(0, 10); }
+    if (!d && /closing day/i.test(m) && off && /^\d{4}-\d\d-\d\d$/.test(off[13] || '')) d = off[13];
+    return { m, d, note, done: /mutual/i.test(m) && d && d <= today }; });
   let cur = []; try { cur = (await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: "'Seller timeline'!A1:E300" })).values || []; } catch (e) { }
-  cur.slice(1).filter(r => String(r[1]).indexOf(n) === 0).forEach(r => { const x = pre.find(p => p.m === r[2]); if (x) { x.d = String(r[0]).slice(0, 10); x.done = /done/i.test(r[4] || ''); x.note = r[3]; } });
-  sheet(`<p class="date">${esc(a)}</p><h3>Seller portal · pending view</h3><p class="s" style="margin:-4px 0 14px">These dates show on your sellers’ portal under “The road to closing.” Nothing changes for them until you tap Publish. Leave a date blank to hide that step (a cash deal has no appraisal).</p>
+  cur.slice(1).filter(r => String(r[1]).indexOf(n) === 0).forEach(r => { const x = pre.find(p => p.m === r[2]); if (x) { x.d = String(r[0]).slice(0, 10) || x.d; x.done = /done/i.test(r[4] || ''); x.note = r[3] || x.note; } });
+  sheet(`<p class="date">${esc(a)}</p><h3>Seller portal · pending view</h3><p class="s" style="margin:-4px 0 14px">Filled in from the signed contract by your TC. Check them, then tap Publish. Nothing changes for your sellers until you do. A step with no date yet still shows on their road as “date to come”; clear its note and date to hide it.</p>
   <form class="form" id="sdf">${pre.map((x, i) => `<div class="fl" style="display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center"><span>${esc(x.m)}<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);margin-top:4px"><input type="checkbox" name="done${i}" ${x.done ? 'checked' : ''}> done</label></span><input type="date" name="d${i}" value="${esc(x.d)}"></div><input name="n${i}" placeholder="Note for the sellers (optional)" value="${esc(x.note || '')}" style="width:100%;margin:6px 0 14px">`).join('')}
   <label style="display:flex;gap:8px;align-items:center;margin:6px 0 6px"><input type="checkbox" name="pend" checked> Switch their portal to the pending view</label>
   <p class="s" style="margin:0 0 14px">When you tick Closing day as done, their portal switches to the closed view (thank-you, what to keep, your Google review link) and the sale date is saved for your past-client follow-up.</p>
@@ -334,7 +340,7 @@ async function sellerDatesSheet(a) {
   $('#sdf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target), b = e.target.querySelector('[type=submit]'); b.disabled = true; b.textContent = 'Publishing…';
     try { const st = (n || a), rows = pre.map((x, i) => [f.get('d' + i) || '', a, x.m, f.get('n' + i) || '', f.get('done' + i) ? 'Done' : '']);
       const keep = cur.slice(1).filter(r => String(r[1]).indexOf(n) !== 0);
-      const all = [['Date', 'Home', 'Milestone', 'Note', 'Status']].concat(keep, rows.filter(r => r[0])); while (all.length < cur.length) all.push(['', '', '', '', '']);   // blank out rows left over from before
+      const all = [['Date', 'Home', 'Milestone', 'Note', 'Status']].concat(keep, rows.filter(r => r[0] || r[3])); while (all.length < cur.length) all.push(['', '', '', '', '']);   // blank out rows left over from before
       await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Seller timeline'!A1:E" + all.length, values: all });
       const ci = pre.findIndex(x => x.m === 'Closing day'), closed = ci >= 0 && f.get('done' + ci) && f.get('d' + ci);
       if (f.get('pend') || closed) { const sel = (await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: 'Sellers!A1:F300' })).values || [], i = sel.findIndex(r => String(r[2] || '').indexOf(n) === 0 || String(r[3] || '').indexOf(n) >= 0);
