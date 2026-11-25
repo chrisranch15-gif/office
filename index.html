@@ -347,7 +347,7 @@ async function sellerDatesSheet(a) {
   <div class="acts"><button class="pill" type="submit">Publish to the sellers’ portal</button><button class="pill ghost" type="button" data-act="close">Cancel</button></div></form>
   <p class="s" style="margin-top:12px">Dates come from the signed contract as your TC logged them. Check them before you publish.</p>`);
   $('#sdf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target), b = e.target.querySelector('[type=submit]'); b.disabled = true; b.textContent = 'Publishing…';
-    try { const st = (n || a), rows = pre.map((x, i) => [f.get('d' + i) || '', a, x.m, f.get('n' + i) || '', f.get('done' + i) ? 'Done' : '']);
+    try { const st = (n || a), rows = pre.map((x, i) => [f.get('d' + i) || (/closing day|mutual/i.test(x.m) ? x.d : ''), a, x.m, f.get('n' + i) || '', f.get('done' + i) ? 'Done' : '']);
       const keep = cur.slice(1).filter(r => String(r[1]).indexOf(n) !== 0);
       const all = [['Date', 'Home', 'Milestone', 'Note', 'Status']].concat(keep, rows.filter(r => r[0] || r[3])); while (all.length < cur.length) all.push(['', '', '', '', '']);   // blank out rows left over from before
       await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Seller timeline'!A1:E" + all.length, values: all });
