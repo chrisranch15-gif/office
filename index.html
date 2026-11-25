@@ -124,6 +124,14 @@ let CALENDARS = []; // Chris's addresses, work first (new events go on the KW ca
 const NET_AGENTS = '~600 agents in 10 offices';
 const KITS = { '19917 145th St E': { brochure: 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf', social: ['just-listed-post', 'greenbelt-post', 'inside-1', 'inside-2', 'inside-3', 'inside-4', 'just-listed-story', 'greenbelt-story', 'inside-story'].map(n => 'https://homes.ranchpnw.com/social/' + n + '.jpg') } };
 const caps = { mcp: null, sample: null, db: null };
+const SITES = [   // public pages on homes.ranchpnw.com; listing pages are added from the Listings tab
+  { ico: 'globe', t: 'Your homes site', s: 'Listings, reviews, selling and Unlisted in one place', u: 'https://homes.ranchpnw.com/' },
+  { ico: 'globe', t: 'Unlisted', s: 'Off-market buyer program: Inside Track and By Invitation', u: 'https://homes.ranchpnw.com/unlisted' },
+  { ico: 'globe', t: 'Reviews', s: 'Client reviews page', u: 'https://homes.ranchpnw.com/reviews' },
+  { ico: 'chart', t: 'Selling with us', s: 'What happens when we take your listing', u: 'https://homes.ranchpnw.com/sell' },
+  { ico: 'phone', t: 'Seller portal', s: 'Sellers sign in to follow their sale', u: 'https://homes.ranchpnw.com/sellers' },
+  { ico: 'doc', t: 'Open house sign-in', s: '19917 · where the QR signs go, with the New Construction Pass', u: 'https://homes.ranchpnw.com/welcome?home=19917' }
+];
 const KIT = [
   { ico: 'chart', t: 'Listing presentation', s: 'Seller slides: how you market and sell a home', links: [['Present', 'https://claude.ai/artifact/EeSHsjer6ZmdwBeXiqkh41'], ['Web version', 'https://homes.ranchpnw.com/sell']] },
   { ico: 'doc', t: 'Seller brochure', s: 'Print piece to leave behind at the appointment', links: [['Open to print', 'https://claude.ai/artifact/Lhphx7onzrptYRs3VVsihc']] },
@@ -422,7 +430,7 @@ function render() {
   <div class="hello"><p class="date">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
     <h1>${hi}, Chris.</h1>
     <p class="status"><span class="dot${n.length ? '' : ''}"></span>${esc(statusLine)}</p></div>
-  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['deals','Deals'],['kit','Presentations'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['deals','Deals'],['kit','Presentations'],['sites','Sites'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
   ${!caps.mcp && S.ready && !S.officeMode ? `<section><div class="group"><div class="row"><div class="ico">${I.globe}</div><div class="body"><div class="t">Open Ranch on claude.ai</div><div class="s">Your Gmail, Sheet and social accounts connect there. This view is a preview.</div></div></div></div></section>` : ''}
 
   <section aria-label="Listings" data-tone="list" id="listings"><div class="h2row"><h2>Listings</h2><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Updating…' : (S.at ? 'Updated ' + new Date(S.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · Refresh' : 'Refresh')}</button><button class="pill ghost launch" data-act="shoot">${I.cal}<span>Order photos</span></button><button class="pill launch" data-act="launch">${I.plus}<span>Launch a listing</span></button></span></div>
@@ -435,6 +443,10 @@ function render() {
   <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; print</h2></div>
     <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
     <p class="note">Slides present full screen and download as PowerPoint or PDF from the top of the deck. Brochures print from the Print button.</p></section>
+
+  <section aria-label="Sites" data-tone="biz" id="sites"><div class="h2row"><h2>Sites &amp; pages</h2></div>
+    <div class="group">${SITES.concat(listings().filter(l => /^https:\/\/homes\.ranchpnw\.com\//.test(l.page || '')).map(l => ({ ico: 'home', t: l.address, s: 'Listing page · ' + (l.status || 'Active'), u: l.page }))).map(k => `<div class="row"><div class="ico">${I[k.ico] || I.globe || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts"><a class="pill" href="${esc(k.u)}" target="_blank" rel="noopener">Open</a><button class="pill ghost" data-act="copylink" data-u="${esc(k.u)}">Copy link</button></div></div>`).join('')}</div>
+    <p class="note">Everything here is public. Private pages, like launch plans and CMAs, stay under Presentations.</p></section>
 
   <section aria-label="Needs you" data-tone="need" id="needs"><div class="h2row"><h2>Needs you</h2><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Refreshing…' : 'Refresh'}</button></div>
     <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div><div class="skel" style="width:40%"></div></div>' : n.length ? n.map(x => `<div class="row"><div class="ico">${x.ico}</div><div class="body"><div class="t">${esc(x.t)}</div>${x.s ? `<div class="s">${esc(x.s)}</div>` : ''}</div><div class="acts">${x.acts}</div></div>`).join('') : '<div class="empty">All clear. Enjoy the quiet.</div>'}</div></section>
@@ -946,6 +958,7 @@ document.addEventListener('click', async e => {
   else if (a === 'deal') dealSheet();
   else if (a === 'tc') tcSheet(x);
   else if (a === 'offers') offersSheet(x);
+  else if (a === 'copylink') { try { await navigator.clipboard.writeText(b.dataset.u); toast('Link copied.'); } catch (err) { toast(b.dataset.u); } }
   else if (a === 'offermail') { const t = b.dataset.t, ad = ($('#sheet h3') && $('#sheet .date').textContent) || ''; S.offerMail = Object.assign({}, S.offerMail, { [t]: 'loading' }); const re = () => { const a2 = listings().find(l => l.address.toUpperCase() === ad.toUpperCase()); offersSheet(a2 ? a2.address : ad); }; re();
     try { const g = await tool('Gmail', 'get_thread', { threadId: t, messageFormat: 'PLAIN_TEXT' }); S.offerMail[t] = ((g && g.messages) || []).filter(m => !/no-?reply|do-?not-?reply|mailer-daemon|notifications?@/i.test(m.sender || '')); }
     catch (err) { S.offerMail[t] = { error: err.message || 'not available' }; } re(); }
