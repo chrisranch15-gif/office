@@ -6090,19 +6090,34 @@ function offerCompare(rs, money, esc, soc) {
     <tbody>${rows.map(row => `<tr><th style="text-align:left;padding:9px 10px;font-size:13px;font-weight:500;opacity:.7;vertical-align:top;border-top:1px solid rgba(128,120,108,.22);white-space:nowrap">${row[0]}</th>${rs.map(r => cell(row, r, rs)).join('')}</tr>`).join('')}</tbody></table></div>
     <p style="font-size:12px;opacity:.6;margin:8px 2px 0">Labels mark the strongest number in each row, not the better offer. Which offer is better is your sellers’ call.</p>`;
 }
+function offerAccepted(r) { const st = String(r[9] || ''); return /accept|mutual|pending|under contract/i.test(st) && !/not accepted|unaccepted/i.test(st); }
+function offerWho(r) { const t = String(r[2] || 'Offer'), m = /\(([^)]+)\)/.exec(t); return m ? m[1] : t.trim().split(/\s+/).slice(-1)[0]; }
+function offerRowNo(r) { const i = (ui.offerRows || []).indexOf(r); return i >= 0 ? i + 2 : 0; } // offerRows start at Offers!A2
+async function offerSetStatus(acceptRow) { const k = homeKeyJs(street()), ups = [];
+  (ui.offerRows || []).forEach(r => { if (homeKeyJs(r[1]) !== k || /withdrawn|rejected|expired/i.test(r[9] || '')) return; const n = offerRowNo(r), st = String(r[9] || '');
+    const to = acceptRow ? (n === acceptRow ? 'Accepted' : /^received|^countered/i.test(st) ? 'Not accepted' : st) : (offerAccepted(r) || /not accepted/i.test(st) ? 'Received' : st);
+    if (to !== st) ups.push({ n, r, to }); });
+  await Promise.all(ups.map(u => callTool('Google Sheets', 'update_values', { spreadsheetId: LIVE_SHEET, range: 'Offers!J' + u.n, values: [[u.to]] })));
+  ups.forEach(u => { u.r[9] = u.to; });
+  callTool('Google Sheets', 'append_values', { spreadsheetId: LIVE_SHEET, range: "'Hub done'!A1", values: [[liveNow(), 'offer-status:' + k, acceptRow ? 'offer accepted' : 'offers reopened', ups.map(u => offerWho(u.r) + ' → ' + u.to).join('; ')]] }).catch(() => {});
+}
 function offerBlock() {
   if (!isStaff() || !caps.mcp || !ui.live) return '';
   const k = homeKeyJs(street()), rs = (ui.offerRows || []).filter(r => homeKeyJs(r[1]) === k && !/withdrawn|rejected|expired/i.test(r[9] || ''));
   if (!rs.length) return '';
+  const acc = rs.find(offerAccepted), others = acc ? rs.filter(r => r !== acc) : rs;
   const num = v => +String(v || '').replace(/[^\d.]/g, '') || 0, $ = v => '$' + Math.round(v).toLocaleString('en-US'), lp = num(V('price'));
   const line = (a, b) => b ? `<div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line)"><span class="small muted" style="flex:0 0 auto;max-width:42%">${esc(a)}</span><span class="small" style="text-align:right">${b}</span></div>` : '';
   const money = v => '$' + Math.round(v).toLocaleString('en-US');
-  return `<div class="sharebar" id="offers" style="border-color:var(--ink,#1E2327)"><div class="eyebrow">${rs.length > 1 ? rs.length + ' offers · compare side by side' : 'Offer received · needs your review'}</div>
-    ${rs.length > 1 ? `<div style="margin:12px 0 4px">${offerCompare(rs.slice(), money, esc, socCheck)}</div><details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">Each offer in full, with its email</summary>` : ''}
-    ${rs.slice().reverse().map(r => { const p = num(r[5]), c = num(r[8]);
+  const card = r => { const p = num(r[5]), c = num(r[8]);
       return `<div style="padding:14px 0 6px"><div><b>${p ? $(p) : 'Price not stated'}</b>${lp && p ? ` · <span class="small">${p === lp ? 'full price' : p > lp ? $(p - lp) + ' over list' : $(lp - p) + ' under list'}</span>` : ''}${r[9] ? ' · ' + esc(r[9]) : ''}<br><span class="small muted">${esc([r[2], r[3] && 'agent ' + r[3], r[4]].filter(Boolean).join(' · '))}</span></div>
       ${socCheck(r).warn ? `<p class="small" style="margin:10px 0 0;padding:8px 10px;border-left:3px solid #B3261E;background:rgba(179,38,30,.07);color:#8C1D18">${esc(socCheck(r).text)}</p>` : ''}<div style="margin-top:8px">${line('Closing date', /^\d{4}-\d\d-\d\d$/.test(r[13] || '') ? new Date(r[13] + 'T12:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : esc(r[13]))}${line('Inspection', esc(r[14]))}${line('Financing', esc(r[6]))}${line('Earnest money', num(r[7]) ? $(num(r[7])) : '')}${line('Seller credit asked', c ? $(c) : '')}${line('Price minus credit', c && p ? $(p - c) : '')}${line('Buyer agent comp (SOC)', esc(socCheck(r).text.replace(/^Discrepancy: /, '')))}${line('Response due', esc(r[10]))}${line('Received', esc(r[0]))}${line('Notes', esc(r[11]))}</div>
-      ${mailTid(r[12]) ? offerMailHtml(mailTid(r[12]), r[12]) : ''}</div>`; }).join('<hr style="border:0;border-top:1px solid var(--line);margin:0">')}${rs.length > 1 ? '</details>' : ''}
+      ${mailTid(r[12]) ? offerMailHtml(mailTid(r[12]), r[12]) : ''}</div>`; };
+  return `<div class="sharebar" id="offers" style="border-color:var(--ink,#1E2327)"><div class="eyebrow">${acc ? 'Accepted offer · ' + esc(offerWho(acc)) : rs.length > 1 ? rs.length + ' offers · compare side by side' : 'Offer received · needs your review'}</div>
+    ${!acc && rs.length > 1 ? `<div style="margin:12px 0 4px">${offerCompare(rs.slice(), money, esc, socCheck)}</div><details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">Each offer in full, with its email</summary>` : ''}
+    ${(acc ? [acc] : rs).slice().reverse().map(card).join('')}${!acc && rs.length > 1 ? '</details>' : ''}
+    ${acc && others.length ? `<details style="margin-top:12px"${ui.offerOthers ? ' open' : ''}><summary class="small" style="cursor:pointer;font-weight:600">${others.length} other offer${others.length > 1 ? 's' : ''} · ${esc(others.map(r => offerWho(r) + ' ' + money(num(r[5]))).join(' · '))} · side by side</summary><div style="margin:12px 0 4px">${offerCompare(rs.slice(), money, esc, socCheck)}</div>${others.slice().reverse().map(card).join('<hr style="border:0;border-top:1px solid var(--line);margin:0">')}</details>` : ''}
+    ${!acc ? `<div class="chips" style="margin:14px 0 0">${rs.map(r => `<button class="chip" data-act="offer-accept" data-r="${offerRowNo(r)}">${ui.offerSure === offerRowNo(r) ? 'Tap again: ' + esc(offerWho(r)) + ' accepted' : esc(offerWho(r)) + ' accepted'}</button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Once your sellers sign, tap the accepted one. This folds into a summary and the other offers stay saved.</p>` : `<div class="chips" style="margin:12px 0 0"><button class="chip" data-act="offer-reopen">Not accepted after all</button></div>`}
     <p class="small muted" style="margin-top:10px">Private to you. The sellers’ portal never shows offers or agent details.</p></div>`;
 }
 function showBlock() {
@@ -6201,6 +6216,9 @@ Object.assign(A, {
   'offer-mail': async (el) => { const t = el.dataset.t; ui.offerMail = Object.assign({}, ui.offerMail, { [t]: 'loading' }); render();
     try { const g = await callTool('Gmail', 'get_thread', { threadId: t, messageFormat: 'PLAIN_TEXT' }); ui.offerMail[t] = ((g && g.messages) || []).filter(x => !/no-?reply|do-?not-?reply|mailer-daemon|notifications?@/i.test(x.sender || '')); }
     catch (e) { ui.offerMail[t] = { error: (e && e.message) || 'not available' }; } render(); },
+  'offer-accept': async (el) => { const n = +el.dataset.r; if (ui.offerSure !== n) { ui.offerSure = n; return render(); }
+    ui.offerSure = null; try { await offerSetStatus(n); toast('Marked accepted. The other offers stay saved.'); } catch (e) { toast('Not saved — ' + ((e && e.message) || 'try again') + '.'); } render(); },
+  'offer-reopen': async () => { try { await offerSetStatus(0); toast('Back to comparing offers.'); } catch (e) { toast('Not saved — ' + ((e && e.message) || 'try again') + '.'); } render(); },
   'offer-mail-close': (el) => { delete (ui.offerMail || {})[el.dataset.t]; render(); },
   'show-fbok': async (el) => {
     const x = showList().find(s => s.key === el.dataset.k); if (!x) return;
