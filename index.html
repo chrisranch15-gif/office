@@ -173,7 +173,7 @@ const I = {
 
 /* ---------- loading ---------- */
 async function loadSheet() {
-  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:Q300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000" };
+  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:Q300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000", sellertl: "'Seller timeline'!A1:E300" };
   const out = {};
   await Promise.all(Object.keys(tabs).map(async k => { try { out[k] = await sheetRows(tabs[k]); } catch (e) { out[k] = null; S.err.sheet = e.message || String(e); } }));
   S.sheet = out; S.at = Date.now();
@@ -327,7 +327,8 @@ async function sellerDatesSheet(a) {
   cur.slice(1).filter(r => String(r[1]).indexOf(n) === 0).forEach(r => { const x = pre.find(p => p.m === r[2]); if (x) { x.d = String(r[0]).slice(0, 10); x.done = /done/i.test(r[4] || ''); x.note = r[3]; } });
   sheet(`<p class="date">${esc(a)}</p><h3>Seller portal · pending view</h3><p class="s" style="margin:-4px 0 14px">These dates show on your sellers’ portal under “The road to closing.” Nothing changes for them until you tap Publish. Leave a date blank to hide that step (a cash deal has no appraisal).</p>
   <form class="form" id="sdf">${pre.map((x, i) => `<div class="fl" style="display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center"><span>${esc(x.m)}<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);margin-top:4px"><input type="checkbox" name="done${i}" ${x.done ? 'checked' : ''}> done</label></span><input type="date" name="d${i}" value="${esc(x.d)}"></div><input name="n${i}" placeholder="Note for the sellers (optional)" value="${esc(x.note || '')}" style="width:100%;margin:6px 0 14px">`).join('')}
-  <label style="display:flex;gap:8px;align-items:center;margin:6px 0 14px"><input type="checkbox" name="pend" checked> Switch their portal to the pending view</label>
+  <label style="display:flex;gap:8px;align-items:center;margin:6px 0 6px"><input type="checkbox" name="pend" checked> Switch their portal to the pending view</label>
+  <p class="s" style="margin:0 0 14px">When you tick Closing day as done, their portal switches to the closed view (thank-you, what to keep, your Google review link) and the sale date is saved for your past-client follow-up.</p>
   <div class="acts"><button class="pill" type="submit">Publish to the sellers’ portal</button><button class="pill ghost" type="button" data-act="close">Cancel</button></div></form>
   <p class="s" style="margin-top:12px">Dates come from the signed contract as your TC logged them. Check them before you publish.</p>`);
   $('#sdf').onsubmit = async e => { e.preventDefault(); const f = new FormData(e.target), b = e.target.querySelector('[type=submit]'); b.disabled = true; b.textContent = 'Publishing…';
@@ -335,9 +336,10 @@ async function sellerDatesSheet(a) {
       const keep = cur.slice(1).filter(r => String(r[1]).indexOf(n) !== 0);
       const all = [['Date', 'Home', 'Milestone', 'Note', 'Status']].concat(keep, rows.filter(r => r[0])); while (all.length < cur.length) all.push(['', '', '', '', '']);   // blank out rows left over from before
       await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Seller timeline'!A1:E" + all.length, values: all });
-      if (f.get('pend')) { const sel = (await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: 'Sellers!A1:F300' })).values || [], i = sel.findIndex(r => String(r[2] || '').indexOf(n) === 0 || String(r[3] || '').indexOf(n) >= 0);
-        if (i > 0) await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: 'Sellers!F' + (i + 1), values: [['Pending']] }); }
-      close(); toast('Published. Their portal shows it the next time they open it.'); } catch (err) { b.disabled = false; b.textContent = 'Publish to the sellers’ portal'; toast('Didn’t publish: ' + (err.message || 'try again')); } };
+      const ci = pre.findIndex(x => x.m === 'Closing day'), closed = ci >= 0 && f.get('done' + ci) && f.get('d' + ci);
+      if (f.get('pend') || closed) { const sel = (await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: 'Sellers!A1:F300' })).values || [], i = sel.findIndex(r => String(r[2] || '').indexOf(n) === 0 || String(r[3] || '').indexOf(n) >= 0);
+        if (i > 0) await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: closed ? 'Sellers!F' + (i + 1) + ':H' + (i + 1) : 'Sellers!F' + (i + 1), values: closed ? [['Closed', sel[i][6] || '', f.get('d' + ci)]] : [['Pending']] }); }
+      close(); toast(closed ? 'Closed. Their portal now shows the thank-you view.' : 'Published. Their portal shows it the next time they open it.'); } catch (err) { b.disabled = false; b.textContent = 'Publish to the sellers’ portal'; toast('Didn’t publish: ' + (err.message || 'try again')); } };
 }
 async function tcCall(k, call, note) { const r = ((S.sheet && S.sheet.shadow) || []).find(x => shadowKey(x) === k); if (!r) return;
   try { await append('TC feedback', [[nowStamp(), r[1], k, call, note || '']]); toast('Saved. Your TC reads this on its next run.'); await loadSheet(); render(); tcSheet(r[1]); } catch (e) { toast('Not saved — try again.'); } }
@@ -370,6 +372,10 @@ function needs() {
     out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : ''].join('') });
   });
   inboxView().open.filter(m => m.kind === 'deal' && m.urgency === 'now').slice(0, 4).forEach(m => out.unshift({ ico: I.doc, t: `Deal · ${m.subject}`, s: `${m.from.replace(/<.*>/, '').replace(/"/g, '').trim()}${m.why ? ' · ' + m.why : ''}`, acts: `${m.url ? `<a class="pill" href="${esc(m.url)}" target="_blank" rel="noopener">Open in Gmail</a>` : ''}<button class="pill ghost" data-act="goinbox">Reply from inbox</button>` }));
+  { const tl = (S.sheet && S.sheet.sellertl) || [], seen = {};
+    shadowRows().filter(r => /mutual acceptance/i.test(r[2] || '') && !/^urgent: soc/i.test(r[2] || '')).forEach(r => { const n = (String(r[1]).match(/^\d{3,6}/) || [r[1]])[0];
+      if (seen[n] || tl.some(x => String(x[1]).indexOf(n) === 0)) return; seen[n] = 1;
+      out.unshift({ ico: I.doc, t: `Mutual acceptance · ${r[1]}`, s: 'Congratulations. Publish the dates so your sellers see the road to closing in their portal.', acts: `<button class="pill" data-act="sellerdates" data-a="${esc(r[1])}">Publish to their portal</button>` }); }); }
   liveDeals().filter(d => d.urgent).forEach(d => out.unshift({ ico: I.doc, t: `Deal · ${d.address}`, s: `${d.urgent} urgent item${d.urgent > 1 ? 's' : ''} from your TC`, acts: `<button class="pill" data-act="tc" data-a="${esc(d.address)}">Open deal</button>` }));
   { const open = ((S.sheet && S.sheet.offers) || []).filter(r => /^received|^countered/i.test(r[9] || '')), by = {};
     open.forEach(r => { (by[hk(r[1])] = by[hk(r[1])] || []).push(r); });
