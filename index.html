@@ -998,6 +998,7 @@ function launchSheet(a, pre) {
     const addr = f.a.value.trim();
     try { await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
       const look = (f.querySelector('input[name=look]:checked') || {}).value || 'editorial';
+      append('Design usage', [[nowStamp(), addr, look, '', 'chosen at launch', 'Office']]).catch(() => { });
       await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'),  'Look: ' + look, f.notes.value.trim()].filter(Boolean).join(' · ')]]);
       sheet(`<p class="date">Launch started</p><h3>${esc(addr)}</h3><p style="font-size:17px;line-height:1.6;margin:0 0 14px">It’s in your Listings now as <b>Preparing</b>.</p>
       <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, the posts, carousel and agent email, plus every print piece (postcards, lookbook, room cards, silent talkers, signs), in all three looks. You choose what to print later on the Desk.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
