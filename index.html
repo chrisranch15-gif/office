@@ -425,7 +425,7 @@ function tcCheckinHtml(r, k) { const c = checkinParts(r), ed = (S.tcCi || {})[k]
     <div class="field" style="margin:0 0 8px"><label>Subject</label><input name="subject" value="${esc(ed.subject)}"></div>
     <div class="field" style="margin:0 0 6px"><label>Message</label><textarea name="body" rows="10" style="min-height:220px">${esc(ed.body)}</textarea></div>
     <p class="s" style="margin:0 0 8px">Your Gmail signature is added when it sends.</p>
-    <div class="acts"><button class="pill" type="button" data-act="tccisend" data-k="${esc(k)}">${S.tcSure === k ? 'Tap again to send to ' + esc(emailsIn(ed.to).join(', ')) : 'Approve & send'}</button><button class="pill ghost" type="button" data-act="tccall" data-k="${esc(k)}" data-v="Skipped">Skip</button><button class="pill ghost" type="button" data-act="tcfix" data-k="${esc(k)}">Change it</button></div></form></div>`; }
+    <div class="acts"><button class="pill" type="button" data-act="tccisend" data-k="${esc(k)}">${S.tcSure === k ? 'Tap again to send to ' + esc(emailsIn(ed.to).join(', ')) : 'Approve & send'}</button><button class="pill ghost" type="button" data-act="tccall" data-k="${esc(k)}" data-v="Skipped">Skip</button><button class="pill ghost" type="button" data-act="tcfix" data-k="${esc(k)}">Change it</button>${typeof ImproveUI !== 'undefined' ? ImproveUI.toneLink('Office', 'TC check-in · ' + (r[1] || ''), ed.body, '') : ''}</div></form></div>`; }
 async function tcCheckinSend(k) { const r = ((S.sheet && S.sheet.shadow) || []).find(x => shadowKey(x) === k); if (!r) return;
   const c = checkinParts(r), ed = (S.tcCi || {})[k] || c, to = emailsIn(ed.to), cc = emailsIn(ed.cc);
   if (!to.length) { S.tcSure = null; tcSheet(r[1]); return toast('Add who it goes to first.'); }
@@ -1410,7 +1410,7 @@ const SocialUI = (() => {
       ${s.err ? `<p class="socp-err">${e(s.err)}</p>` : ''}
       <div class="socp-acts">${local ? `<span class="socp-note">Approve from your Office in the Claude app, where Metricool is connected.</span>` : `<button class="socp-btn" data-soc="approve" data-k="${e(k)}" ${s.busy ? 'disabled' : ''}>${s.busy ? 'Scheduling…' : 'Approve'}</button>`}
         <button class="socp-btn ghost" data-soc="edit" data-k="${e(k)}">${s.edit ? 'Done editing' : 'Edit'}</button>
-        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener">Full size</a></div>
+        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener">Full size</a>${typeof ImproveUI !== 'undefined' ? ImproveUI.toneLink(H.where || 'Office', `${set.key} ${set.event} · ${p.id}`, caption(set, p), p.trail) : ''}</div>
       ${!local ? `<p class="socp-note">Approve schedules it for the time above${p.network === 'gmb' ? '' : ''}. Want a different photo or line? Tell the Concierge and it comes back here for your OK.</p>` : ''}`}
     </div>`;
   }
@@ -1531,14 +1531,16 @@ const ImproveUI = (() => {
     ${items.length ? items.map(x => itemHtml(x)).join('') : '<p class="imp-s">No improvements waiting. The next review comes Monday morning.</p>'}
     ${(review || []).filter(x => x.r[11] && !x.r[13] && !/undone/i.test(x.r[13] || '')).slice(-6).length ? `<details class="imp-undo"><summary>Recent changes you approved</summary>${(review || []).filter(x => x.r[11] && !x.r[13]).slice(-6).map(x => `<div class="imp-row"><span>${e(x.r[2])} <span class="imp-s">· ${e(x.r[11])}</span></span><button class="imp-btn ghost" data-imp="undo" data-row="${x.row}">Undo</button></div>`).join('')}</details>` : ''}`;
   }
+  function choices(t) { const m = String(t || '').split(/\n(?=[A-D]: )/).map(x => x.match(/^([A-D]): ([\s\S]+)$/)).filter(Boolean); return m.length >= 2 ? m.map(x => ({ k: x[1], t: x[2].trim() })) : []; }
   function itemHtml(x) {
     const r = x.r, b = busy[x.row];
     return `<div class="imp-card" id="imp-${x.row}"><div class="imp-n">${e(r[1])}</div><div class="imp-t">${e(r[2])}</div>
       <p><b>What happened:</b> ${e(r[3])}</p><p><b>What I'd change:</b> ${e(r[4])}</p>
-      ${r[5] || r[6] ? `<div class="imp-ba"><div><span>Before</span>${e(r[5])}</div><div><span>After</span>${e(r[6])}</div></div>` : ''}
+      ${choices(r[6]).length ? `<p class="imp-s" style="margin-top:10px">Which one sounds like you?</p>${choices(r[6]).map(c => `<div class="imp-ba" style="grid-template-columns:1fr"><div><span>Version ${e(c.k)}</span>${e(c.t)}</div></div>`).join('')}`
+        : r[5] || r[6] ? `<div class="imp-ba"><div><span>Before</span>${e(r[5])}</div><div><span>After</span>${e(r[6])}</div></div>` : ''}
       ${r[7] ? `<p class="imp-s">Where it shows up: ${e(r[7])}</p>` : ''}${r[8] ? `<p class="imp-s">Tested: ${e(r[8])}</p>` : ''}
       ${b === 'note' ? `<label class="imp-lab">What's not quite right? One line is plenty.<textarea class="imp-ta" data-imp-note="${x.row}" rows="2"></textarea></label><div class="imp-acts"><button class="imp-btn" data-imp="notquite-save" data-row="${x.row}">Send</button><button class="imp-btn ghost" data-imp="cancel" data-row="${x.row}">Cancel</button></div>`
-        : b ? `<p class="imp-s">${e(b)}</p>` : `<div class="imp-acts"><button class="imp-btn" data-imp="call" data-v="Approve" data-row="${x.row}">Approve</button><button class="imp-btn ghost" data-imp="notquite" data-row="${x.row}">Not quite</button><button class="imp-btn ghost" data-imp="call" data-v="I don't understand" data-row="${x.row}">I don't understand</button><button class="imp-btn ghost" data-imp="call" data-v="Skip" data-row="${x.row}">Skip</button></div>`}</div>`;
+        : b ? `<p class="imp-s">${e(b)}</p>` : choices(r[6]).length ? `<div class="imp-acts">${choices(r[6]).map(c => `<button class="imp-btn" data-imp="pick" data-v="${e(c.k)}" data-row="${x.row}">${e(c.k)} sounds like me</button>`).join('')}<button class="imp-btn ghost" data-imp="call" data-v="I don't understand" data-row="${x.row}">I don't understand</button><button class="imp-btn ghost" data-imp="call" data-v="Skip" data-row="${x.row}">None of these</button></div>` : `<div class="imp-acts"><button class="imp-btn" data-imp="call" data-v="Approve" data-row="${x.row}">Approve</button><button class="imp-btn ghost" data-imp="notquite" data-row="${x.row}">Not quite</button><button class="imp-btn ghost" data-imp="call" data-v="I don't understand" data-row="${x.row}">I don't understand</button><button class="imp-btn ghost" data-imp="call" data-v="Skip" data-row="${x.row}">Skip</button></div>`}</div>`;
   }
   async function call(row, v, note) {
     busy[row] = 'Saving…'; H.render();
@@ -1597,6 +1599,19 @@ const ImproveUI = (() => {
       try { await add('Marketing brain inbox', [[now(), f.l.value.trim(), f.n.value.trim(), 'New', '']]); H.close(); H.toast('Added. You’ll see what it teaches in your weekly review.'); } catch (x) { H.toast('Not saved. Try again.'); } };
   }
 
+  /* ---- "This feels off": Chris names the feeling; the trail stays hidden (weekly review diagnoses it) ---- */
+  const toneCtx = {}; let toneN = 0;
+  const TONES = ['Too salesy', 'Too formal', 'Too fluffy', 'Too cocky', 'Trying too hard', 'Not me', 'Feels right'];
+  function toneLink(where, piece, text, trail) { const id = 't' + (++toneN); toneCtx[id] = { where, piece, text, trail: Array.isArray(trail) ? trail.join(' · ') : (trail || '') };
+    return `<button class="imp-link" style="font-size:12px;padding:2px 0" data-imp="tone" data-id="${id}">This feels off</button>`; }
+  function toneSheet(id) { const c = toneCtx[id] || {};
+    H.sheet(`<p class="date">This feels off</p><h3>How does it feel?</h3><p class="s" style="margin:-4px 0 12px">Just the feeling. You don't need to know why; I'll figure out what caused it and show you a couple of versions to pick from.</p>
+    <form id="imptone"><div class="imp-chips">${TONES.map(t => `<label class="imp-chip"><input type="radio" name="t" value="${e(t)}" required><span>${e(t)}</span></label>`).join('')}</div>
+    <div class="field" style="margin-top:12px"><label for="itn-w">In your words (optional)</label><input id="itn-w" name="w" placeholder="e.g. sounds like a commercial"></div>
+    <div class="acts"><button class="pill">Send</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+    document.getElementById('imptone').onsubmit = async ev => { ev.preventDefault(); const f = ev.target, t = (f.querySelector('input[name=t]:checked') || {}).value;
+      try { await add('Tone reports', [[now(), c.where || H.where || 'Office', c.piece || '', t, f.w.value.trim(), String(c.text || '').slice(0, 4000), c.trail || '', 'New', '']]); H.close(); H.toast(t === 'Feels right' ? 'Saved as a good example.' : 'Got it. You’ll see a couple of versions to pick from in your weekly review.'); } catch (x) { H.toast('Not saved. Try again.'); } }; }
+
   /* ---- usage: which sections Chris taps (counts only, no scrolling) ---- */
   function bump(sec) { const d = new Date().toISOString().slice(0, 10), u = store('use') || {}; u[d] = u[d] || {}; const k = sec; u[d][k] = u[d][k] || { t: 0, s: 0 }; u[d][k].t++;
     const ses = store('ses') || {}; if (!ses[d + k] || Date.now() - ses[d + k] > 30 * 60e3) u[d][k].s++; ses[d + k] = Date.now(); store('ses', ses); store('use', u); }
@@ -1631,6 +1646,8 @@ const ImproveUI = (() => {
     if (a === 'off') return offSheet();
     if (a === 'asked') return askedSheet();
     if (a === 'teach') return teachSheet();
+    if (a === 'tone') return toneSheet(b.dataset.id);
+    if (a === 'pick') { const x = (review || []).find(y => y.row === +row); if (x) fire(REVIEW_TASK, `Chris picked version ${b.dataset.v} on improvement row ${row}. Apply what that choice shows (weekly-review.md step 5).`); return call(row, 'Picked ' + b.dataset.v); }
     if (a === 'review') return H.sheet(`<p class="date">Weekly review</p><h3>Ways to make it better</h3><p class="s" style="margin:-4px 0 14px">Each one is a small change, tested before it goes live. Nothing changes without your OK.</p><div id="impbody">${reviewHtml()}</div><div class="acts"><button class="pill ghost" data-act="close">Close</button></div>`);
     if (a === 'questions') return H.sheet(`<p class="date">Seller questions</p><h3>From the seller portals</h3><div id="impq">${questionsBody()}</div><div class="acts"><button class="pill ghost" data-act="close">Close</button></div>`);
     if (a === 'arrange') return arrangeSheet(H.wrap());
@@ -1656,11 +1673,11 @@ const ImproveUI = (() => {
 .imp-s{font-size:13px;opacity:.72}.imp-h{font-weight:600;margin:14px 0 2px}.imp-q{font-size:16px}.imp-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.imp-btn{border:0;border-radius:999px;padding:9px 16px;font-family:inherit;font-weight:600;font-size:13px;line-height:1;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}
 .imp-btn.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-btn[disabled]{opacity:.35}.imp-ta{display:block;width:100%;box-sizing:border-box;margin-top:6px;font-family:inherit;font-size:14px;line-height:1.45;padding:8px 10px;border-radius:8px;border:1px solid rgba(128,120,108,.4);background:transparent;color:inherit}.imp-lab{display:block;font-size:13px;margin-top:8px}
 .imp-help{border-radius:12px;padding:10px 14px;background:rgba(63,107,69,.10);margin:6px 0}.imp-help p{margin:4px 0;font-size:14px}.imp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(128,120,108,.18)}
-.imp-tools{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin:18px 0 6px}.imp-link{border:0;background:none;color:inherit;opacity:.7;font-family:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}.imp-undo{margin-top:12px}#impoff .pill,#impask .pill,#impteach .pill{border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-weight:600;font-size:14px;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}#impoff .pill.ghost,#impask .pill.ghost,#impteach .pill.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-undo summary{cursor:pointer;font-size:13px;opacity:.75}`;
+.imp-tools{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin:18px 0 6px}.imp-link{border:0;background:none;color:inherit;opacity:.7;font-family:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}.imp-undo{margin-top:12px}.imp-chips{display:flex;flex-wrap:wrap;gap:8px}.imp-chip input{position:absolute;opacity:0}.imp-chip span{display:inline-block;padding:8px 14px;border-radius:999px;border:1px solid rgba(128,120,108,.45);font-size:14px;cursor:pointer}.imp-chip input:checked+span{background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);border-color:transparent}#imptone .pill{border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-weight:600;font-size:14px;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}#imptone .pill.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}#impoff .pill,#impask .pill,#impteach .pill{border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-weight:600;font-size:14px;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}#impoff .pill.ghost,#impask .pill.ghost,#impteach .pill.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-undo summary{cursor:pointer;font-size:13px;opacity:.75}`;
   return {
     init(h) { H = h; if (!document.getElementById('imp-css')) { const s = document.createElement('style'); s.id = 'imp-css'; s.textContent = CSS; document.head.appendChild(s); }
       const r = H.render; H.render = () => { r(); refreshSheet(); if (H.wrap) arrange(H.wrap()); }; load(); flush(); setInterval(flush, 15 * 60e3); setInterval(load, 5 * 60e3); },
-    needs, tools, reload: load, arrange: w => arrange(w), questionsFor: home => (qs || []).filter(x => homeNum(x.r[2]) === homeNum(home))
+    needs, tools, toneLink, reload: load, arrange: w => arrange(w), questionsFor: home => (qs || []).filter(x => homeNum(x.r[2]) === homeNum(home))
   };
 })();
 
