@@ -1016,13 +1016,19 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
       $('#msave').onclick = async () => { try { await append('Market', rowsM.map(r => [r.month, a, area, r.median, r.sold, r.active, r.dom, r.moi, r.stl, src])); close(); toast('Charted on the sellers’ portal.'); } catch (err) { toast('Not saved — try again.'); } };
     } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
 }
-const SOCIAL_TASK = 'trig_01HsnuhtZBs1vsjgVFT5a7rc';   // "Social posts for listing moments": writes and designs the set, then it waits here for Approve
+// Jobs go on the Sheet's "To do" tab and start the one hourly check right away (Chris, Nov 26, 2026: fewer scheduled runs, less usage).
+// Taps a few seconds apart start one run, not several; if the start can't reach Claude from here, the hourly check picks the row up.
+const DISPATCH_TASK = 'trig_01HavDAbqKXYeY9L2VnxYPoi';
+let JOBQ = [], JOBT = 0;
+function queueJob(job, address, why) {
+  JOBQ.push(`${job} · ${address} · ${why}`);
+  append('To do', [[nowStamp(), job, address, why, job + '|office:' + Date.now().toString(36), '', '', '']]).catch(() => { });
+  clearTimeout(JOBT); JOBT = setTimeout(() => { const t = JOBQ.splice(0); tool('Claude Code Remote', 'fire_trigger', { trigger_id: DISPATCH_TASK, text: 'From the Office, do these now: ' + t.join(' | ') }).catch(() => { }); }, 2500);
+}
 function hasSocial(n, ev) { return SOCIAL.some(x => x.key === String(n) && x.event === ev) || doneIds().has('socnow:' + n + ':' + ev); }
-function runSocialNow(listing, moment) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: SOCIAL_TASK, text: `${listing} just moved to ${moment}. Make its ${moment} social set now.` }).catch(() => {}); }
-const LAUNCH_TASK = 'trig_01QoE5M1jSKw9vSE9jz8Jjtf';   // "Listing launch": starts by itself when photos are in; the Launch button just starts it sooner
-function runLaunchNow(listing, photos) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: LAUNCH_TASK, text: photos ? `Photos are in for ${listing}. Do step 3b (the sellers' photo preview and email draft) first, right now, then the rest.` : `Chris just tapped Launch for ${listing}. Do this one now.` }).catch(() => {}); }
-const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
-async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
+function runSocialNow(listing, moment) { queueJob('social', listing, moment); }
+function runLaunchNow(listing, photos) { queueJob('launch', listing, photos ? 'Photos are in: the sellers\u2019 photo preview first' : 'Chris tapped Launch'); }
+async function runMarketingNow(listing, piece, change) { queueJob('marketing', listing, (piece || 'all') + ': ' + change); return true; }
 const LAUNCH_LOOKS = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
 const LAUNCH_PRINT = [['postcard-listed', 'Just Listed postcard (neighbors)', 1], ['postcard-contract', 'Under contract postcard', 1], ['postcard-sold', 'Just sold postcard', 1], ['preview-invite', 'Neighbors’ preview invitation', 0], ['lookbook', 'Lookbook', 1], ['room-cards', 'Room story cards', 1], ['talkers', 'Silent talkers', 1], ['signs', 'Open house signs', 1]];
 function launchSheet(a, pre) {
