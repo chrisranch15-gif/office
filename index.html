@@ -1535,8 +1535,8 @@ const ImproveUI = (() => {
   function itemHtml(x) {
     const r = x.r, b = busy[x.row];
     return `<div class="imp-card" id="imp-${x.row}"><div class="imp-n">${e(r[1])}</div><div class="imp-t">${e(r[2])}</div>
-      <p><b>What happened:</b> ${e(r[3])}</p><p><b>What I'd change:</b> ${e(r[4])}</p>
-      ${choices(r[6]).length ? `<p class="imp-s" style="margin-top:10px">Which one sounds like you?</p>${choices(r[6]).map(c => `<div class="imp-ba" style="grid-template-columns:1fr"><div><span>Version ${e(c.k)}</span>${e(c.t)}</div></div>`).join('')}`
+      <p><b>What happened:</b> ${e(r[3])}</p>${r[4] ? `<p><b>What I'd change:</b> ${e(r[4])}</p>` : ''}
+      ${choices(r[6]).length ? `${r[5] ? `<div class="imp-ba" style="grid-template-columns:1fr"><div><span>The one that felt off</span>${e(r[5])}</div></div>` : ''}<p class="imp-s" style="margin-top:10px">Which one sounds like you?</p>${choices(r[6]).map(c => `<div class="imp-ba" style="grid-template-columns:1fr"><div><span>Version ${e(c.k)}</span>${e(c.t)}</div></div>`).join('')}`
         : r[5] || r[6] ? `<div class="imp-ba"><div><span>Before</span>${e(r[5])}</div><div><span>After</span>${e(r[6])}</div></div>` : ''}
       ${r[7] ? `<p class="imp-s">Where it shows up: ${e(r[7])}</p>` : ''}${r[8] ? `<p class="imp-s">Tested: ${e(r[8])}</p>` : ''}
       ${b === 'note' ? `<label class="imp-lab">What's not quite right? One line is plenty.<textarea class="imp-ta" data-imp-note="${x.row}" rows="2"></textarea></label><div class="imp-acts"><button class="imp-btn" data-imp="notquite-save" data-row="${x.row}">Send</button><button class="imp-btn ghost" data-imp="cancel" data-row="${x.row}">Cancel</button></div>`
