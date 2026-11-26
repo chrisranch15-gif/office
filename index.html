@@ -1010,6 +1010,8 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
 const SOCIAL_TASK = 'trig_01HsnuhtZBs1vsjgVFT5a7rc';   // "Social posts for listing moments": writes and designs the set, then it waits here for Approve
 function hasSocial(n, ev) { return SOCIAL.some(x => x.key === String(n) && x.event === ev) || doneIds().has('socnow:' + n + ':' + ev); }
 function runSocialNow(listing, moment) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: SOCIAL_TASK, text: `${listing} just moved to ${moment}. Make its ${moment} social set now.` }).catch(() => {}); }
+const LAUNCH_TASK = 'trig_01QoE5M1jSKw9vSE9jz8Jjtf';   // "Listing launch": starts by itself when photos are in; the Launch button just starts it sooner
+function runLaunchNow(listing) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: LAUNCH_TASK, text: `Chris just tapped Launch for ${listing}. Do this one now.` }).catch(() => {}); }
 const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
 async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
 const LAUNCH_LOOKS = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
@@ -1027,13 +1029,14 @@ function launchSheet(a, pre) {
   $('#lf').onsubmit = async e => { e.preventDefault(); const f = e.target, btn = $('#lgo'); if (btn.disabled) return;
     btn.disabled = true; btn.textContent = 'Starting…';
     const addr = f.a.value.trim();
-    try { await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
+    try { if (!listings().some(l => hk(l.address) === hk(addr))) await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);   // an existing listing is never added twice
       const look = (f.querySelector('input[name=look]:checked') || {}).value || 'editorial';
       append('Design usage', [[nowStamp(), addr, look, '', 'chosen at launch', 'Office']]).catch(() => { });
       runSocialNow(addr, 'listed');
+      runLaunchNow(addr);
       await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'),  'Look: ' + look, f.notes.value.trim()].filter(Boolean).join(' · ')]]);
       sheet(`<p class="date">Launch started</p><h3>${esc(addr)}</h3><p style="font-size:17px;line-height:1.6;margin:0 0 14px">It’s in your Listings now as <b>Preparing</b>.</p>
-      <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, the posts, carousel and agent email, plus every print piece (postcards, lookbook, room cards, silent talkers, signs), in all three looks. You choose what to print later on the Desk.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
+      <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Building now: the page, The Desk, the seller portal, the posts, carousel and agent email, plus every print piece in all three looks. It shows up in Up next for your review, usually within the hour.</li><li>If the photos aren’t in yet, it starts by itself the moment they are.</li><li>Nothing goes public until you approve it and give me the MLS number.</li></ul>
       <div class="acts"><button class="pill" data-act="close">Done</button></div>`);
       loadSheet().then(render); } catch (err) { btn.disabled = false; btn.textContent = 'Start the launch'; toast('Not saved — ' + (err.message || 'try again')); } };
 }
