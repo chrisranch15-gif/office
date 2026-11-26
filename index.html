@@ -575,6 +575,15 @@ function needs() {
     if (!last || Date.now() - last > 7 * 864e5) out.push({ ico: I.chart, t: `Zillow & Redfin numbers · ${l.address}`, s: last ? 'Last updated ' + ago(last) : 'Not entered yet — the sellers see these first', acts: `<button class="pill ghost" data-act="portals" data-a="${esc(l.address)}">Update</button>` });
   });
   listings().filter(l => /active/i.test(l.status) && !l.page).forEach(l => out.push({ ico: I.plus, t: `${l.address} has no page yet`, s: 'Launch kit: page, Desk, seller portal, posts', acts: `<button class="pill ghost" data-act="launch" data-a="${esc(l.address)}">Launch</button>` }));
+  // Photos are in: the sellers' sneak peek goes first, always at the very top (sellers want their photos right away)
+  const ids = doneIds(), pv = {};
+  (sh.marketing || []).forEach(r => { if (/^photo preview ready$/i.test(r[2] || '')) pv[hk(r[1])] = r; });
+  Object.keys(pv).forEach(k => { const r = pv[k]; if (ids.has('pv:' + k)) return;
+    out.unshift({ ico: I.star || I.mail, t: `Photos are in · ${r[1]}`, s: 'Their sneak-peek page and email are ready. Send it whenever you like; it’s in your drafts.',
+      acts: `${r[3] ? `<a class="pill" href="${esc(r[3])}" target="_blank" rel="noopener">Open the email</a>` : ''}${r[4] ? `<a class="pill ghost" href="${esc(r[4])}" target="_blank" rel="noopener">See their page</a>` : ''}<button class="pill ghost" data-act="pvsent" data-k="${esc(k)}" data-t="${esc(r[1])}">I sent it</button>` }); });
+  Object.values(shoots()).forEach(x => { const k = hk(x.address); const when = toDate(x.ready); if (!x.address || pv[k] || !/ready|deliver/i.test(x.status || '') || !when || Date.now() - when > 5 * 864e5) return;   // only fresh deliveries (last 5 days)
+    if (!ids.has('pvstart:' + k)) { markDone({ id: 'pvstart:' + k, subject: x.address }, 'started'); runLaunchNow(x.address, true); }   // start it the moment the Office sees the photos are in
+    out.unshift({ ico: I.star || I.mail, t: `Photos are in · ${x.address}`, s: 'Making the sellers’ sneak-peek page and email now. It shows up here in a few minutes.', acts: `<button class="pill ghost" data-act="pvgo" data-a="${esc(x.address)}">Start it again</button>` }); });
   return out;
 }
 
@@ -1011,7 +1020,7 @@ const SOCIAL_TASK = 'trig_01HsnuhtZBs1vsjgVFT5a7rc';   // "Social posts for list
 function hasSocial(n, ev) { return SOCIAL.some(x => x.key === String(n) && x.event === ev) || doneIds().has('socnow:' + n + ':' + ev); }
 function runSocialNow(listing, moment) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: SOCIAL_TASK, text: `${listing} just moved to ${moment}. Make its ${moment} social set now.` }).catch(() => {}); }
 const LAUNCH_TASK = 'trig_01QoE5M1jSKw9vSE9jz8Jjtf';   // "Listing launch": starts by itself when photos are in; the Launch button just starts it sooner
-function runLaunchNow(listing) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: LAUNCH_TASK, text: `Chris just tapped Launch for ${listing}. Do this one now.` }).catch(() => {}); }
+function runLaunchNow(listing, photos) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: LAUNCH_TASK, text: photos ? `Photos are in for ${listing}. Do step 3b (the sellers' photo preview and email draft) first, right now, then the rest.` : `Chris just tapped Launch for ${listing}. Do this one now.` }).catch(() => {}); }
 const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
 async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
 const LAUNCH_LOOKS = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
@@ -1205,6 +1214,8 @@ document.addEventListener('click', async e => {
   else if (a === 'launch') launchSheet(x);
   else if (a === 'socopen') socSheet(b.dataset.k);
   else if (a === 'socnow') { const n = (String(b.dataset.a).match(/^\d{3,6}/) || [b.dataset.a])[0]; runSocialNow(b.dataset.a, b.dataset.m); append('Hub done', [[nowStamp(), 'socnow:' + n + ':' + b.dataset.m, 'asked for ' + b.dataset.m + ' posts', '']]).then(() => loadSheet().then(render)).catch(() => {}); toast('Making them now. They’ll show up here for your OK in a few minutes. Nothing posts until you approve.'); }
+  else if (a === 'pvsent') { markDone({ id: 'pv:' + b.dataset.k, subject: b.dataset.t }, 'sent'); append('Marketing', [[nowStamp(), b.dataset.t, 'Photo preview sent', '', '']]).catch(() => { }); render(); toast('Nice. Marked sent.'); }
+  else if (a === 'pvgo') { runLaunchNow(b.dataset.a, true); toast('Started. It shows up here in a few minutes.'); }
   else if (a === 'allup') { S.allUp = !S.allUp; render(); }
   else if (a === 'nlater') { markDone({ id: b.dataset.k + '@' + new Date().toLocaleDateString('en-CA'), subject: b.dataset.t }, 'later'); render(); toast('Back tomorrow morning.'); }
   else if (a === 'nclear') { markDone({ id: b.dataset.k, subject: b.dataset.t }, 'cleared'); render(); toast('Cleared. It comes back only if something changes.'); }
