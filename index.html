@@ -979,6 +979,8 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
       $('#msave').onclick = async () => { try { await append('Market', rowsM.map(r => [r.month, a, area, r.median, r.sold, r.active, r.dom, r.moi, r.stl, src])); close(); toast('Charted on the sellers’ portal.'); } catch (err) { toast('Not saved — try again.'); } };
     } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
 }
+const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
+async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
 const LAUNCH_LOOKS = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
 const LAUNCH_PRINT = [['postcard-listed', 'Just Listed postcard (neighbors)', 1], ['postcard-contract', 'Under contract postcard', 1], ['postcard-sold', 'Just sold postcard', 1], ['preview-invite', 'Neighbors’ preview invitation', 0], ['lookbook', 'Lookbook', 1], ['room-cards', 'Room story cards', 1], ['talkers', 'Silent talkers', 1], ['signs', 'Open house signs', 1]];
 function launchSheet(a, pre) {
@@ -990,16 +992,15 @@ function launchSheet(a, pre) {
   <div class="field"><label for="lph">Photos (Google Drive folder link)</label><input id="lph" name="photos" value="${v('photos')}"></div>
   <div class="field"><label for="lno">Anything else</label><textarea id="lno" name="notes" placeholder="Photo day, list date, what makes it special, upgrades the sellers made…">${v('notes')}</textarea></div>
   <div class="field"><label>Look</label><div class="seg" role="group" aria-label="Look">${LAUNCH_LOOKS.map(([k, n], i) => `<label style="display:inline-flex;gap:6px;align-items:center;margin-right:14px"><input type="radio" name="look" value="${k}" ${i === 0 ? 'checked' : ''}> ${n}</label>`).join('')}</div><p class="s" style="margin:6px 0 0">Every piece is made in all three looks; this one is active. Switch any time on the Desk.</p></div>
-  <div class="field"><label>Print pieces</label><div>${LAUNCH_PRINT.map(([k, n, on]) => `<label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="pr" value="${k}" ${on ? 'checked' : ''}> ${n}</label>`).join('')}</div><p class="s" style="margin:6px 0 0">Digital pieces (page, posts, carousel, films, agent email) are always made.</p></div>
   <div class="acts"><button class="pill" id="lgo">Start the launch</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
   $('#lf').onsubmit = async e => { e.preventDefault(); const f = e.target, btn = $('#lgo'); if (btn.disabled) return;
     btn.disabled = true; btn.textContent = 'Starting…';
     const addr = f.a.value.trim();
     try { await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
-      const look = (f.querySelector('input[name=look]:checked') || {}).value || 'editorial', pr = [...f.querySelectorAll('input[name=pr]:checked')].map(x => x.value);
-      await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'), 'Look: ' + look, 'Print: ' + (pr.join(', ') || 'none'), f.notes.value.trim()].filter(Boolean).join(' · ')]]);
+      const look = (f.querySelector('input[name=look]:checked') || {}).value || 'editorial';
+      await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'),  'Look: ' + look, f.notes.value.trim()].filter(Boolean).join(' · ')]]);
       sheet(`<p class="date">Launch started</p><h3>${esc(addr)}</h3><p style="font-size:17px;line-height:1.6;margin:0 0 14px">It’s in your Listings now as <b>Preparing</b>.</p>
-      <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, the posts, carousel and agent email, plus the print pieces you picked, in all three looks.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
+      <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, the posts, carousel and agent email, plus every print piece (postcards, lookbook, room cards, silent talkers, signs), in all three looks. You choose what to print later on the Desk.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
       <div class="acts"><button class="pill" data-act="close">Done</button></div>`);
       loadSheet().then(render); } catch (err) { btn.disabled = false; btn.textContent = 'Start the launch'; toast('Not saved — ' + (err.message || 'try again')); } };
 }
@@ -1104,7 +1105,7 @@ REQUEST: ${q}`, { modelTier: 'default', cache: false });
         if (out.action === 'email') await mail('draft', { to: v('to') ? [v('to')] : [], subject: v('subject'), body: v('body') });
         if (out.action === 'seller_update') await append('Seller updates', [[nowStamp(), v('address'), v('title'), v('message'), 'Chris']]);
         if (out.action === 'marketing') await append('Marketing', [[nowStamp(), v('address'), v('what'), v('reach'), v('notes')]]);
-        if (out.action === 'marketing_change') await append('Marketing changes', [[nowStamp(), v('address'), v('piece'), v('change'), 'Requested', '', '']]);
+        if (out.action === 'marketing_change') { await append('Marketing changes', [[nowStamp(), v('address'), v('piece'), v('change'), 'Requested', '', '']]); runMarketingNow(v('address'), v('piece'), v('change')); }
         if (out.action === 'deal') await append('Deals', [[nowStamp(), v('address'), 'Listing', v('status'), v('price'), v('pct'), '', '', v('closing'), '']]);
         close(); toast('Done.'); loadSheet().then(render); if (out.action === 'event') loadCalendar().then(render);
       } catch (err) { b.disabled = false; toast(out.action === 'event' && /connect|unavailable|not_connected|server/i.test(String(err.message || err.code)) ? 'Connect Google Calendar in claude.ai first.' : 'Didn’t go through — ' + (err.message || 'try again')); } };
@@ -1301,7 +1302,7 @@ async function runProposal(i, j, kind, btn) {
     else if (kind === 'log_offer') { let o = {}; try { o = JSON.parse(p.body); } catch (e) { } o.address = o.address || p.listing; return offerSheet({ id: 'concierge-' + Date.now(), subject: 'Offer on ' + (p.listing || ''), url: '' }, o); }
     else if (kind === 'seller_update') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Seller updates', [[nowStamp(), p.listing, p.subject || 'An update from Chris', p.body, 'Chris']]); p.done = 'Posted to their portal.'; }
     else if (kind === 'publish_feedback') { close(); return feedbackSheet(p.listing || ''); }
-    else if (kind === 'marketing_change') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Marketing changes', [[nowStamp(), p.listing, p.subject || 'all', p.body, 'Requested', '', '']]); p.done = 'Requested. It’s made within the hour and comes back to you for an OK before it replaces anything.'; }
+    else if (kind === 'marketing_change') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Marketing changes', [[nowStamp(), p.listing, p.subject || 'all', p.body, 'Requested', '', '']]); p.done = (await runMarketingNow(p.listing, p.subject, p.body)) ? 'On it. It’s usually ready in a few minutes and shows up in Needs you for your OK before it replaces anything.' : 'Requested. It’s made at the next hourly run and comes back to you for an OK.'; }
     else if (kind === 'event') { if (!p.start) throw new Error('What time? Ask me again with a day and time.'); const st = String(p.start).replace(/(Z|[+-]\d\d:\d\d)$/, ''), en = String(p.end || new Date(Date.parse(st) + 36e5).toISOString().slice(0, 19)).replace(/(Z|[+-]\d\d:\d\d)$/, '');
       await tool('Google Calendar', 'create_event', { calendarId: CALENDARS[0], summary: p.subject || p.body.slice(0, 80), startTime: st, endTime: en, location: p.location || p.listing || '' }); p.done = 'On your calendar.'; loadCalendar().then(render); }
     else if (kind === 'launch_listing') { let d = {}; try { d = JSON.parse(p.body); } catch (e) { d = { notes: p.body }; } close(); return launchSheet(p.listing || d.address || '', Object.assign({ address: p.listing }, d)); }
