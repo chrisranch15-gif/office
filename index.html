@@ -498,6 +498,7 @@ async function sellerDatesSheet(a) {
       const ci = pre.findIndex(x => x.m === 'Closing day'), closed = ci >= 0 && f.get('done' + ci) && f.get('d' + ci);
       if (f.get('pend') || closed) { const sel = (await tool('Google Sheets', 'get_values', { spreadsheetId: SHEET, range: 'Sellers!A1:F300' })).values || [], i = sel.findIndex(r => String(r[2] || '').indexOf(n) === 0 || String(r[3] || '').indexOf(n) >= 0);
         if (i > 0) await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: closed ? 'Sellers!F' + (i + 1) + ':H' + (i + 1) : 'Sellers!F' + (i + 1), values: closed ? [['Closed', sel[i][6] || '', f.get('d' + ci)]] : [['Pending']] }); }
+      if (f.get('pend') || closed) runSocialNow(a, closed ? 'sold' : 'pending');
       close(); toast(closed ? 'Closed. Their portal now shows the thank-you view.' : 'Published. Their portal shows it the next time they open it.'); } catch (err) { b.disabled = false; b.textContent = 'Publish to the sellers’ portal'; toast('Didn’t publish: ' + (err.message || 'try again')); } };
 }
 async function tcCall(k, call, note) { const r = ((S.sheet && S.sheet.shadow) || []).find(x => shadowKey(x) === k); if (!r) return;
@@ -983,13 +984,15 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
       $('#msave').onclick = async () => { try { await append('Market', rowsM.map(r => [r.month, a, area, r.median, r.sold, r.active, r.dom, r.moi, r.stl, src])); close(); toast('Charted on the sellers’ portal.'); } catch (err) { toast('Not saved — try again.'); } };
     } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
 }
+const SOCIAL_TASK = 'trig_01HsnuhtZBs1vsjgVFT5a7rc';   // "Social posts for listing moments": writes and designs the set, then it waits here for Approve
+function runSocialNow(listing, moment) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: SOCIAL_TASK, text: `${listing} just moved to ${moment}. Make its ${moment} social set now.` }).catch(() => {}); }
 const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
 async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
 const LAUNCH_LOOKS = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
 const LAUNCH_PRINT = [['postcard-listed', 'Just Listed postcard (neighbors)', 1], ['postcard-contract', 'Under contract postcard', 1], ['postcard-sold', 'Just sold postcard', 1], ['preview-invite', 'Neighbors’ preview invitation', 0], ['lookbook', 'Lookbook', 1], ['room-cards', 'Room story cards', 1], ['talkers', 'Silent talkers', 1], ['signs', 'Open house signs', 1]];
 function launchSheet(a, pre) {
   pre = pre || {}; const v = k => esc(pre[k] || '');
-  sheet(`<p class="date">Launch a listing</p><h3>${pre.address ? esc(pre.address) : 'A few details.'}</h3><p class="s" style="margin:-4px 0 16px">Ranch builds the page, The Desk, the seller portal, three social posts and the agent-network email. Nothing goes public until you approve it. Leave anything you don’t know yet blank.</p>
+  sheet(`<p class="date">Launch a listing</p><h3>${pre.address ? esc(pre.address) : 'A few details.'}</h3><p class="s" style="margin:-4px 0 16px">Ranch builds the page, The Desk, the seller portal, the just-listed social posts and the agent-network email. Nothing goes public until you approve it. Leave anything you don’t know yet blank.</p>
   <form id="lf"><div class="field"><label for="la">Address</label><input id="la" name="a" value="${esc(a || pre.address || '')}" required></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label for="lc">City or community</label><input id="lc" name="city" value="${v('city')}"></div><div class="field"><label for="lp">Price</label><input id="lp" name="price" inputmode="numeric" value="${v('price')}"></div></div>
   <div class="field"><label for="lse">Sellers</label><input id="lse" name="sellers" placeholder="Aaron and Holly" value="${v('sellers')}"></div>
@@ -1003,6 +1006,7 @@ function launchSheet(a, pre) {
     try { await append('Listings', [[addr, f.city.value.trim(), String(f.price.value).replace(/[^\d]/g, ''), 'Preparing', f.sellers.value.trim(), '', '', '', '', '']]);
       const look = (f.querySelector('input[name=look]:checked') || {}).value || 'editorial';
       append('Design usage', [[nowStamp(), addr, look, '', 'chosen at launch', 'Office']]).catch(() => { });
+      runSocialNow(addr, 'listed');
       await append('Marketing', [[nowStamp(), addr, 'Launch requested', '', ['Photos: ' + (f.photos.value.trim() || 'not yet'),  'Look: ' + look, f.notes.value.trim()].filter(Boolean).join(' · ')]]);
       sheet(`<p class="date">Launch started</p><h3>${esc(addr)}</h3><p style="font-size:17px;line-height:1.6;margin:0 0 14px">It’s in your Listings now as <b>Preparing</b>.</p>
       <ul class="s" style="margin:0 0 16px;padding-left:18px;line-height:1.7"><li>Next time you open a Claude session, I build the page, The Desk, the seller portal, the posts, carousel and agent email, plus every print piece (postcards, lookbook, room cards, silent talkers, signs), in all three looks. You choose what to print later on the Desk.</li><li>Each piece waits for your approval before anything goes public.</li><li>Missing photos or price? Add them any time; the launch waits for them.</li></ul>
