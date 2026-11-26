@@ -6094,13 +6094,13 @@ function assetsBlock() {
   const all = every.filter(a => !a.look || a.look === look);
   if (!all.length) return '';
   const tile = a => `<div class="atile"><a href="${esc(a.u)}" target="_blank" rel="noopener">${a.th ? `<img src="${esc(a.th)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<b>${esc(a.t)}</b></a><button class="chip" data-act="asset-copy" data-u="${esc(a.u)}" data-t="${esc(a.t)}">Copy link</button></div>`;
-  const order = [['Listing page', 'Ready now · pages'], ['Page', 'Ready now · pages'], ['Email', 'Ready now · agent email'], ['Carousel', 'Ready now · Instagram carousel'], ['Social', 'Ready now · posts and stories'], ['Film', 'Ready now · films'], ['Print', 'Print · pick what you want printed']], groups = {};
+  const order = [['Listing page', 'Ready now · pages'], ['Page', 'Ready now · pages'], ['Email', 'Ready now · agent email'], ['Carousel', 'Ready now · Instagram carousel'], ['Social', 'Ready now · posts and stories'], ['Film', 'Ready now · films'], ['Onsite', 'Day one · signs, cards and sheets for the home'], ['Print', 'Print · mailers, lookbook and leave-behinds']], groups = {};
   order.forEach(([k, g]) => all.filter(a => a.kind === k).forEach(a => (groups[g] = groups[g] || []).push(a)));
   const hasLooks = every.some(a => a.look);
   return `<div class="sharebar" id="assets"><div class="eyebrow">Marketing assets · ${all.length}</div>
     ${hasLooks ? `<div style="margin-top:10px"><span class="small muted">Look</span> <span class="seg" role="group" aria-label="Marketing look">${LOOK_NAMES.map(([k, n]) => `<button data-act="mode" data-v="${k}" aria-pressed="${look === k}">${n}</button>`).join('')}</span></div>
     <p class="small muted" style="margin:8px 0 0">Every piece is made in all three looks at launch, so switching is instant. The look you pick here is the one you share and print.</p>` : '<p class="small muted" style="margin:6px 0 0">Everything made for this listing. Tap to open, or copy a link to send.</p>'}
-    ${Object.keys(groups).map(g => `<div class="small" style="font-weight:600;margin:16px 0 8px">${esc(g)}</div>${g.startsWith('Print') ? '<p class="small muted" style="margin:-4px 0 8px">Print-ready PDFs. Open the ones you want and send them to your printer or mail house.</p>' : ''}<div class="agrid">${groups[g].map(tile).join('')}</div>`).join('')}
+    ${Object.keys(groups).map(g => `<div class="small" style="font-weight:600;margin:16px 0 8px">${esc(g)}</div>${/^(Print|Day one)/.test(g) ? '<p class="small muted" style="margin:-4px 0 8px">Print-ready PDFs. Open the ones you want and print them, or send them to your printer or mail house.</p>' : ''}<div class="agrid">${groups[g].map(tile).join('')}</div>`).join('')}
     <p class="small muted" style="margin-top:14px">Want a change? Tell the Concierge (“swap the postcard photo for the deck”). It’s made in a few minutes and comes back for your OK.</p></div>`;
 }
 const SIGN_SETS = { '19917': { editorial: 'noir', arch: 'daylight', heritage: 'heritage' } }; // look → sign style, printed by source/print/open_house_signs.py
@@ -6730,7 +6730,7 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Room story cards",
 "u": "https://homes.ranchpnw.com/marketing/19917/editorial/room-cards.pdf",
 "th": "marketing/thumbs/19917-editorial-room-cards.jpg",
@@ -6738,10 +6738,98 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Silent talkers",
 "u": "https://homes.ranchpnw.com/marketing/19917/editorial/talkers.pdf",
 "th": "marketing/thumbs/19917-editorial-talkers.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Take-one flyer",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/flyer.pdf",
+"th": "marketing/thumbs/19917-editorial-flyer.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighborhood guide booklet",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/guide.pdf",
+"th": "marketing/thumbs/19917-editorial-guide.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Please remove your shoes",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/shoes.pdf",
+"th": "marketing/thumbs/19917-editorial-shoes.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Shoe covers card",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/bootie-card.pdf",
+"th": "marketing/thumbs/19917-editorial-bootie-card.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "QR sign rider (24\u00d76)",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/sign-rider.pdf",
+"th": "marketing/thumbs/19917-editorial-sign-rider.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Front window QR",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/window-cling.pdf",
+"th": "marketing/thumbs/19917-editorial-window-cling.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Thanks for touring card",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/thanks-card.pdf",
+"th": "marketing/thumbs/19917-editorial-thanks-card.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Showing instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/showing-sheet.pdf",
+"th": "marketing/thumbs/19917-editorial-showing-sheet.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Offer instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/offer-sheet.pdf",
+"th": "marketing/thumbs/19917-editorial-offer-sheet.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Upgrades sheet",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/upgrades.pdf",
+"th": "marketing/thumbs/19917-editorial-upgrades.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Home rules signs",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/rules.pdf",
+"th": "marketing/thumbs/19917-editorial-rules.jpg",
 "look": "editorial",
 "pick": 1
 },
@@ -6855,7 +6943,7 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Room story cards",
 "u": "https://homes.ranchpnw.com/marketing/19917/arch/room-cards.pdf",
 "th": "marketing/thumbs/19917-arch-room-cards.jpg",
@@ -6863,10 +6951,98 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Silent talkers",
 "u": "https://homes.ranchpnw.com/marketing/19917/arch/talkers.pdf",
 "th": "marketing/thumbs/19917-arch-talkers.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Take-one flyer",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/flyer.pdf",
+"th": "marketing/thumbs/19917-arch-flyer.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighborhood guide booklet",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/guide.pdf",
+"th": "marketing/thumbs/19917-arch-guide.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Please remove your shoes",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/shoes.pdf",
+"th": "marketing/thumbs/19917-arch-shoes.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Shoe covers card",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/bootie-card.pdf",
+"th": "marketing/thumbs/19917-arch-bootie-card.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "QR sign rider (24\u00d76)",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/sign-rider.pdf",
+"th": "marketing/thumbs/19917-arch-sign-rider.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Front window QR",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/window-cling.pdf",
+"th": "marketing/thumbs/19917-arch-window-cling.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Thanks for touring card",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/thanks-card.pdf",
+"th": "marketing/thumbs/19917-arch-thanks-card.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Showing instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/showing-sheet.pdf",
+"th": "marketing/thumbs/19917-arch-showing-sheet.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Offer instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/offer-sheet.pdf",
+"th": "marketing/thumbs/19917-arch-offer-sheet.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Upgrades sheet",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/upgrades.pdf",
+"th": "marketing/thumbs/19917-arch-upgrades.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Home rules signs",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/rules.pdf",
+"th": "marketing/thumbs/19917-arch-rules.jpg",
 "look": "arch",
 "pick": 1
 },
@@ -6980,7 +7156,7 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Room story cards",
 "u": "https://homes.ranchpnw.com/marketing/19917/heritage/room-cards.pdf",
 "th": "marketing/thumbs/19917-heritage-room-cards.jpg",
@@ -6988,10 +7164,98 @@ const ASSETS = {
 "pick": 1
 },
 {
-"kind": "Print",
+"kind": "Onsite",
 "t": "Silent talkers",
 "u": "https://homes.ranchpnw.com/marketing/19917/heritage/talkers.pdf",
 "th": "marketing/thumbs/19917-heritage-talkers.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Take-one flyer",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/flyer.pdf",
+"th": "marketing/thumbs/19917-heritage-flyer.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighborhood guide booklet",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/guide.pdf",
+"th": "marketing/thumbs/19917-heritage-guide.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Please remove your shoes",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/shoes.pdf",
+"th": "marketing/thumbs/19917-heritage-shoes.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Shoe covers card",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/bootie-card.pdf",
+"th": "marketing/thumbs/19917-heritage-bootie-card.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "QR sign rider (24\u00d76)",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/sign-rider.pdf",
+"th": "marketing/thumbs/19917-heritage-sign-rider.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Front window QR",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/window-cling.pdf",
+"th": "marketing/thumbs/19917-heritage-window-cling.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Thanks for touring card",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/thanks-card.pdf",
+"th": "marketing/thumbs/19917-heritage-thanks-card.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Showing instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/showing-sheet.pdf",
+"th": "marketing/thumbs/19917-heritage-showing-sheet.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Offer instructions",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/offer-sheet.pdf",
+"th": "marketing/thumbs/19917-heritage-offer-sheet.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Upgrades sheet",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/upgrades.pdf",
+"th": "marketing/thumbs/19917-heritage-upgrades.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Onsite",
+"t": "Home rules signs",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/rules.pdf",
+"th": "marketing/thumbs/19917-heritage-rules.jpg",
 "look": "heritage",
 "pick": 1
 },
