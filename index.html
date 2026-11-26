@@ -133,9 +133,7 @@ const ASSET_BASE = /ranchpnw\.com$/.test(location.hostname) ? 'https://homes.ran
 const KIT = [
   { ico: 'chart', t: 'Listing presentation', s: 'Seller slides: how you market and sell a home', links: [['Present', 'https://claude.ai/artifact/EeSHsjer6ZmdwBeXiqkh41'], ['Web version', 'https://homes.ranchpnw.com/sell']] },
   { ico: 'doc', t: 'Seller brochure', s: 'Print piece to leave behind at the appointment', links: [['Open to print', 'https://claude.ai/artifact/Lhphx7onzrptYRs3VVsihc']] },
-  { ico: 'globe', t: 'Aaron & Holly · CMA & launch plan', s: '19917 145th St E', links: [['Open', 'https://homes.ranchpnw.com/plan/aaron-holly-4d7d4e75ad.html']] },
-  { ico: 'doc', t: '19917 · listing brochure', s: 'Two pages, letter size, QR to the listing page', links: [['Print PDF', 'https://homes.ranchpnw.com/print/19917-145th-St-E-brochure.pdf']] },
-  { ico: 'chart', t: '19917 · listing films', s: 'Full tour (64s) and vertical for Reels', links: [['Full tour', 'https://homes.ranchpnw.com/social/video/19917-full-tour.mp4'], ['Vertical', 'https://homes.ranchpnw.com/social/video/19917-vertical-30.mp4']] },
+  { ico: 'globe', t: 'CMA & launch plan', s: 'The plan every seller gets. Show this example at a drop-off or a two-step appointment. Each seller’s own plan lives on their listing’s Desk.', links: [['Open the example', 'https://homes.ranchpnw.com/plan/sample-27a4f7d745.html']] },
   { ico: 'phone', t: 'For agents', s: 'Why agents join The Ranch Real Estate Group', links: [['Present', 'https://claude.ai/artifact/2tnLxKwbXZZkFd4Gz41SxZ']] },
   { ico: 'globe', t: 'For brokerages', s: 'Groundwork: the system as a product', links: [['Present', 'https://claude.ai/artifact/D8brh9kw3wY32NKdebFzqE']] }
 ];
@@ -286,7 +284,8 @@ function shootFor(a) { return shoots()[hk(a)]; }
 const KNOWN = { '19917 145th st': { sqft: 2772, beds: 5, baths: 2.75, city: 'Bonney Lake', zip: '98391' } };
 function dealFor(a) { const n = (String(a).match(/^\d{3,6}/) || [])[0]; return n && (S.inbox || []).find(m => m.kind === 'deal' && !m.replied && (String(m.deal).indexOf(n) === 0 || (m.subject + m.snippet).indexOf(n) >= 0)); }
 function offersFor(a) { const n = (String(a).match(/^\d{3,6}/) || [])[0]; return ((S.sheet && S.sheet.offers) || []).filter(r => n && String(r[1]).indexOf(n) === 0 && !/withdrawn|rejected|expired/i.test(r[9] || '')); }
-function listings() { return (S.sheet && S.sheet.listings || []).filter(r => r[0] && !/^removed$/i.test(r[3] || '')).map(r => ({ address: r[0], city: r[1], price: r[2], status: r[3] || 'Active', sellers: r[4], page: r[5], desk: r[6], code: r[7], listed: toDate(r[8]), photo: r[9] })); }
+function listings() { const rows = (S.sheet && S.sheet.listings || []).filter(r => r[0] && r[0] !== 'Address' && !/^removed$/i.test(r[3] || '')), last = {}; rows.forEach(r => { last[hk(r[0]) || r[0]] = r; });   // one row per home: a re-entered row replaces the older one
+  return rows.filter(r => last[hk(r[0]) || r[0]] === r).map(r => ({ address: r[0], city: r[1], price: r[2], status: r[3] || 'Active', sellers: r[4], page: r[5], desk: r[6], code: r[7], listed: toDate(r[8]), photo: r[9] })); }
 function deals() { return latestBy(S.sheet && S.sheet.deals, 1).map(r => ({ address: r[1], side: r[2], status: r[3], price: Number(String(r[4]).replace(/[^\d.]/g, '')) || 0, pct: Number(String(r[5]).replace(/[^\d.]/g, '')) || 0, gci: Number(String(r[6]).replace(/[^\d.]/g, '')) || 0, contract: toDate(r[7]), closing: toDate(r[8]), notes: r[9] })); }
 /* ---------- TC shadow mode: what the TC would have done, side by side with what happened. Nothing here sends. ---------- */
 function shadowKey(r) { return [r[0], r[1], String(r[2] || '').slice(0, 60)].join(' · '); }
@@ -462,7 +461,7 @@ function tcSheet(a) {
       <details style="margin-top:6px"><summary class="s" style="cursor:pointer">Full details${r[5] ? ' and the draft' : ''}</summary><div class="draftbox">${esc(r[2])}${r[4] ? '\n\n' + esc(r[4]) : ''}${r[5] ? '\n\nDraft' + (r[6] ? ' (' + esc(r[6]) + ')' : '') + ':\n' + esc(r[5]) : ''}</div></details>
       <div class="acts" style="margin-top:10px">${r[5] && !/^https?:/.test(r[5]) ? `<button class="pill ghost" data-act="tccopy" data-k="${esc(k)}">Copy draft</button>` : ''}<button class="pill ghost" data-act="tccall" data-k="${esc(k)}" data-v="Handled">Handled</button><button class="pill ghost" data-act="tcfix" data-k="${esc(k)}">Change it</button></div></div>`; };
   sheet(`<p class="date">Deal</p><h3>${esc(a)}</h3>
-  <h4 class="mini">Needs you${need.length ? ' · ' + need.length : ''}</h4><div class="group">${need.length ? need.map(card).join('') : '<div class="empty">Nothing needs you on this deal right now.</div>'}</div>
+  <h4 class="mini">For you${need.length ? ' · ' + need.length : ''}</h4><div class="group">${need.length ? need.map(card).join('') : '<div class="empty">Nothing for you on this deal right now.</div>'}</div>
   <h4 class="mini">Key dates</h4><div class="group">${dates.length ? dates.map(x => `<div class="row plain${x.t && x.t < Date.now() - 864e5 ? ' faded' : ''}"><div style="width:96px;flex:none;font-size:14px;color:var(--muted)">${x.t ? esc(day(x.t)) : 'To come'}</div><div class="body"><div class="t">${esc(x.m)}</div>${x.note ? `<div class="s">${esc(tcShort(x.note, 110))}</div>` : ''}</div></div>`).join('') : '<div class="empty">Dates fill in the moment the contract is signed.</div>'}</div>
   <div class="acts" style="margin:14px 0 4px"><button class="pill" data-act="sellerdates" data-a="${esc(a)}">Update the sellers’ portal</button></div>
   <details style="margin-top:18px"><summary class="mini" style="cursor:pointer;margin:0 4px">Everything your TC logged · ${rs.length} (with sources)</summary><div class="group" style="margin-top:8px">${rs.slice().reverse().map(r => `<div class="row plain" style="display:block"><div class="s">${esc(r[0])}${r[3] ? ' · due ' + esc(r[3]) : ''}${calls[shadowKey(r)] ? ' · your call: ' + esc(calls[shadowKey(r)].call) : ''}</div><div class="t" style="font-size:14px">${esc(r[2])}</div>${r[8] ? `<div class="s">What happened: ${esc(r[8])}</div>` : ''}</div>`).join('')}</div></details>
@@ -511,8 +510,16 @@ function business() {
   const soon = pending.filter(d => d.closing && d.closing - Date.now() < 30 * 864e5 && d.closing > Date.now() - 864e5);
   const active = ds.filter(d => /active|coming/i.test(d.status));
   const missingPct = ds.filter(d => !d.gci && !d.pct && !/closed/i.test(d.status)).length;
-  return { ytd: closed.reduce((a, d) => a + gci(d), 0), pending: pending.reduce((a, d) => a + gci(d), 0), soon, active, activeVolume: active.reduce((a, d) => a + d.price, 0), missingPct, any: ds.length };
+  // True volume from the Listings tab, one row per home (the last row wins, so a re-entered price replaces the old one); pending buy-side deals add to pending
+  const num = v => +String(v || '').replace(/[^\d.]/g, '') || 0, homes = {}; listings().forEach(l => { homes[hk(l.address)] = l; });
+  const ls = Object.values(homes), act = ls.filter(l => /active|coming/i.test(l.status)), pend = ls.filter(l => /pending|contract/i.test(l.status));
+  const pendBuy = pending.filter(d => !ls.some(l => hk(l.address) === hk(d.address)));
+  return { ytd: closed.reduce((a, d) => a + gci(d), 0), pending: pending.reduce((a, d) => a + gci(d), 0), soon, active: act, activeVolume: act.reduce((a, l) => a + num(l.price), 0), pendingVolume: pend.reduce((a, l) => a + num(l.price), 0) + pendBuy.reduce((a, d) => a + d.price, 0), pendingCount: pend.length + pendBuy.length, missingPct, any: ds.length };
 }
+/* ---------- Up next: the top 3 first; each one can be done, put off till tomorrow, declined (with an optional why) or cleared ---------- */
+function nkey(x) { let h = 7; const t = String(x.t || ''); for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return 'nx:' + (h >>> 0).toString(36); }   // a changed item (new count, new title) comes back
+function upNext() { const ids = doneIds(), day = new Date().toLocaleDateString('en-CA'); return needs().filter(x => { const k = nkey(x); return !ids.has(k) && !ids.has(k + '@' + day); }); }
+function upCard(x) { const k = nkey(x), t = esc(x.t); return `<div class="row"><div class="ico">${x.ico}</div><div class="body"><div class="t">${t}</div>${x.s ? `<div class="s">${esc(x.s)}</div>` : ''}</div><div class="acts">${x.acts}<button class="pill ghost" data-act="nlater" data-k="${k}" data-t="${t}">Later</button>${x.ask ? `<button class="pill ghost" data-act="ndecline" data-k="${k}" data-t="${t}">Decline</button>` : ''}<button class="xbtn" data-act="nclear" data-k="${k}" data-t="${t}" aria-label="Clear: ${t}" title="Clear it">✕</button></div></div>`; }
 function checks() {
   const r = (S.sheet && S.sheet.checks) || []; if (!r.length) return null;
   const last = r.map(x => toDate(x[0])).filter(Boolean).sort((a, b) => b - a)[0];
@@ -521,13 +528,13 @@ function checks() {
 }
 function needs() {
   const out = [], sh = S.sheet || {};
-  if (typeof ImproveUI !== 'undefined') ImproveUI.needs().forEach(x => out.unshift(Object.assign({ ico: I.check || I.doc }, x)));
+  if (typeof ImproveUI !== 'undefined') ImproveUI.needs().forEach(x => out.unshift(Object.assign({ ico: I.check || I.doc, ask: /^Weekly review/.test(x.t) ? 1 : 0 }, x)));
   if (typeof SocialUI !== 'undefined') SocialUI.waiting().forEach(w => { const n = w.posts.length;
-    out.unshift({ ico: I.star || I.doc, t: `${w.set.title}: ${n} post${n > 1 ? 's' : ''} ready`, s: `Instagram, Facebook, stories and Google, made in this listing’s look. See each one as it will look, then Approve. Nothing posts until you do.`,
+    out.unshift({ ask: 1, ico: I.star || I.doc, t: `${w.set.title}: ${n} post${n > 1 ? 's' : ''} ready`, s: `Instagram, Facebook, stories and Google, made in this listing’s look. See each one as it will look, then Approve. Nothing posts until you do.`,
       acts: `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">${w.posts.map(p => `<img src="${esc(ASSET_BASE + p.th[0])}" alt="${esc(p.kind)}" style="width:64px;height:80px;object-fit:cover;border-radius:6px">`).join('')}</div><button class="pill" data-act="socopen" data-k="${esc(w.set.key)}">Review and approve</button>` }); });
   PENDING_PACKS.forEach(p => { if (doneIds().has('pend:' + p.key) || (typeof SOCIAL !== 'undefined' && SOCIAL.some(x => x.key === p.key && x.event === 'pending'))) return;   // went pending: Chris posts these (nothing posts on its own)
     const look = p.look, its = p.items.filter(a => !a.look || a.look === look);
-    out.unshift({ ico: I.star || I.doc, t: `Under contract · ${p.address}: post it`, s: `Your pending package is ready: ${its.filter(a => a.kind === 'Pending').length} social graphics and the under contract postcard for the neighbors. Post them on Instagram and Facebook.`,
+    out.unshift({ ask: 1, ico: I.star || I.doc, t: `Under contract · ${p.address}: post it`, s: `Your pending package is ready: ${its.filter(a => a.kind === 'Pending').length} social graphics and the under contract postcard for the neighbors. Post them on Instagram and Facebook.`,
       acts: `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">${its.map(a => `<a href="${esc(a.u)}" target="_blank" rel="noopener" title="${esc(a.t)}"><img src="${esc(ASSET_BASE + a.th)}" alt="${esc(a.t)}" style="width:72px;height:90px;object-fit:cover;border-radius:6px"></a>`).join('')}</div><button class="pill" data-act="pendposted" data-k="${esc(p.key)}">I posted them</button>` }); });
   (sh.mchanges || []).forEach((r, i) => { if (i === 0 || !/^ready/i.test(r[4] || '')) return;   // a marketing change made and waiting for Chris's OK
     out.push({ ico: I.doc, t: `Change ready · ${r[1]}`, s: `${r[2] ? r[2] + ': ' : ''}${r[3]}${r[6] ? ' · ' + r[6] : ''}`, acts: `${r[5] ? `<a class="pill ghost" href="${esc(r[5])}" target="_blank" rel="noopener">See it</a>` : ''}<button class="pill" data-act="mchg" data-row="${i + 1}" data-v="Approved">Approve</button><button class="pill ghost" data-act="mchg" data-row="${i + 1}" data-v="Redo">Not quite</button>` }); });
@@ -614,8 +621,8 @@ function render() {
   document.documentElement.className = 't-' + S.theme;
   const d = new Date(), h = d.getHours();
   const hi = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  const n = S.sheet ? needs() : [], ck = checks(), biz = business();
-  const statusLine = !S.sheet ? 'Getting your day ready…' : n.length === 0 ? 'Everything is running. Nothing needs you.' : `Everything is running. ${n.length === 1 ? 'One thing needs' : (n.length < 10 ? ['', '', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][n.length] : n.length) + ' things need'} a tap.`;
+  const n = S.sheet ? upNext() : [], ck = checks(), biz = business();
+  const statusLine = !S.sheet ? 'Getting your day ready…' : n.length === 0 ? 'Everything is running. You’re all caught up.' : `Everything is running. ${n.length === 1 ? 'One thing is' : (n.length < 10 ? ['', '', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][n.length] : n.length) + ' things are'} up next.`;
   $('#root').innerHTML = `<div class="wrap">
   <header class="top"><span class="brand"><span class="mark">The Office</span><span class="sub">Your whole business</span></span>
     <div style="display:flex;align-items:center;gap:10px">
@@ -624,8 +631,12 @@ function render() {
   <div class="hello"><p class="date">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
     <h1>${hi}, Chris.</h1>
     <p class="status"><span class="dot${n.length ? '' : ''}"></span>${esc(statusLine)}</p></div>
-  <nav class="jump" aria-label="Jump to">${[['listings','Listings'],['deals','Deals'],['kit','Presentations'],['sites','Sites'],['needs','Needs you'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+  <nav class="jump" aria-label="Jump to">${[['needs','Up next'],['listings','Listings'],['deals','Deals'],['kit','Templates'],['sites','Sites'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
   ${!caps.mcp && S.ready && !S.officeMode ? `<section><div class="group"><div class="row"><div class="ico">${I.globe}</div><div class="body"><div class="t">Open Ranch on claude.ai</div><div class="s">Your Gmail, Sheet and social accounts connect there. This view is a preview.</div></div></div></div></section>` : ''}
+
+  <section aria-label="Up next" data-tone="need" id="needs"><div class="h2row"><h2>Up next</h2><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Refreshing…' : 'Refresh'}</button></div>
+    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div><div class="skel" style="width:40%"></div></div>' : n.length ? (S.allUp ? n : n.slice(0, 3)).map(upCard).join('') : '<div class="empty">All caught up. Enjoy the quiet.</div>'}</div>
+    ${n.length > 3 ? `<div class="moreline"><button class="linkbtn" data-act="allup">${S.allUp ? 'Show just the top 3' : 'See all ' + n.length}</button></div>` : ''}</section>
 
   <section aria-label="Listings" data-tone="list" id="listings"><div class="h2row"><h2>Listings</h2><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Updating…' : (S.at ? 'Updated ' + new Date(S.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · Refresh' : 'Refresh')}</button><button class="pill ghost launch" data-act="shoot">${I.cal}<span>Order photos</span></button><button class="pill launch" data-act="launch">${I.plus}<span>Launch a listing</span></button></span></div>
     <div class="group">${listings().length ? '' : '<div class="empty">No listings yet. Launch your first one.</div>'}${listings().map(l => `<button class="lrow" data-act="listing" data-a="${esc(l.address)}">${l.photo ? `<img class="thumb" src="${esc(localPhoto(l.photo))}" alt="" onerror="this.onerror=null;this.src='${esc(l.photo)}'">` : '<span class="thumb" aria-hidden="true"></span>'}<span class="body"><span class="t" style="display:block">${esc(l.address)}</span><span class="s" style="display:block">${esc([l.city, money(l.price), l.listed ? 'Day ' + (Math.floor((Date.now() - l.listed) / 864e5) + 1) : l.page ? '' : 'needs a page', offersFor(l.address).find(offerAccepted) ? (r => 'Accepted · ' + offerWho(r) + ' ' + money(r[5]))(offersFor(l.address).find(offerAccepted)) : offersFor(l.address).length ? offersFor(l.address).length + ' offer' + (offersFor(l.address).length > 1 ? 's' : '') + ' · best ' + money(Math.max(...offersFor(l.address).map(r => +r[5] || 0))) : dealFor(l.address) ? 'Offer / deal email waiting' : '', (shootFor(l.address) || {}).status ? 'Photos: ' + shootFor(l.address).status.toLowerCase() : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('')}</div></section>
@@ -634,16 +645,14 @@ function render() {
   <section aria-label="Deals" data-tone="need" id="deals"><div class="h2row"><h2>Deals</h2><span class="note" style="margin:0">Shadow mode · nothing sends</span></div>
     <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : liveDeals().length ? liveDeals().map(d => `<button class="lrow" data-act="tc" data-a="${esc(d.address)}"><span class="body"><span class="t" style="display:block">${d.urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(d.address)}</span><span class="s" style="display:block">${esc([d.next ? 'Next: ' + String(d.next.r[2]).slice(0, 60) + ' · ' + new Date(d.next.t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : d.rows.length ? '' : 'Waiting on mutual acceptance', d.waiting ? d.waiting + ' need' + (d.waiting > 1 ? '' : 's') + ' you' : '', d.rows.length ? d.rows.length + ' logged' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No live deals. When one goes pending, its timeline and your TC’s drafts show up here.</div>'}</div></section>
 
-  <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; print</h2></div>
+  <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; templates</h2></div>
     <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
-    <p class="note">Slides present full screen and download as PowerPoint or PDF from the top of the deck. Brochures print from the Print button.</p></section>
+    <p class="note">The standard pieces for every appointment. Slides present full screen and download as PowerPoint or PDF. Each listing’s own plan, brochure, films and posts live on its Desk.</p></section>
 
   <section aria-label="Sites" data-tone="biz" id="sites"><div class="h2row"><h2>Sites &amp; pages</h2></div>
     ${[...new Set(SITES.map(x => x.g))].map(g => `<h4 class="mini">${esc(g)}</h4><div class="sgrid">${SITES.filter(x => x.g === g).map(k => `<div class="stile${k.draft ? ' draft' : ''}"><a href="${esc(k.u)}" target="_blank" rel="noopener">${k.th ? `<img src="${esc(ASSET_BASE + k.th)}" alt="" loading="lazy">` : `<span class="ph">${esc(k.t)}</span>`}<b>${esc(k.t)}</b><span class="s">${esc(k.s)}</span></a>${k.draft ? '' : `<button class="pill ghost" data-act="copylink" data-u="${esc(k.u)}">Copy link</button>`}</div>`).join('')}</div>`).join('')}
     <p class="note">Public pages to show clients or send. Drafts open your private review copy. Each listing’s own pages, signs and social posts live on its Desk under Marketing assets.</p></section>
 
-  <section aria-label="Needs you" data-tone="need" id="needs"><div class="h2row"><h2>Needs you</h2><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Refreshing…' : 'Refresh'}</button></div>
-    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div><div class="skel" style="width:40%"></div></div>' : n.length ? n.map(x => `<div class="row"><div class="ico">${x.ico}</div><div class="body"><div class="t">${esc(x.t)}</div>${x.s ? `<div class="s">${esc(x.s)}</div>` : ''}</div><div class="acts">${x.acts}</div></div>`).join('') : '<div class="empty">All clear. Enjoy the quiet.</div>'}</div></section>
 
   <section aria-label="Today" data-tone="day" id="today"><div class="h2row"><h2>Today</h2></div>
     <div class="group">${S.cal ? (todayList(d).length ? todayList(d).map(x => x.show ? showingRow(x, d) : (e => { const t = new Date(e.start); const allDay = String(e.start).length <= 10; return `<div class="row plain"><div class="timecol" style="width:64px;flex:none;font-size:14px;color:var(--muted)">${allDay ? 'All day' : t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}${t.getDate() !== d.getDate() ? '<br>' + t.toLocaleDateString('en-US', { weekday: 'short' }) : ''}</div><div class="body"><div class="t">${esc(e.title)}</div>${e.where ? `<div class="s">${esc(e.where)}</div>` : ''}</div>${e.invite ? `<div class="acts"><button class="pill" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="accepted">Accept</button><button class="pill ghost" data-act="rsvp" data-id="${esc(e.id)}" data-c="${esc(e.cal)}" data-v="declined">Decline</button></div>` : e.link ? `<a class="pill ghost" href="${esc(e.link)}" target="_blank" rel="noopener">Open</a>` : ''}</div>`; })(x.e)).join('') : '<div class="empty">Nothing on the calendar today or tomorrow.</div>')
@@ -669,8 +678,8 @@ function render() {
     <div class="tiles">
       <div class="tile"><span class="k">GCI closed this year</span><span class="v">${biz.ytd ? k$(biz.ytd) : '—'}</span></div>
       <div class="tile"><span class="k">Pending GCI</span><span class="v">${biz.pending ? k$(biz.pending) : '—'}</span></div>
-      <div class="tile"><span class="k">Active volume</span><span class="v">${biz.activeVolume ? k$(biz.activeVolume) : '—'}</span></div>
-      <div class="tile"><span class="k">Closing in 30 days</span><span class="v">${biz.soon.length}</span></div>
+      <div class="tile"><span class="k">Active volume · ${biz.active.length} listing${biz.active.length === 1 ? '' : 's'}</span><span class="v">${biz.activeVolume ? k$(biz.activeVolume) : '—'}</span></div>
+      <div class="tile"><span class="k">Pending volume · ${biz.pendingCount}</span><span class="v">${biz.pendingVolume ? k$(biz.pendingVolume) : '—'}</span></div>
     </div>
     ${biz.soon.length ? `<div class="group" style="margin-top:12px">${biz.soon.map(x => `<div class="row plain"><div class="body"><div class="t">${esc(x.address)}</div><div class="s">${esc(x.side)} · closes ${new Date(x.closing).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div></div></div>`).join('')}</div>` : ''}
     <p class="note">${biz.missingPct ? `Add your commission on ${biz.missingPct} deal${biz.missingPct > 1 ? 's' : ''} to see GCI. ` : ''}Deals live in your Ranch Sheet until KW Command is connected.</p></section>
@@ -1148,7 +1157,7 @@ ${text}`, { modelTier: 'default', cache: false }) || {};
   $('#offsave').onclick = async ev => { const v = Object.fromEntries(new FormData($('#offf'))); if (!v.address) return toast('Which listing?'); ev.target.disabled = true;
     try { await append('Offers', [[nowStamp(), v.address, v.buyers, v.agent, v.brokerage, String(v.price).replace(/[^\d.]/g, ''), v.financing, String(v.earnest).replace(/[^\d.]/g, ''), String(v.credit).replace(/[^\d.]/g, ''), 'Received', v.due, v.notes, m.url || m.id, v.closing, v.inspection, v.socA ? String(v.socA).replace(/[^\d.]/g, '') + '%' : '', v.socB ? String(v.socB).replace(/[^\d.]/g, '') + '%' : '']]);
       append('Hub done', [[nowStamp(), 'offer:' + m.id, 'offer logged', m.subject]]).catch(() => { });
-      close(); toast('Offer logged. It’s on the listing and in Needs you.'); await loadSheet(); render(); }
+      close(); toast('Offer logged. It’s on the listing and in Up next.'); await loadSheet(); render(); }
     catch (err) { ev.target.disabled = false; toast('Not saved — ' + (err.message || 'try again')); } };
 }
 
@@ -1182,6 +1191,12 @@ document.addEventListener('click', async e => {
   else if (a === 'launch') launchSheet(x);
   else if (a === 'socopen') socSheet(b.dataset.k);
   else if (a === 'socnow') { const n = (String(b.dataset.a).match(/^\d{3,6}/) || [b.dataset.a])[0]; runSocialNow(b.dataset.a, b.dataset.m); append('Hub done', [[nowStamp(), 'socnow:' + n + ':' + b.dataset.m, 'asked for ' + b.dataset.m + ' posts', '']]).then(() => loadSheet().then(render)).catch(() => {}); toast('Making them now. They’ll show up here for your OK in a few minutes. Nothing posts until you approve.'); }
+  else if (a === 'allup') { S.allUp = !S.allUp; render(); }
+  else if (a === 'nlater') { markDone({ id: b.dataset.k + '@' + new Date().toLocaleDateString('en-CA'), subject: b.dataset.t }, 'later'); render(); toast('Back tomorrow morning.'); }
+  else if (a === 'nclear') { markDone({ id: b.dataset.k, subject: b.dataset.t }, 'cleared'); render(); toast('Cleared. It comes back only if something changes.'); }
+  else if (a === 'ndecline') { const k = b.dataset.k, t = b.dataset.t;
+    sheet(`<p class="date">Decline</p><h3>${esc(t)}</h3><form id="declf"><div class="field"><label for="dw">What’s not right? (optional)</label><textarea id="dw" name="w" placeholder="Wrong photo on the first post"></textarea></div><p class="s" style="margin:-4px 0 14px">Nothing goes out. What you write here goes into your weekly review so the next one is better.</p><div class="acts"><button class="pill">Decline</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+    $('#declf').onsubmit = e => { e.preventDefault(); const w = e.target.w.value.trim(); markDone({ id: k, subject: t }, 'declined'); if (w) append('Papercuts', [[nowStamp(), 'Chris', 'Office · ' + t, '', '', 'Declined: ' + w, '', 'New', '', 'from Chris']]).catch(() => { }); close(); render(); toast(w ? 'Declined. Your note is in the weekly review.' : 'Declined.'); }; }
   else if (a === 'pendposted') { append('Hub done', [[nowStamp(), 'pend:' + b.dataset.k, 'pending package posted', '']]).then(() => { toast('Nice. Marked posted.'); loadSheet().then(render); }).catch(() => toast('Not saved. Try again.')); }
   else if (a === 'mchg') { const row = b.dataset.row, v2 = b.dataset.v;
     tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Marketing changes'!E" + row, values: [[v2]] })
@@ -1317,7 +1332,7 @@ async function runProposal(i, j, kind, btn) {
     else if (kind === 'log_offer') { let o = {}; try { o = JSON.parse(p.body); } catch (e) { } o.address = o.address || p.listing; return offerSheet({ id: 'concierge-' + Date.now(), subject: 'Offer on ' + (p.listing || ''), url: '' }, o); }
     else if (kind === 'seller_update') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Seller updates', [[nowStamp(), p.listing, p.subject || 'An update from Chris', p.body, 'Chris']]); p.done = 'Posted to their portal.'; }
     else if (kind === 'publish_feedback') { close(); return feedbackSheet(p.listing || ''); }
-    else if (kind === 'marketing_change') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Marketing changes', [[nowStamp(), p.listing, p.subject || 'all', p.body, 'Requested', '', '']]); p.done = (await runMarketingNow(p.listing, p.subject, p.body)) ? 'On it. It’s usually ready in a few minutes and shows up in Needs you for your OK before it replaces anything.' : 'Requested. It’s made at the next hourly run and comes back to you for an OK.'; }
+    else if (kind === 'marketing_change') { if (!p.listing) throw new Error('Which listing? Ask me again with the address.'); await append('Marketing changes', [[nowStamp(), p.listing, p.subject || 'all', p.body, 'Requested', '', '']]); p.done = (await runMarketingNow(p.listing, p.subject, p.body)) ? 'On it. It’s usually ready in a few minutes and shows up in Up next for your OK before it replaces anything.' : 'Requested. It’s made at the next hourly run and comes back to you for an OK.'; }
     else if (kind === 'event') { if (!p.start) throw new Error('What time? Ask me again with a day and time.'); const st = String(p.start).replace(/(Z|[+-]\d\d:\d\d)$/, ''), en = String(p.end || new Date(Date.parse(st) + 36e5).toISOString().slice(0, 19)).replace(/(Z|[+-]\d\d:\d\d)$/, '');
       await tool('Google Calendar', 'create_event', { calendarId: CALENDARS[0], summary: p.subject || p.body.slice(0, 80), startTime: st, endTime: en, location: p.location || p.listing || '' }); p.done = 'On your calendar.'; loadCalendar().then(render); }
     else if (kind === 'launch_listing') { let d = {}; try { d = JSON.parse(p.body); } catch (e) { d = { notes: p.body }; } close(); return launchSheet(p.listing || d.address || '', Object.assign({ address: p.listing }, d)); }
