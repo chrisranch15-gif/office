@@ -5313,6 +5313,10 @@ async function tell(q) {
       execute: ({ text }) => { const r = E.emit(LID, 'seller.note', { text: String(text).slice(0, 1200) }); return log('Note to seller', r.pending ? 'Waiting for your approval, per your rule' : r.ok ? 'Sent' : 'Not sent'); } },
     { name: 'set_lead_photo', description: 'Change the photo the Property Story leads with.', inputSchema: { type: 'object', properties: { photo: { type: 'string', enum: LC.MEDIA.map(m => m.id) } }, required: ['photo'] },
       execute: ({ photo }) => { if (!M(photo)) throw new Error('Unknown photo'); E.setLeadPhoto(LID, photo, 'asked of the Concierge'); return log('Lead photo → ' + M(photo).room, 'Done'); } },
+    { name: 'request_marketing_change', description: 'Ask for a change to this listing\'s marketing pieces (postcards, lookbook, room cards, silent talkers, open house signs, Instagram carousel, posts, films, agent email, listing page) or switch its look. It is logged for the team to make, and comes back to the agent for approval before anything is replaced. Never say the change is already made.', inputSchema: { type: 'object', properties: { piece: { type: 'string' }, change: { type: 'string' } }, required: ['change'] },
+      execute: async ({ piece, change }) => { if (!caps.mcp) throw new Error('Open The Desk on claude.ai with Google Sheets allowed to request changes.');
+        await callTool('Google Sheets', 'append_values', { spreadsheetId: LIVE_SHEET, range: "'Marketing changes'!A1", values: [[liveNow(), street(), piece || 'all', change, 'Requested', '', '']] });
+        return log('Marketing change requested: ' + (piece ? piece + ' · ' : '') + change, 'Comes back to you for an OK, usually within the hour'); } },
     { name: 'request_price_change', description: 'Request a list price change. It is NEVER applied directly: it goes to The Desk for the agent to approve.', inputSchema: { type: 'object', properties: { to: { type: 'number' } }, required: ['to'] },
       execute: ({ to }) => { if (!(to > 50000)) throw new Error('Invalid price'); E.emit(LID, 'price.change.requested', { to: Math.round(to) }); return log('Price change to ' + LC.money(to), 'Waiting for your approval on The Desk'); } },
     { name: 'add_pending_facts', description: 'Add property facts the agent stated. They are added as PENDING and publish only after verification.', inputSchema: { type: 'object', properties: { items: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'string' } } } } }, required: ['items'] },
@@ -6078,22 +6082,30 @@ ${pendingDeal() ? `<details style="margin-top:12px"><summary class="btn ghost" s
 ${pendingDeal() ? '</div></details>' : ''}` : ''}</div>`;
 }
 /* ---------- marketing assets: every launch asset for this listing, as a gallery (source/marketing/build_assets.py) ---------- */
+const LOOK_NAMES = [['editorial', 'Estate Editorial'], ['arch', 'Modern Architectural'], ['heritage', 'Warm Heritage']];
+function activeLook() { const num = (String(street()).match(/^\d+/) || [''])[0]; return L().mode || (typeof ASSET_LOOK !== 'undefined' && ASSET_LOOK[num]) || 'editorial'; }
 function assetsBlock() {
   if (!isStaff() || typeof ASSETS === 'undefined') return '';
-  const num = (String(street()).match(/^\d+/) || [''])[0], all = ASSETS[num] || [];
+  const num = (String(street()).match(/^\d+/) || [''])[0], look = activeLook(), every = ASSETS[num] || [];
+  const all = every.filter(a => !a.look || a.look === look);
   if (!all.length) return '';
-  const order = [['Listing page', 'Pages'], ['Page', 'Pages'], ['Print', 'Print'], ['Film', 'Films'], ['Social', 'Social posts and stories']], groups = {};
+  const tile = a => `<div class="atile"><a href="${esc(a.u)}" target="_blank" rel="noopener">${a.th ? `<img src="${esc(a.th)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<b>${esc(a.t)}</b></a><button class="chip" data-act="asset-copy" data-u="${esc(a.u)}">Copy link</button></div>`;
+  const order = [['Listing page', 'Ready now · pages'], ['Page', 'Ready now · pages'], ['Email', 'Ready now · agent email'], ['Carousel', 'Ready now · Instagram carousel'], ['Social', 'Ready now · posts and stories'], ['Film', 'Ready now · films'], ['Print', 'Print · pick what you want printed']], groups = {};
   order.forEach(([k, g]) => all.filter(a => a.kind === k).forEach(a => (groups[g] = groups[g] || []).push(a)));
-  return `<div class="sharebar" id="assets"><div class="eyebrow">Marketing assets · ${all.length}</div><p class="small muted" style="margin:6px 0 0">Everything made for this listing. Tap to open, or copy a link to send.</p>
-    ${Object.keys(groups).map(g => `<div class="small" style="font-weight:600;margin:16px 0 8px">${esc(g)}</div><div class="agrid">${groups[g].map(a => `<div class="atile"><a href="${esc(a.u)}" target="_blank" rel="noopener">${a.th ? `<img src="${esc(a.th)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<b>${esc(a.t)}</b></a><button class="chip" data-act="asset-copy" data-u="${esc(a.u)}">Copy link</button></div>`).join('')}</div>`).join('')}</div>`;
+  const hasLooks = every.some(a => a.look);
+  return `<div class="sharebar" id="assets"><div class="eyebrow">Marketing assets · ${all.length}</div>
+    ${hasLooks ? `<div style="margin-top:10px"><span class="small muted">Look</span> <span class="seg" role="group" aria-label="Marketing look">${LOOK_NAMES.map(([k, n]) => `<button data-act="mode" data-v="${k}" aria-pressed="${look === k}">${n}</button>`).join('')}</span></div>
+    <p class="small muted" style="margin:8px 0 0">Every piece is made in all three looks at launch, so switching is instant. The look you pick here is the one you share and print.</p>` : '<p class="small muted" style="margin:6px 0 0">Everything made for this listing. Tap to open, or copy a link to send.</p>'}
+    ${Object.keys(groups).map(g => `<div class="small" style="font-weight:600;margin:16px 0 8px">${esc(g)}</div>${g.startsWith('Print') ? '<p class="small muted" style="margin:-4px 0 8px">Print-ready PDFs. Open the ones you want and send them to your printer or mail house.</p>' : ''}<div class="agrid">${groups[g].map(tile).join('')}</div>`).join('')}
+    <p class="small muted" style="margin-top:14px">Want a change? Tell the Concierge (“swap the postcard photo for the deck”). It’s logged, made, and comes back here for your OK.</p></div>`;
 }
-const SIGN_SETS = { '19917': [['gallery', 'Gallery'], ['noir', 'Noir'], ['daylight', 'Daylight']] }; // printed by source/print/open_house_signs.py
+const SIGN_SETS = { '19917': { editorial: 'noir', arch: 'daylight', heritage: 'heritage' } }; // look → sign style, printed by source/print/open_house_signs.py
 function ohBlock() {
   if (!isStaff()) return '';
   const up = L().openHouses.filter(o => o.status === 'scheduled');
   const nextSat = (() => { const d = new Date(); d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7)); return d.toISOString().slice(0, 10); })();
   const opt = (sel) => OH_TIMES.map(([v, t]) => `<option value="${v}" ${v === sel ? 'selected' : ''}>${t}</option>`).join('');
-  const num = (String(street()).match(/^\d+/) || [''])[0], styles = SIGN_SETS[num] || [];
+  const num = (String(street()).match(/^\d+/) || [''])[0], ss = SIGN_SETS[num] || {}, styles = ss[activeLook()] ? [[ss[activeLook()], (LOOK_NAMES.find(x => x[0] === activeLook()) || [, ''])[1]]] : [];
   const signs = styles.length ? `<div style="margin-top:12px"><div class="small" style="font-weight:600">Sign-in signs with QR codes · print-ready</div><div class="chips" style="margin-top:8px">${styles.map(([k, t]) => `<a class="chip" href="https://homes.ranchpnw.com/print/open-house-signs-${num}-${k}.pdf" target="_blank" rel="noopener">${t}</a>`).join('')}</div><p class="small muted" style="margin-top:6px">Letter size, 4 pages each. Guests scan, sign in in about 20 seconds, and land in your Leads.</p></div>` : '<p class="small muted" style="margin-top:12px">No sign-in signs for this home yet. Ask your Concierge to make them.</p>';
   return `<div class="sharebar" id="openhouses"><div class="eyebrow">Open houses</div>${signs}
     ${up.length ? `<div class="list" style="margin-top:10px">${up.map(o => `<div><span aria-hidden="true">●</span><span><b>${esc(o.label)}</b><br><span class="small muted">On the listing page · comes off when it ends</span></span>${caps.mcp ? `<button class="btn text small" data-act="oh-cancel" data-id="${esc(o.id)}">Remove</button>` : ''}</div>`).join('')}</div>` : '<p class="small muted" style="margin:8px 0 0">Nothing scheduled. Add one below when the time is set — it won’t show anywhere until you publish it.</p>'}
@@ -6651,21 +6663,410 @@ const ASSETS = {
 },
 {
 "kind": "Print",
-"t": "Open house signs \u00b7 Daylight",
+"t": "Open house signs",
 "u": "https://homes.ranchpnw.com/print/open-house-signs-19917-daylight.pdf",
-"th": "marketing/thumbs/open-house-signs-19917-daylight.jpg"
+"th": "marketing/thumbs/open-house-signs-19917-daylight.jpg",
+"look": "arch",
+"pick": 1
 },
 {
 "kind": "Print",
-"t": "Open house signs \u00b7 Gallery",
+"t": "Open house signs",
 "u": "https://homes.ranchpnw.com/print/open-house-signs-19917-gallery.pdf",
-"th": "marketing/thumbs/open-house-signs-19917-gallery.jpg"
+"th": "marketing/thumbs/open-house-signs-19917-gallery.jpg",
+"look": "gallery",
+"pick": 1
 },
 {
 "kind": "Print",
-"t": "Open house signs \u00b7 Noir",
+"t": "Open house signs",
+"u": "https://homes.ranchpnw.com/print/open-house-signs-19917-heritage.pdf",
+"th": "marketing/thumbs/open-house-signs-19917-heritage.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Open house signs",
 "u": "https://homes.ranchpnw.com/print/open-house-signs-19917-noir.pdf",
-"th": "marketing/thumbs/open-house-signs-19917-noir.jpg"
+"th": "marketing/thumbs/open-house-signs-19917-noir.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Just Listed postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/postcard-listed.pdf",
+"th": "marketing/thumbs/19917-editorial-postcard-listed.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Under contract postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/postcard-contract.pdf",
+"th": "marketing/thumbs/19917-editorial-postcard-contract.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighbors\u2019 preview invitation",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/preview-invite.pdf",
+"th": "marketing/thumbs/19917-editorial-preview-invite.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Lookbook",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/lookbook.pdf",
+"th": "marketing/thumbs/19917-editorial-lookbook.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Room story cards",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/room-cards.pdf",
+"th": "marketing/thumbs/19917-editorial-room-cards.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Silent talkers",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/talkers.pdf",
+"th": "marketing/thumbs/19917-editorial-talkers.jpg",
+"look": "editorial",
+"pick": 1
+},
+{
+"kind": "Email",
+"t": "Agent-to-agent email",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/agent-email.html",
+"th": "marketing/thumbs/19917-editorial-agent-email.jpg",
+"look": "editorial"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 post",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/contract-post.jpg",
+"th": "marketing/thumbs/19917-editorial-contract-post.jpg",
+"look": "editorial"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 story",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/contract-story.jpg",
+"th": "marketing/thumbs/19917-editorial-contract-story.jpg",
+"look": "editorial"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 square",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/contract-square.jpg",
+"th": "marketing/thumbs/19917-editorial-contract-square.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 1 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-1.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-1.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 2 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-2.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-2.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 3 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-3.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-3.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 4 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-4.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-4.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 5 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-5.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-5.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 6 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-6.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-6.jpg",
+"look": "editorial"
+},
+{
+"kind": "Carousel",
+"t": "Slide 7 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/editorial/carousel-7.jpg",
+"th": "marketing/thumbs/19917-editorial-carousel-7.jpg",
+"look": "editorial"
+},
+{
+"kind": "Print",
+"t": "Just Listed postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/postcard-listed.pdf",
+"th": "marketing/thumbs/19917-arch-postcard-listed.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Under contract postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/postcard-contract.pdf",
+"th": "marketing/thumbs/19917-arch-postcard-contract.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighbors\u2019 preview invitation",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/preview-invite.pdf",
+"th": "marketing/thumbs/19917-arch-preview-invite.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Lookbook",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/lookbook.pdf",
+"th": "marketing/thumbs/19917-arch-lookbook.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Room story cards",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/room-cards.pdf",
+"th": "marketing/thumbs/19917-arch-room-cards.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Silent talkers",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/talkers.pdf",
+"th": "marketing/thumbs/19917-arch-talkers.jpg",
+"look": "arch",
+"pick": 1
+},
+{
+"kind": "Email",
+"t": "Agent-to-agent email",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/agent-email.html",
+"th": "marketing/thumbs/19917-arch-agent-email.jpg",
+"look": "arch"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 post",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/contract-post.jpg",
+"th": "marketing/thumbs/19917-arch-contract-post.jpg",
+"look": "arch"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 story",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/contract-story.jpg",
+"th": "marketing/thumbs/19917-arch-contract-story.jpg",
+"look": "arch"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 square",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/contract-square.jpg",
+"th": "marketing/thumbs/19917-arch-contract-square.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 1 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-1.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-1.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 2 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-2.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-2.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 3 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-3.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-3.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 4 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-4.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-4.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 5 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-5.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-5.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 6 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-6.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-6.jpg",
+"look": "arch"
+},
+{
+"kind": "Carousel",
+"t": "Slide 7 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/arch/carousel-7.jpg",
+"th": "marketing/thumbs/19917-arch-carousel-7.jpg",
+"look": "arch"
+},
+{
+"kind": "Print",
+"t": "Just Listed postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/postcard-listed.pdf",
+"th": "marketing/thumbs/19917-heritage-postcard-listed.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Under contract postcard",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/postcard-contract.pdf",
+"th": "marketing/thumbs/19917-heritage-postcard-contract.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Neighbors\u2019 preview invitation",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/preview-invite.pdf",
+"th": "marketing/thumbs/19917-heritage-preview-invite.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Lookbook",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/lookbook.pdf",
+"th": "marketing/thumbs/19917-heritage-lookbook.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Room story cards",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/room-cards.pdf",
+"th": "marketing/thumbs/19917-heritage-room-cards.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Print",
+"t": "Silent talkers",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/talkers.pdf",
+"th": "marketing/thumbs/19917-heritage-talkers.jpg",
+"look": "heritage",
+"pick": 1
+},
+{
+"kind": "Email",
+"t": "Agent-to-agent email",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/agent-email.html",
+"th": "marketing/thumbs/19917-heritage-agent-email.jpg",
+"look": "heritage"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 post",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/contract-post.jpg",
+"th": "marketing/thumbs/19917-heritage-contract-post.jpg",
+"look": "heritage"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 story",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/contract-story.jpg",
+"th": "marketing/thumbs/19917-heritage-contract-story.jpg",
+"look": "heritage"
+},
+{
+"kind": "Pending",
+"t": "Under contract \u00b7 square",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/contract-square.jpg",
+"th": "marketing/thumbs/19917-heritage-contract-square.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 1 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-1.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-1.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 2 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-2.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-2.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 3 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-3.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-3.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 4 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-4.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-4.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 5 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-5.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-5.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 6 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-6.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-6.jpg",
+"look": "heritage"
+},
+{
+"kind": "Carousel",
+"t": "Slide 7 of 7",
+"u": "https://homes.ranchpnw.com/marketing/19917/heritage/carousel-7.jpg",
+"th": "marketing/thumbs/19917-heritage-carousel-7.jpg",
+"look": "heritage"
 },
 {
 "kind": "Page",
@@ -6761,6 +7162,7 @@ const ASSETS = {
 }
 ]
 };
+const ASSET_LOOK = {"19917": "editorial"};   // each listing's launch look (the Desk toggle can switch it)
 
 /* ---------- start ---------- */
 if (SITE) {
