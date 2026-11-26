@@ -6539,7 +6539,7 @@ const SocialUI = (() => {
   function caption(set, p) { const s = S(pk(set, p)); return s.text != null ? s.text : p.caption; }
   function whenVal(set, p) { const s = S(pk(set, p)); return s.when || p.when; }
   function nice(w) { const d = new Date(w); return isNaN(d) ? w : d.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
-  const img = (set, p, i) => e((H.base || '') + p.th[i]);
+  const img = (set, p, i) => e(((H && H.base) || '') + p.th[i]);
 
   /* ---- the previews: drawn the way each network shows a post ---- */
   function slider(set, p, k, ratio) {
@@ -6580,7 +6580,7 @@ const SocialUI = (() => {
       ${s.err ? `<p class="socp-err">${e(s.err)}</p>` : ''}
       <div class="socp-acts">${local ? `<span class="socp-note">Approve from your Office in the Claude app, where Metricool is connected.</span>` : `<button class="socp-btn" data-soc="approve" data-k="${e(k)}" ${s.busy ? 'disabled' : ''}>${s.busy ? 'Scheduling…' : 'Approve'}</button>`}
         <button class="socp-btn ghost" data-soc="edit" data-k="${e(k)}">${s.edit ? 'Done editing' : 'Edit'}</button>
-        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener">Full size</a>${typeof ImproveUI !== 'undefined' ? ImproveUI.toneLink(H.where || 'Office', `${set.key} ${set.event} · ${p.id}`, caption(set, p), p.trail) : ''}</div>
+        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener">Full size</a>${typeof ImproveUI !== 'undefined' ? ImproveUI.toneLink((H && H.where) || 'Office', `${set.key} ${set.event} · ${p.id}`, caption(set, p), p.trail) : ''}</div>
       ${!local ? `<p class="socp-note">Approve schedules it for the time above${p.network === 'gmb' ? '' : ''}. Want a different photo or line? Tell the Concierge and it comes back here for your OK.</p>` : ''}`}
     </div>`;
   }
@@ -6676,7 +6676,7 @@ const ImproveUI = (() => {
   const e = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const now = () => new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
   const vals = r => (r && (r.values || (r.valueRanges && r.valueRanges[0] && r.valueRanges[0].values))) || [];
-  const local = () => !(window.claude && window.claude.use) && !H.office;
+  const local = () => !(window.claude && window.claude.use) && !(H && H.office);
   const store = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem('imp:' + k) || 'null'); localStorage.setItem('imp:' + k, JSON.stringify(v)); } catch (x) { return null; } };
   const homeNum = s => (String(s || '').match(/^\d{3,6}/) || [''])[0];
 
@@ -6722,8 +6722,8 @@ const ImproveUI = (() => {
   }
 
   /* ---- seller questions ---- */
-  const forChris = () => (qs || []).filter(x => /^for chris/i.test(x.r[8] || '') && (!H.home || homeNum(x.r[2]) === homeNum(H.home)));
-  const autoRecent = () => (qs || []).filter(x => /^auto/i.test(x.r[7] || '') && /^answered/i.test(x.r[8] || '') && (!H.home || homeNum(x.r[2]) === homeNum(H.home)) && (Date.now() - new Date(x.r[9] || x.r[0]).getTime()) < 4 * 864e5);
+  const forChris = () => (qs || []).filter(x => /^for chris/i.test(x.r[8] || '') && (!(H && H.home) || homeNum(x.r[2]) === homeNum(H.home)));
+  const autoRecent = () => (qs || []).filter(x => /^auto/i.test(x.r[7] || '') && /^answered/i.test(x.r[8] || '') && (!(H && H.home) || homeNum(x.r[2]) === homeNum(H.home)) && (Date.now() - new Date(x.r[9] || x.r[0]).getTime()) < 4 * 864e5);
   function questionHtml(x, mode) {
     const r = x.r, b = busy['q' + x.row];
     return `<div class="imp-card"><div class="imp-t">${e(r[2])}${r[3] ? ` <span class="imp-s">· ${e(r[3])}</span>` : ''}</div><p class="imp-q">“${e(r[4])}”</p>
