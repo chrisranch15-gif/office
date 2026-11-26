@@ -1588,6 +1588,15 @@ const ImproveUI = (() => {
       try { await add('Seller questions', [[now(), '', f.h.value.trim(), '', f.q.value.trim(), '', f.a.value.trim(), 'Chris (call/text)', 'Logged', now(), '']]); H.close(); H.toast('Saved.'); load(); } catch (x) { H.toast('Not saved. Try again.'); } };
   }
 
+  function teachSheet() {
+    H.sheet(`<p class="date">Teach the marketer</p><h3>Something worth learning from?</h3><p class="s" style="margin:-4px 0 14px">A link, a post you liked, an idea. It gets summarized for your marketing brain, and your weekly review shows how it would change what we make.</p>
+    <form id="impteach"><div class="field"><label for="it-l">Link or idea</label><textarea id="it-l" name="l" required placeholder="https://… or “posts that show the before-and-after of a room get shared a lot”"></textarea></div>
+    <div class="field"><label for="it-n">What you liked about it (optional)</label><input id="it-n" name="n"></div>
+    <div class="acts"><button class="pill">Add to the marketing brain</button><button type="button" class="pill ghost" data-act="close">Cancel</button></div></form>`);
+    document.getElementById('impteach').onsubmit = async ev => { ev.preventDefault(); const f = ev.target;
+      try { await add('Marketing brain inbox', [[now(), f.l.value.trim(), f.n.value.trim(), 'New', '']]); H.close(); H.toast('Added. You’ll see what it teaches in your weekly review.'); } catch (x) { H.toast('Not saved. Try again.'); } };
+  }
+
   /* ---- usage: which sections Chris taps (counts only, no scrolling) ---- */
   function bump(sec) { const d = new Date().toISOString().slice(0, 10), u = store('use') || {}; u[d] = u[d] || {}; const k = sec; u[d][k] = u[d][k] || { t: 0, s: 0 }; u[d][k].t++;
     const ses = store('ses') || {}; if (!ses[d + k] || Date.now() - ses[d + k] > 30 * 60e3) u[d][k].s++; ses[d + k] = Date.now(); store('ses', ses); store('use', u); }
@@ -1621,6 +1630,7 @@ const ImproveUI = (() => {
     if (a === 'answer-save' || a === 'fix-save') { const t = document.querySelector(`[data-imp-ans="${row}"]`); return answer(row, t ? t.value : '', a === 'fix-save'); }
     if (a === 'off') return offSheet();
     if (a === 'asked') return askedSheet();
+    if (a === 'teach') return teachSheet();
     if (a === 'review') return H.sheet(`<p class="date">Weekly review</p><h3>Ways to make it better</h3><p class="s" style="margin:-4px 0 14px">Each one is a small change, tested before it goes live. Nothing changes without your OK.</p><div id="impbody">${reviewHtml()}</div><div class="acts"><button class="pill ghost" data-act="close">Close</button></div>`);
     if (a === 'questions') return H.sheet(`<p class="date">Seller questions</p><h3>From the seller portals</h3><div id="impq">${questionsBody()}</div><div class="acts"><button class="pill ghost" data-act="close">Close</button></div>`);
     if (a === 'arrange') return arrangeSheet(H.wrap());
@@ -1640,13 +1650,13 @@ const ImproveUI = (() => {
     if (f.length) out.push({ t: `Answered for you: ${f.length}`, s: 'Factual questions from sellers, answered from the contract and your TC’s records. Tap to check or fix.', acts: `<button class="pill ghost" data-imp="questions">See them</button>` });
     return out;
   }
-  const tools = () => `<div class="imp-tools"><button class="imp-link" data-imp="off">Something’s off</button><button class="imp-link" data-imp="asked">Seller asked…</button>${H && H.wrap ? '<button class="imp-link" data-imp="arrange">Arrange</button>' : ''}<button class="imp-link" data-imp="review">Weekly review</button></div>`;
+  const tools = () => `<div class="imp-tools"><button class="imp-link" data-imp="off">Something’s off</button><button class="imp-link" data-imp="asked">Seller asked…</button><button class="imp-link" data-imp="teach">Teach the marketer</button>${H && H.wrap ? '<button class="imp-link" data-imp="arrange">Arrange</button>' : ''}<button class="imp-link" data-imp="review">Weekly review</button></div>`;
   const CSS = `.imp-card{border:1px solid rgba(128,120,108,.28);border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(128,120,108,.05)}.imp-card p{margin:8px 0;line-height:1.5}.imp-n{font-size:12px;opacity:.6}.imp-t{font-weight:600;font-size:16px;margin-top:2px}
 .imp-ba{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.imp-ba div{border-radius:10px;padding:10px;background:rgba(128,120,108,.08);font-size:14px;line-height:1.45}.imp-ba span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
 .imp-s{font-size:13px;opacity:.72}.imp-h{font-weight:600;margin:14px 0 2px}.imp-q{font-size:16px}.imp-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.imp-btn{border:0;border-radius:999px;padding:9px 16px;font-family:inherit;font-weight:600;font-size:13px;line-height:1;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}
 .imp-btn.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-btn[disabled]{opacity:.35}.imp-ta{display:block;width:100%;box-sizing:border-box;margin-top:6px;font-family:inherit;font-size:14px;line-height:1.45;padding:8px 10px;border-radius:8px;border:1px solid rgba(128,120,108,.4);background:transparent;color:inherit}.imp-lab{display:block;font-size:13px;margin-top:8px}
 .imp-help{border-radius:12px;padding:10px 14px;background:rgba(63,107,69,.10);margin:6px 0}.imp-help p{margin:4px 0;font-size:14px}.imp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(128,120,108,.18)}
-.imp-tools{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin:18px 0 6px}.imp-link{border:0;background:none;color:inherit;opacity:.7;font-family:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}.imp-undo{margin-top:12px}#impoff .pill,#impask .pill{border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-weight:600;font-size:14px;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}#impoff .pill.ghost,#impask .pill.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-undo summary{cursor:pointer;font-size:13px;opacity:.75}`;
+.imp-tools{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin:18px 0 6px}.imp-link{border:0;background:none;color:inherit;opacity:.7;font-family:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}.imp-undo{margin-top:12px}#impoff .pill,#impask .pill,#impteach .pill{border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-weight:600;font-size:14px;background:var(--btn,#1C1B19);color:var(--btnText,#F6F2EB);cursor:pointer}#impoff .pill.ghost,#impask .pill.ghost,#impteach .pill.ghost{background:transparent;color:inherit;border:1px solid rgba(128,120,108,.45)}.imp-undo summary{cursor:pointer;font-size:13px;opacity:.75}`;
   return {
     init(h) { H = h; if (!document.getElementById('imp-css')) { const s = document.createElement('style'); s.id = 'imp-css'; s.textContent = CSS; document.head.appendChild(s); }
       const r = H.render; H.render = () => { r(); refreshSheet(); if (H.wrap) arrange(H.wrap()); }; load(); flush(); setInterval(flush, 15 * 60e3); setInterval(load, 5 * 60e3); },
