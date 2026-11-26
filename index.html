@@ -133,6 +133,7 @@ const ASSET_BASE = /ranchpnw\.com$/.test(location.hostname) ? 'https://homes.ran
 const KIT = [
   { ico: 'chart', t: 'Listing presentation', s: 'Seller slides: how you market and sell a home', links: [['Present', 'https://claude.ai/artifact/EeSHsjer6ZmdwBeXiqkh41'], ['Web version', 'https://homes.ranchpnw.com/sell']] },
   { ico: 'doc', t: 'Seller brochure', s: 'Print piece to leave behind at the appointment', links: [['Open to print', 'https://claude.ai/artifact/Lhphx7onzrptYRs3VVsihc']] },
+  { ico: 'chart', t: 'Buyer presentation', s: 'The buyer consult: their top three, how we’re different, Unlisted, their Buyer Pass and how we win offers. One for you, one for Hannah.', links: [['Present (Chris)', 'https://claude.ai/artifact/ANSsZV3bvXC82Un5AvmKBP'], ['Hannah’s version', 'https://claude.ai/artifact/PzJ52pxGrTZCVpuPVNuV5p'], ['Sample buyer portal', 'https://homes.ranchpnw.com/buyers.html#demo']] },
   { ico: 'globe', t: 'CMA & launch plan', s: 'The plan every seller gets. Show this example at a drop-off or a two-step appointment. Each seller’s own plan lives on their listing’s Desk.', links: [['Open the example', 'https://homes.ranchpnw.com/plan/sample-27a4f7d745.html']] },
   { ico: 'phone', t: 'For agents', s: 'Why agents join The Ranch Real Estate Group', links: [['Present', 'https://claude.ai/artifact/2tnLxKwbXZZkFd4Gz41SxZ']] },
   { ico: 'globe', t: 'For brokerages', s: 'Groundwork: the system as a product', links: [['Present', 'https://claude.ai/artifact/D8brh9kw3wY32NKdebFzqE']] }
@@ -174,7 +175,7 @@ const I = {
 
 /* ---------- loading ---------- */
 async function loadSheet() {
-  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:Q300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000", sellertl: "'Seller timeline'!A1:E300", mchanges: "'Marketing changes'!A1:G400" };
+  const tabs = { leads: 'Leads!A1:J400', listings: 'Listings!A1:J60', deals: 'Deals!A1:J300', checks: 'Checks!A1:E400', portals: 'Portals!A1:F200', marketing: 'Marketing!A1:E200', docs: 'Documents!A1:F400', showings: "'Showing agents'!A1:J500", done: "'Hub done'!A1:D2000", shoots: "'Photo shoots'!A1:K200", offers: 'Offers!A1:Q300', shadow: "'TC shadow'!A1:L1500", tcfb: "'TC feedback'!A1:E3000", sellertl: "'Seller timeline'!A1:E300", mchanges: "'Marketing changes'!A1:G400", buyers: 'Buyers!A1:M300', banswers: "'Buyer answers'!A1:G1500", bhomes: "'Buyer homes'!A1:H1500" };
   const out = {};
   await Promise.all(Object.keys(tabs).map(async k => { try { out[k] = await sheetRows(tabs[k]); } catch (e) { out[k] = null; S.err.sheet = e.message || String(e); } }));
   S.sheet = out; S.at = Date.now();
@@ -545,6 +546,11 @@ function needs() {
     const body = showText('fb', first, showAddr(r[1]), at);
     out.push({ ico: I.phone, t: `Feedback · ${street}`, s: `${r[3] || 'Buyer’s agent'}${r[4] ? ' · ' + r[4] : ''} · showed ${new Date(at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`, acts: `<a class="pill" href="sms:${esc(ph)}?&body=${encodeURIComponent(body)}">Text for feedback</a><a class="pill ghost" href="tel:${esc(ph)}">Call</a><button class="pill ghost" data-act="fbok" data-k="${esc(r[0])}" data-a="${esc(street + ' · ' + (r[3] || 'Agent'))}">Got feedback</button>` });
   });
+  { const B = buyersList(), nm = c => (B.find(x => x.code === String(c).toUpperCase()) || {}).names || 'A buyer';
+    (sh.banswers || []).filter(r => r[4] !== '(skipped)' && Date.now() - toDate(r[0]) < 7 * 864e5 && !doneIds().has('ba:' + r[0] + '|' + r[1] + '|' + r[2])).slice(-5).reverse().forEach(r =>
+      out.push({ ico: I.check || I.doc, t: `Buyer · ${nm(r[1])} answered`, s: `${r[3] || r[2]}: ${r[4] || ''}${r[5] ? ' · ' + r[5] : ''}`, acts: `<button class="pill" data-act="buyer" data-a="${esc(r[1])}">Open buyer</button><button class="pill ghost" data-act="leaddone" data-k="${esc('ba:' + r[0] + '|' + r[1] + '|' + r[2])}" data-a="${esc('Buyer answer · ' + nm(r[1]))}">Seen</button>` }));
+    (sh.bhomes || []).filter(r => r[6] === 'Buyer' && Date.now() - toDate(r[0]) < 7 * 864e5 && !doneIds().has('bh:' + r[0] + '|' + r[1])).slice(-5).reverse().forEach(r =>
+      out.push({ ico: I.star || I.doc, t: r[7] === 'Got away' ? `${nm(r[1])} sent a home that got away` : `${nm(r[1])} sent a home they love`, s: [r[3] || r[2], r[4]].filter(Boolean).join(' · '), acts: `${r[3] ? `<a class="pill" href="${esc(r[3])}" target="_blank" rel="noopener">See it</a>` : ''}<button class="pill ghost" data-act="buyer" data-a="${esc(r[1])}">Open buyer</button><button class="pill ghost" data-act="leaddone" data-k="${esc('bh:' + r[0] + '|' + r[1])}" data-a="${esc('Buyer home · ' + nm(r[1]))}">Seen</button>` })); }
   (sh.leads || []).filter(r => r[9] === 'New' && r[8] !== 'test' && Date.now() - toDate(r[0]) < 7 * 864e5 && !doneIds().has('lead:' + r[0] + '|' + (r[4] || r[3]))).slice(-6).reverse().forEach(r => {
     const tel = String(r[3] || '').replace(/[^\d+]/g, '');
     out.push({ ico: I.phone, t: `${r[1]} · ${r[2]}`, s: [r[6], r[5]].filter(Boolean).join(' · '), acts: [tel ? `<a class="pill" href="tel:${esc(tel)}">Call</a>` : '', tel ? `<a class="pill ghost" href="sms:${esc(tel)}">Text</a>` : '', r[4] ? `<a class="pill ghost" href="mailto:${esc(r[4])}">Email</a>` : '', `<button class="pill ghost" data-act="leaddone" data-k="${esc('lead:' + r[0] + '|' + (r[4] || r[3]))}" data-a="${esc(r[1] + ' · ' + r[2])}">Handled</button>`].join('') });
@@ -640,7 +646,7 @@ function render() {
   <div class="hello"><p class="date">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
     <h1>${hi}, Chris.</h1>
     <p class="status"><span class="dot${n.length ? '' : ''}"></span>${esc(statusLine)}</p></div>
-  <nav class="jump" aria-label="Jump to">${[['needs','Up next'],['listings','Listings'],['deals','Deals'],['kit','Templates'],['sites','Sites'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
+  <nav class="jump" aria-label="Jump to">${[['needs','Up next'],['listings','Listings'],['deals','Deals'],['buyers','Buyers'],['kit','Templates'],['sites','Sites'],['today','Today'],['inbox','Inbox']].map(([id, l]) => `<a href="#${id}">${l}</a>`).join('')}</nav>
   ${!caps.mcp && S.ready && !S.officeMode ? `<section><div class="group"><div class="row"><div class="ico">${I.globe}</div><div class="body"><div class="t">Open Ranch on claude.ai</div><div class="s">Your Gmail, Sheet and social accounts connect there. This view is a preview.</div></div></div></div></section>` : ''}
 
   <section aria-label="Up next" data-tone="need" id="needs"><div class="h2row"><h2>Up next</h2><button class="linkbtn" data-act="refresh" ${S.busy.all ? 'disabled' : ''}>${S.busy.all ? 'Refreshing…' : 'Refresh'}</button></div>
@@ -653,6 +659,10 @@ function render() {
 
   <section aria-label="Deals" data-tone="need" id="deals"><div class="h2row"><h2>Deals</h2><span class="note" style="margin:0">Shadow mode · nothing sends</span></div>
     <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : liveDeals().length ? liveDeals().map(d => `<button class="lrow" data-act="tc" data-a="${esc(d.address)}"><span class="body"><span class="t" style="display:block">${d.urgent ? '<span class="tag now">Urgent</span>' : ''}${esc(d.address)}</span><span class="s" style="display:block">${esc([d.next ? 'Next: ' + String(d.next.r[2]).slice(0, 60) + ' · ' + new Date(d.next.t).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : d.rows.length ? '' : 'Waiting on mutual acceptance', d.waiting ? d.waiting + ' need' + (d.waiting > 1 ? '' : 's') + ' you' : '', d.rows.length ? d.rows.length + ' logged' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No live deals. When one goes pending, its timeline and your TC’s drafts show up here.</div>'}</div></section>
+
+  <section aria-label="Buyers" data-tone="list" id="buyers"><div class="h2row"><h2>Buyers</h2><button class="linkbtn" data-act="buyeradd">Add a buyer</button></div>
+    <div class="group">${!S.sheet ? '<div class="empty"><div class="skel"></div></div>' : buyersList().length ? buyersList().map(b => `<button class="lrow" data-act="buyer" data-a="${esc(b.code)}"><span class="body"><span class="t" style="display:block">${esc(b.names)}</span><span class="s" style="display:block">${esc([b.stage, b.areas, b.price, b.agent !== 'Chris' ? 'with ' + b.agent : '', b.answered ? b.answered + ' answer' + (b.answered > 1 ? 's' : '') : '', b.away ? b.away + ' that got away' : ''].filter(Boolean).join(' · '))}</span></span>${I.chev}</button>`).join('') : '<div class="empty">No buyers yet. Add one, or they start a Buyer Pass at your open houses.</div>'}</div>
+    <p class="note">Each buyer has a private portal: quick questions, homes you pick, the ones that got away, and Unlisted. Screenshots they send land in your Gmail.</p></section>
 
   <section aria-label="Presentations" data-tone="biz" id="kit"><div class="h2row"><h2>Presentations &amp; templates</h2></div>
     <div class="group">${KIT.map(k => `<div class="row"><div class="ico">${I[k.ico] || I.check}</div><div class="body"><div class="t">${esc(k.t)}</div><div class="s">${esc(k.s)}</div></div><div class="acts">${k.links.map((l, i) => `<a class="pill${i ? ' ghost' : ''}" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div></div>`).join('')}</div>
@@ -696,6 +706,35 @@ function render() {
   ${typeof ImproveUI !== 'undefined' ? `<div style="padding-bottom:96px">${ImproveUI.tools()}</div>` : ''}
   <div class="dock"><form id="tell" autocomplete="off"><input id="tellq" placeholder="Ask your Concierge… “who should I call today?”" aria-label="Ask your Concierge"><button aria-label="Go">${I.up}</button></form></div>`;
 }
+
+/* ---------- buyers: portal at homes.ranchpnw.com/buyers.html ---------- */
+const BUYER_PORTAL = 'https://homes.ranchpnw.com/buyers.html';
+const BUYER_STAGES = ['Getting started', 'Consult', 'Pre-approved', 'Searching', 'Touring', 'Offer', 'Under contract', 'Keys'];
+function buyersList() { const sh = S.sheet || {}, ans = sh.banswers || [], hm = sh.bhomes || [];
+  return (sh.buyers || []).filter(r => r[0]).map((r, i) => { const code = String(r[0]).toUpperCase();
+    return { row: i + 2, code, names: String(r[1] || ''), agent: String(r[2] || 'Chris'), stage: String(r[4] || 'Getting started'), areas: String(r[5] || ''), price: String(r[6] || ''), top3: String(r[7] || ''), unlisted: String(r[8] || ''), phone: String(r[9] || ''), email: String(r[10] || ''), from: String(r[11] || ''),
+      answered: ans.filter(a => String(a[1]).toUpperCase() === code && a[4] !== '(skipped)').length, away: hm.filter(h => String(h[1]).toUpperCase() === code && h[7] === 'Got away').length }; }); }
+function buyerSheet(code) {
+  const b = buyersList().find(x => x.code === String(code).toUpperCase()); if (!b) return toast('That buyer isn’t in the Sheet yet. Refresh.');
+  const sh = S.sheet || {}, ans = (sh.banswers || []).filter(a => String(a[1]).toUpperCase() === b.code && a[4] !== '(skipped)'), hm = (sh.bhomes || []).filter(h => String(h[1]).toUpperCase() === b.code), link = BUYER_PORTAL + '#code=' + b.code, tel = b.phone.replace(/[^\d]/g, '').replace(/^1?(\d{10})$/, '+1$1');
+  sheet(`<p class="date">Buyer · ${esc(b.agent === 'Chris' ? 'yours' : 'with ' + b.agent)}${b.from ? ' · ' + esc(b.from) : ''}</p><h3>${esc(b.names)}</h3>
+    <div class="acts" style="margin:4px 0 14px;flex-wrap:wrap">${BUYER_STAGES.map(st => `<button class="pill${st === b.stage ? '' : ' ghost'}" data-act="buyerstage" data-a="${esc(b.code)}" data-v="${esc(st)}">${esc(st)}</button>`).join('')}</div>
+    <p class="s" style="margin:0 0 12px">${esc([b.top3 && 'Top 3: ' + b.top3, b.areas && 'Where: ' + b.areas, b.price && 'Price: ' + b.price, b.unlisted && 'Unlisted: ' + b.unlisted].filter(Boolean).join(' · ') || 'No answers yet.')}</p>
+    ${ans.length ? `<h4 class="mini">Their answers</h4><div class="group" style="margin-bottom:12px">${ans.slice(-8).reverse().map(a => `<div class="row plain"><div class="body"><div class="t" style="font-size:15px">${esc(a[3] || a[2])}</div><div class="s">${esc(a[4] || '')}${a[5] ? ' · ' + esc(a[5]) : ''}</div></div></div>`).join('')}</div>` : ''}
+    ${hm.length ? `<h4 class="mini">Homes</h4><div class="group" style="margin-bottom:12px">${hm.slice(-8).reverse().map(h => `<div class="row plain"><div class="body"><div class="t" style="font-size:15px">${h[3] ? `<a href="${esc(h[3])}" target="_blank" rel="noopener">${esc(h[2])}</a>` : esc(h[2])}</div><div class="s">${esc([h[7], h[5] && 'Their take: ' + h[5], h[4]].filter(Boolean).join(' · '))}</div></div></div>`).join('')}</div>` : ''}
+    <div class="acts" style="flex-wrap:wrap"><a class="pill" href="${esc(link)}" target="_blank" rel="noopener">Open their portal</a><button class="pill ghost" data-act="buyercopy" data-a="${esc(link)}">Copy their link</button>${tel ? `<a class="pill ghost" href="sms:${esc(tel)}?&body=${encodeURIComponent('Here’s your private buyer portal: ' + link)}">Text them their link</a>` : ''}</div>
+    <h4 class="mini" style="margin-top:18px">Ask them something</h4>
+    <form id="bqf" class="form"><input name="q" placeholder="Your question, e.g. How big a shop do you need?" required><input name="why" placeholder="Why it helps them (shown under the question)"><select name="kind"><option value="pick">Tap one answer</option><option value="many">Tap several</option><option value="text">Type an answer</option><option value="photo">Send a photo or screenshot</option></select><input name="opts" placeholder="Answers to tap, separated by |  e.g. Two-car | Three-car | A real shop"><button class="pill" data-act="buyerask" data-a="${esc(b.code)}" type="button">Add to their portal</button></form>
+    <h4 class="mini" style="margin-top:18px">Pick a home for them</h4>
+    <form id="bhf" class="form"><input name="address" placeholder="Address or a short title" required><input name="link" placeholder="Link (optional)"><input name="note" placeholder="Why it fits (they’ll see this)"><button class="pill" data-act="buyerhome" data-a="${esc(b.code)}" type="button">Add to their portal</button></form>
+    <h4 class="mini" style="margin-top:18px">Post an update</h4>
+    <form id="buf" class="form"><input name="title" placeholder="Title, e.g. Three owners said maybe" required><textarea name="msg" rows="3" placeholder="They’ll see this in their portal, in your words." required></textarea><button class="pill" data-act="buyerupd" data-a="${esc(b.code)}" type="button">Post to their portal</button></form>
+    <p class="note">Nothing here emails or texts them. It shows in their portal the next time they open it.</p><div class="acts"><button class="pill ghost" data-act="close">Done</button></div>`);
+}
+function buyerAddSheet() {
+  sheet(`<p class="date">New buyer</p><h3>Start their buyer portal</h3><form id="baf" class="form"><input name="names" placeholder="Names, e.g. Sam and Alex Rivera" required><input name="email" type="email" placeholder="Email"><input name="phone" placeholder="Phone"><select name="agent"><option value="Chris">Chris</option><option value="Hannah">Hannah</option></select><button class="pill" data-act="buyeraddgo" type="button">Create their portal</button></form><p class="note">They get a private code and link. You send it when you’re ready.</p>`);
+}
+function newBuyerCode(names) { const ini = ((names.match(/\b[A-Za-z]/g) || ['B']).slice(0, 2).join('').toUpperCase() + 'X').slice(0, 2); const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; const r = new Uint32Array(6); crypto.getRandomValues(r); r.forEach(n => c += ch[n % ch.length]); return ini + '-' + c; }
 function tile(cls, live, k, s) { return `<div class="tile"><span class="live ${cls}">${esc(live)}</span><span style="font-size:16px;font-weight:500">${esc(k)}</span><span style="font-size:13px;color:var(--muted);line-height:1.4">${esc(s)}</span></div>`; }
 
 /* ---------- sheets (bottom cards) ---------- */
@@ -1237,6 +1276,18 @@ document.addEventListener('click', async e => {
   else if (a === 'deal') dealSheet();
   else if (a === 'tc') tcSheet(x);
   else if (a === 'offers') offersSheet(x);
+  else if (a === 'buyer') buyerSheet(x);
+  else if (a === 'buyeradd') buyerAddSheet();
+  else if (a === 'buyercopy') { try { await navigator.clipboard.writeText(x); toast('Link copied.'); } catch (err) { toast(x); } }
+  else if (a === 'buyerstage') { const bb = buyersList().find(y => y.code === x); if (!bb) return; b.disabled = true;
+    try { await tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: 'Buyers!E' + bb.row, values: [[b.dataset.v]] }); S.sheet.buyers[bb.row - 2][4] = b.dataset.v; buyerSheet(x); toast('Their portal now shows: ' + b.dataset.v); } catch (err) { b.disabled = false; toast('Not saved. ' + (err.message || 'Try again.')); } }
+  else if (a === 'buyerask' || a === 'buyerhome' || a === 'buyerupd') { const f = $(a === 'buyerask' ? '#bqf' : a === 'buyerhome' ? '#bhf' : '#buf'); if (!f.reportValidity()) return; const v = Object.fromEntries(new FormData(f)); b.disabled = true;
+    const row = a === 'buyerask' ? ['Buyer asks', [nowStamp(), x, 'ask-' + Date.now().toString(36), v.q, v.why || '', v.kind, v.opts || '', 'Active']]
+      : a === 'buyerhome' ? ['Buyer homes', [nowStamp(), x, v.address, v.link || '', v.note || '', '', 'Chris', 'For you']] : ['Buyer updates', [nowStamp(), x, v.title, v.msg, '']];
+    try { await append(row[0], [row[1]]); const k = { 'Buyer homes': 'bhomes' }[row[0]]; if (k) (S.sheet[k] = S.sheet[k] || []).push(row[1]); f.reset(); b.disabled = false; toast('Added. It’s in their portal now.'); } catch (err) { b.disabled = false; toast('Not saved. ' + (err.message || 'Try again.')); } }
+  else if (a === 'buyeraddgo') { const f = $('#baf'); if (!f.reportValidity()) return; const v = Object.fromEntries(new FormData(f)), code = newBuyerCode(v.names); b.disabled = true;
+    const r = [code, v.names, v.agent, nowStamp(), 'Getting started', '', '', '', '', v.phone || '', (v.email || '').toLowerCase(), 'Added in the Office', ''];
+    try { await append('Buyers', [r]); (S.sheet.buyers = S.sheet.buyers || []).push(r); render(); buyerSheet(code); toast('Portal ready. Code ' + code); } catch (err) { b.disabled = false; toast('Not saved. ' + (err.message || 'Try again.')); } }
   else if (a === 'leaddone') { const id = b.dataset.k; try { const l = JSON.parse(store('done') || '[]'); l.push(id); store('done', JSON.stringify(l.slice(-300))); } catch (err) { } render(); toast('Handled. It’s off your list.'); append('Hub done', [[nowStamp(), id, 'Handled by call or text', x || '']]).catch(() => { }); }
   else if (a === 'sellerdates') sellerDatesSheet(x);
   else if (a === 'offeraccept') { const n = +b.dataset.r, r = ((S.sheet && S.sheet.offers) || [])[n - 1];
