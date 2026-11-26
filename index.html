@@ -544,7 +544,7 @@ function needs() {
   { const tl = (S.sheet && S.sheet.sellertl) || [], seen = {};
     shadowRows().filter(r => /mutual acceptance/i.test(r[2] || '') && !/^urgent: soc/i.test(r[2] || '')).forEach(r => { const n = (String(r[1]).match(/^\d{3,6}/) || [r[1]])[0];
       if (seen[n] || tl.some(x => String(x[1]).indexOf(n) === 0)) return; seen[n] = 1;
-      out.unshift({ ico: I.doc, t: `Mutual acceptance · ${r[1]}`, s: 'Congratulations. Publish the dates so your sellers see the road to closing in their portal.', acts: `<button class="pill" data-act="sellerdates" data-a="${esc(r[1])}">Publish to their portal</button>` }); }); }
+      out.unshift({ ico: I.doc, t: `Mutual acceptance · ${r[1]}`, s: 'Congratulations. Publish the dates so your sellers see the road to closing in their portal.', acts: `<button class="pill" data-act="sellerdates" data-a="${esc(r[1])}">Publish to their portal</button>${hasSocial(n, 'pending') ? '' : `<button class="pill ghost" data-act="socnow" data-a="${esc(r[1])}" data-m="pending">Make the under-contract posts now</button>`}` }); }); }
   liveDeals().filter(d => d.urgent || d.drafts).forEach(d => out.unshift({ ico: I.doc, t: `Deal · ${d.address}`, s: [d.urgent ? `${d.urgent} urgent item${d.urgent > 1 ? 's' : ''} from your TC` : '', d.drafts ? `${d.drafts} email${d.drafts > 1 ? 's' : ''} ready for you to send` : ''].filter(Boolean).join(' · '), acts: `<button class="pill" data-act="tc" data-a="${esc(d.address)}">Open deal</button>` }));
   { const open = ((S.sheet && S.sheet.offers) || []).filter(r => /^received|^countered/i.test(r[9] || '')), by = {};
     open.forEach(r => { (by[hk(r[1])] = by[hk(r[1])] || []).push(r); });
@@ -985,6 +985,7 @@ ${f.txt.value.slice(0, 8000)}`, { modelTier: 'default', cache: false });
     } catch (err) { b.disabled = false; b.textContent = 'Read with Claude'; toast('Couldn’t read those numbers — ' + (err.message || 'try again')); } };
 }
 const SOCIAL_TASK = 'trig_01HsnuhtZBs1vsjgVFT5a7rc';   // "Social posts for listing moments": writes and designs the set, then it waits here for Approve
+function hasSocial(n, ev) { return SOCIAL.some(x => x.key === String(n) && x.event === ev) || doneIds().has('socnow:' + n + ':' + ev); }
 function runSocialNow(listing, moment) { tool('Claude Code Remote', 'fire_trigger', { trigger_id: SOCIAL_TASK, text: `${listing} just moved to ${moment}. Make its ${moment} social set now.` }).catch(() => {}); }
 const MKT_TASK = 'trig_013MVf6ipKUJzSyGEJuYJkTY';   // "Listing marketing" scheduled task: run it now instead of waiting for the hour
 async function runMarketingNow(listing, piece, change) { try { await tool('Claude Code Remote', 'fire_trigger', { trigger_id: MKT_TASK, text: `Chris just asked the Concierge for a marketing change on ${listing} (${piece || 'all'}): ${change}. Do JOB 2 for it now.` }); return true; } catch (e) { return false; } }
@@ -1177,6 +1178,7 @@ document.addEventListener('click', async e => {
   else if (a === 'files') filesSheet(x);
   else if (a === 'launch') launchSheet(x);
   else if (a === 'socopen') socSheet(b.dataset.k);
+  else if (a === 'socnow') { const n = (String(b.dataset.a).match(/^\d{3,6}/) || [b.dataset.a])[0]; runSocialNow(b.dataset.a, b.dataset.m); append('Hub done', [[nowStamp(), 'socnow:' + n + ':' + b.dataset.m, 'asked for ' + b.dataset.m + ' posts', '']]).then(() => loadSheet().then(render)).catch(() => {}); toast('Making them now. They’ll show up here for your OK in a few minutes. Nothing posts until you approve.'); }
   else if (a === 'pendposted') { append('Hub done', [[nowStamp(), 'pend:' + b.dataset.k, 'pending package posted', '']]).then(() => { toast('Nice. Marked posted.'); loadSheet().then(render); }).catch(() => toast('Not saved. Try again.')); }
   else if (a === 'mchg') { const row = b.dataset.row, v2 = b.dataset.v;
     tool('Google Sheets', 'update_values', { spreadsheetId: SHEET, range: "'Marketing changes'!E" + row, values: [[v2]] })

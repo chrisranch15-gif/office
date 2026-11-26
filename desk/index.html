@@ -5675,6 +5675,7 @@ THIS WEEK: ${E.report(LID).summary}`, { modelTier: 'default', cache: false });
   'check-drive': () => checkDrive(),
   'all-photos': () => { ui.allPhotos = !ui.allPhotos; render(); },
   'check-metricool': () => checkMetricool(),
+  'soc-now': () => { ui.socNow = true; render(); callTool('Claude Code Remote', 'fire_trigger', { trigger_id: 'trig_01HsnuhtZBs1vsjgVFT5a7rc', text: `${street()} is under contract. Make its pending social set now.` }).then(() => toast('Making them now. Nothing posts until you approve.')).catch(() => { ui.socNow = false; toast('Couldn’t start it here. It will still be made on the next check.'); render(); }); },
   gmail: el => { const st = settings(); st.gmail = el.dataset.v; if (st.gmail === 'drafts') st.gmailSince = Date.now(); dirty = true; scheduleSave(); render(); if (st.gmail === 'drafts' && !L().sellers[0].email) toast('Add your seller’s email in step 4.'); },
   suggest: () => aiSuggest(),
   'do-suggest': el => { const x = (ui.suggest || ruleSuggestions())[el.dataset.i * 1]; if (!x) return;
@@ -6098,7 +6099,9 @@ function assetsBlock() {
   order.forEach(([k, g]) => all.filter(a => a.kind === k).forEach(a => (groups[g] = groups[g] || []).push(a)));
   const hasLooks = every.some(a => a.look);
   const soc = (typeof SocialUI !== 'undefined' && caps.mcp !== undefined) ? SocialUI.html(num) : '';
-  return `${soc ? `<div class="sharebar" id="social"><div class="eyebrow">Social posts · see them as they’ll look, then approve</div><p class="small muted" style="margin:6px 0 0">Nothing posts until you tap Approve. Then it’s scheduled in Metricool for the time shown.</p>${soc}</div>` : ''}<div class="sharebar" id="assets"><div class="eyebrow">Marketing assets · ${all.length}</div>
+  const pendNow = pendingDeal() && !(typeof SOCIAL !== 'undefined' && SOCIAL.some(x => x.key === num && x.event === 'pending')) && caps.mcp
+    ? `<div class="sharebar" id="socnow"><div class="eyebrow">Under contract posts</div><p class="small muted" style="margin:6px 0 10px">Made automatically once the contract shows up. Want them now?</p><button class="btn" data-act="soc-now" ${ui.socNow ? 'disabled' : ''}>${ui.socNow ? 'Making them · back here in a few minutes' : 'Make the under-contract posts now'}</button></div>` : '';
+  return `${pendNow}${soc ? `<div class="sharebar" id="social"><div class="eyebrow">Social posts · see them as they’ll look, then approve</div><p class="small muted" style="margin:6px 0 0">Nothing posts until you tap Approve. Then it’s scheduled in Metricool for the time shown.</p>${soc}</div>` : ''}<div class="sharebar" id="assets"><div class="eyebrow">Marketing assets · ${all.length}</div>
     ${hasLooks ? `<div style="margin-top:10px"><span class="small muted">Look</span> <span class="seg" role="group" aria-label="Marketing look">${LOOK_NAMES.map(([k, n]) => `<button data-act="mode" data-v="${k}" aria-pressed="${look === k}">${n}</button>`).join('')}</span></div>
     <p class="small muted" style="margin:8px 0 0">Every piece is made in all three looks at launch, so switching is instant. The look you pick here is the one you share and print.</p>` : '<p class="small muted" style="margin:6px 0 0">Everything made for this listing. Tap to open, or copy a link to send.</p>'}
     ${Object.keys(groups).map(g => `<div class="small" style="font-weight:600;margin:16px 0 8px">${esc(g)}</div>${/^(Print|Day one)/.test(g) ? '<p class="small muted" style="margin:-4px 0 8px">Print-ready PDFs. Open the ones you want and print them, or send them to your printer or mail house.</p>' : ''}<div class="agrid">${groups[g].map(tile).join('')}</div>`).join('')}
