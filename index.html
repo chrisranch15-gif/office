@@ -1401,7 +1401,7 @@ const SocialUI = (() => {
       ${s.err ? `<p class="socp-err">${e(s.err)}</p>` : ''}
       <div class="socp-acts">${local ? `<span class="socp-note">Approve from your Office in the Claude app, where Metricool is connected.</span>` : `<button class="socp-btn" data-soc="approve" data-k="${e(k)}" ${s.busy ? 'disabled' : ''}>${s.busy ? 'Scheduling…' : 'Approve'}</button>`}
         <button class="socp-btn ghost" data-soc="edit" data-k="${e(k)}">${s.edit ? 'Done editing' : 'Edit'}</button>
-        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener" download>Full size</a></div>
+        <a class="socp-btn ghost" href="${e(p.urls[0])}" target="_blank" rel="noopener">Full size</a></div>
       ${!local ? `<p class="socp-note">Approve schedules it for the time above${p.network === 'gmb' ? '' : ''}. Want a different photo or line? Tell the Concierge and it comes back here for your OK.</p>` : ''}`}
     </div>`;
   }
